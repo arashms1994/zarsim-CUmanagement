@@ -7,6 +7,7 @@ import { Controller, useForm } from "react-hook-form";
 // import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
 import type { IExitFormProps } from "../types/type";
 import { useSearchSubProductionPlans } from "../hooks/useSearchSubProductionPlans";
+import { getSubProductionPlanByCart } from "../api/getData";
 
 export default function ProductionExitForm() {
   const { control, setValue } = useForm<IExitFormProps>();
@@ -19,7 +20,6 @@ export default function ProductionExitForm() {
     handleSearch,
   } = useSearchSubProductionPlans();
 
-
   // const handleProductionSubmit = async (
   //   data: IExitFormProps,
   //   planItem: IDarkhastMavadListItem,
@@ -27,7 +27,21 @@ export default function ProductionExitForm() {
   // ) => {
   //   return await submitMaterialProductionExit(data, planItem, index);
   // };
-console.log(searchResults);
+
+  const handleCartSelect = async (cartNumber: string) => {
+    setValue("productionPlanNumber", cartNumber);
+    setShowSuggestions(false);
+
+    try {
+      const planDetails = await getSubProductionPlanByCart(cartNumber);
+      console.log("اطلاعات کامل آیتم انتخاب شده:", planDetails);
+      if (planDetails.length > 0) {
+        console.log("اولین آیتم:", planDetails[0]);
+      }
+    } catch (error) {
+      console.error("خطا در دریافت اطلاعات آیتم:", error);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -89,10 +103,7 @@ console.log(searchResults);
                     <div
                       key={index}
                       className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                      onClick={() => {
-                        setValue("productionPlanNumber", plan);
-                        setShowSuggestions(false);
-                      }}
+                      onClick={() => handleCartSelect(plan)}
                     >
                       {plan}
                     </div>

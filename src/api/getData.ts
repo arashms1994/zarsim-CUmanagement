@@ -271,3 +271,54 @@ export async function searchSubProductionPlans(
 
   return uniques;
 }
+
+export async function getSubProductionPlanByCart(
+  cartNumber: string
+): Promise<ISubProductionPlanListItem[]> {
+  const listGuid = config.LIST_GUIDS.SUB_PRODUCTION_PLAN;
+  if (!cartNumber || cartNumber.trim().length === 0) return [];
+
+  let items: ISubProductionPlanListItem[] = [];
+  const encodedCartNumber = encodeURIComponent(cartNumber.trim());
+
+  let nextUrl:
+    | string
+    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$filter=shomarecart eq '${encodedCartNumber}'&$orderby=ID desc`;
+
+  try {
+    while (nextUrl) {
+      const res = await fetch(nextUrl, {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(
+          `خطا در گرفتن آیتم‌های کارت ${cartNumber}: ${err} (Status: ${res.status})`
+        );
+      }
+
+      const json: {
+        d: { results: ISubProductionPlanListItem[]; __next?: string };
+      } = await res.json();
+
+      const results = json.d?.results;
+      if (!Array.isArray(results)) {
+        throw new Error(
+          "ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست"
+        );
+      }
+
+      items = [...items, ...results];
+      nextUrl = json.d.__next ?? null;
+    }
+
+    return items;
+  } catch (err) {
+    console.error(`خطا در دریافت آیتم‌های کارت ${cartNumber}:`, err);
+    throw err;
+  }
+}
