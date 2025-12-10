@@ -4,7 +4,7 @@ import type { IDarkhastMavadListItem } from "../types/type";
 
 export const useDarkhastMavad = () => {
   return useQuery<IDarkhastMavadListItem[] | null, Error>({
-    queryKey: ["crm-notifications"],
+    queryKey: ["darkhast-mavad-list"],
     queryFn: () => getDarkhastMavadList(),
     staleTime: 1000,
   });

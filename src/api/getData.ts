@@ -4,6 +4,7 @@ import type {
   IDarkhastMavadListItem,
   ISupplierItem,
   IPersonnelItem,
+  ISubProductionPlanListItem,
 } from "../types/type";
 
 export async function getDarkhastMavadList(): Promise<
@@ -233,4 +234,40 @@ export async function getPersonnel(): Promise<IPersonnelItem[]> {
     console.error("خطا در دریافت لیست پرسنل:", err);
     throw err;
   }
+}
+
+export async function searchSubProductionPlans(
+  term: string
+): Promise<string[]> {
+  const listGuid = config.LIST_GUIDS.SUB_PRODUCTION_PLAN;
+  if (!term || term.trim().length < 2) return [];
+
+  const encodedTerm = encodeURIComponent(term.trim());
+  const url = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=Id,shomarecart&$filter=startswith(shomarecart,'${encodedTerm}')&$orderby=shomarecart&$top=50`;
+
+  const res = await fetch(url, {
+    headers: {
+      Accept: "application/json;odata=verbose",
+      "Content-Type": "application/json;odata=verbose",
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`خطا در جستجوی شماره کارت: ${err} (Status: ${res.status})`);
+  }
+
+  const json: {
+    d: { results: Pick<ISubProductionPlanListItem, "shomarecart">[] };
+  } = await res.json();
+
+  const uniques = (json.d?.results ?? [])
+    .map((i) => i.shomarecart)
+    .filter((v): v is string => Boolean(v))
+    .reduce<string[]>((acc, cur) => {
+      if (!acc.includes(cur)) acc.push(cur);
+      return acc;
+    }, []);
+
+  return uniques;
 }

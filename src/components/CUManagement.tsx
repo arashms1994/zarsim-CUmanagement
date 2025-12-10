@@ -1,53 +1,51 @@
 import { useState } from "react";
-import type { IDarkhastMavadListItem, IExitFormProps } from "../types/type";
-import { Controller, useForm } from "react-hook-form";
-import { useSearchPlans } from "../hooks/useSearchPlans";
-import { usePlanDetails } from "../hooks/usePlanDetails";
-import { submitMaterialProductionExit } from "../api/addData";
 import { Input } from "./ui/input";
-import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
 import { Stack } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
+// import { usePlanDetails } from "../hooks/usePlanDetails";
+// import { submitMaterialProductionExit } from "../api/addData";
+// import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
+import type { IExitFormProps } from "../types/type";
+import { useSearchSubProductionPlans } from "../hooks/useSearchSubProductionPlans";
 
 export default function ProductionExitForm() {
-  const { control, watch, setValue } = useForm<IExitFormProps>();
-  const selectedPlan = watch("productionPlanNumber");
+  const { control, setValue } = useForm<IExitFormProps>();
+  // const selectedPlan = watch("productionPlanNumber");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const {
     searchResults,
     isLoading: searchLoading,
     handleSearch,
-  } = useSearchPlans();
+  } = useSearchSubProductionPlans();
 
-  const { planDetails, isLoading: planLoading } = usePlanDetails(
-    selectedPlan || ""
-  );
 
-  const handleProductionSubmit = async (
-    data: IExitFormProps,
-    planItem: IDarkhastMavadListItem,
-    index: number
-  ) => {
-    return await submitMaterialProductionExit(data, planItem, index);
-  };
+  // const handleProductionSubmit = async (
+  //   data: IExitFormProps,
+  //   planItem: IDarkhastMavadListItem,
+  //   index: number
+  // ) => {
+  //   return await submitMaterialProductionExit(data, planItem, index);
+  // };
+console.log(searchResults);
 
   return (
     <div className="space-y-4">
       <div className="w-full flex flex-col items-center justify-center relative gap-8">
-      <Stack
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-            bgcolor="#1e7677"
-            width="fit-content"
-            paddingBlock={1}
-            paddingInline={3}
-            borderRadius={4}
-          >
-            <span className="text-xl font-medium text-white">
-              فرم ثبت مس مصرفی بر اساس شماره برنامه
-            </span>
-          </Stack>
+        <Stack
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          bgcolor="#1e7677"
+          width="fit-content"
+          paddingBlock={1}
+          paddingInline={3}
+          borderRadius={4}
+        >
+          <span className="text-xl font-medium text-white">
+            فرم ثبت مس مصرفی بر اساس شماره برنامه
+          </span>
+        </Stack>
 
         <div className="flex items-center justify-start gap-3">
           <label htmlFor="productionPlanNumber" className="min-w-[150px]">
@@ -110,7 +108,7 @@ export default function ProductionExitForm() {
         </div>
       </div>
 
-      {selectedPlan && (
+      {/* {selectedPlan && (
         <div className="space-y-4">
           {planLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -140,7 +138,7 @@ export default function ProductionExitForm() {
             </div>
           )}
         </div>
-      )}
+      )} */}
     </div>
   );
 }
