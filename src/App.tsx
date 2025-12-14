@@ -7,7 +7,7 @@ import { Bounce, ToastContainer } from "react-toastify";
 import { CssBaseline, Stack } from "@mui/material";
 import AppProvider from "./providers/AppProvider.tsx";
 import { CacheProvider, ThemeProvider } from "@emotion/react";
-import MaterialManagement from "./components/CUManagement.tsx";
+import CUManagement from "./components/CUManagement.tsx";
 
 const cacheRtl = createCache({
   key: "muirtl",
@@ -27,7 +27,7 @@ function App() {
         <CacheProvider value={cacheRtl}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <MaterialManagement />
+            <CUManagement />
             <ToastContainer
               position="top-center"
               autoClose={3000}

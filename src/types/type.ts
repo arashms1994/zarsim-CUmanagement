@@ -20,15 +20,15 @@ export interface IProductionPlanRowFormProps {
   index?: number;
   onDelete?: () => void;
   showDeleteButton?: boolean;
-  planItem: IDarkhastMavadListItem;
+  planItem: ISubProductionPlanListItem;
   onSubmit?: (
-    data: IExitFormProps,
-    planItem: IDarkhastMavadListItem,
+    data: ICUManagementFormProps,
+    planItem: ISubProductionPlanListItem,
     index: number
   ) => Promise<{ success: boolean; message: string }>;
 }
 
-export interface IExitFormProps {
+export interface ICUManagementFormProps {
   firstName: string;
   productionPlanNumber: string;
   materialCategories: string;
@@ -149,6 +149,7 @@ export interface IMaterialChargeListItem {
 
 export interface ISubProductionPlanListItem {
   FileSystemObjectType: number;
+  Priority: string;
   Id: number;
   ContentTypeId: string;
   Title: string;

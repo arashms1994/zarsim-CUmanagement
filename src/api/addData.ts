@@ -1,7 +1,7 @@
 import { config } from "./config";
 import type {
   IEnterFormInput,
-  IExitFormProps,
+  ICUManagementFormProps,
   IDarkhastMavadListItem,
 } from "../types/type";
 import { BASE_URL } from "./base";
@@ -64,7 +64,7 @@ export async function submitMaterialChargeEntry(
 }
 
 export async function submitMaterialChargeExit(
-  formData: IExitFormProps,
+  formData: ICUManagementFormProps,
   planItem: IDarkhastMavadListItem,
   index: number
 ): Promise<{ success: boolean; message: string }> {
@@ -129,7 +129,7 @@ export async function submitMaterialChargeExit(
 }
 
 export async function submitMaterialProductionExit(
-  formData: IExitFormProps,
+  formData: ICUManagementFormProps,
   planItem: IDarkhastMavadListItem,
   index: number
 ): Promise<{ success: boolean; message: string }> {
