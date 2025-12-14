@@ -54,11 +54,30 @@ export default function CUManagement() {
     if (!selectedStage) return [];
     if (!selectedMachine) return [];
 
-    return planDetails.filter(
+    const filtered = planDetails.filter(
       (item) =>
         item.namemarhale === selectedStage &&
         item.namedastghah === selectedMachine
     );
+
+    if (filtered.length === 0) return [];
+
+    // ادغام همه ردیف‌ها به یک ردیف واحد
+    const mergedItem = { ...filtered[0] }; // کپی اولین ردیف
+
+    // جمع کردن meghdartoliddaremroz (تبدیل به number قبل از جمع)
+    mergedItem.meghdartoliddaremroz = filtered.reduce((sum, item) => {
+      const value = Number(item.meghdartoliddaremroz) || 0;
+      return sum + value;
+    }, 0);
+
+    // جمع کردن meghdarkolesefaresh (تبدیل به number قبل از جمع)
+    mergedItem.meghdarkolesefaresh = filtered.reduce((sum, item) => {
+      const value = Number(item.meghdarkolesefaresh) || 0;
+      return sum + value;
+    }, 0);
+
+    return [mergedItem];
   }, [planDetails, selectedStage, selectedMachine]);
 
   const handleCartSelect = (cartNumber: string) => {
@@ -83,7 +102,7 @@ export default function CUManagement() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex flex-col items-center justify-center">
       <div className="w-full flex flex-col items-center justify-center relative gap-8">
         <Stack
           direction="row"
@@ -171,7 +190,6 @@ export default function CUManagement() {
             </div>
           ) : planDetails.length > 0 ? (
             <>
-              {/* فیلتر مرحله */}
               <div className="flex items-center justify-start gap-3">
                 <label htmlFor="stage-select" className="min-w-[150px]">
                   مرحله را انتخاب کنید:
@@ -230,7 +248,6 @@ export default function CUManagement() {
                 )}
               </div>
 
-              {/* فیلتر دستگاه */}
               {selectedStage && (
                 <div className="flex items-center justify-start gap-3">
                   <label htmlFor="machine-select" className="min-w-[150px]">
