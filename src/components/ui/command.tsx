@@ -1,14 +1,14 @@
 "use client";
 
 import { Command as CommandPrimitive } from "cmdk";
+import { cn } from "../../lib/utils";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { cn } from "../../lib/utils";
+} from "./dialog";
 
 function Command({
   className,
@@ -66,7 +66,19 @@ function CommandInput({
       data-slot="command-input-wrapper"
       className="flex h-9 items-center gap-2 border-b px-3"
     >
-      <SearchIcon className="size-4 shrink-0 opacity-50" />
+      <svg
+        className="size-4 shrink-0 opacity-50"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(

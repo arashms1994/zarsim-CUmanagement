@@ -1,18 +1,24 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Input } from "./ui/input";
 import { Stack } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-// import { usePlanDetails } from "../hooks/usePlanDetails";
-// import { submitMaterialProductionExit } from "../api/addData";
-// import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
-import type { IExitFormProps } from "../types/type";
+import type { ICUManagementFormProps } from "../types/type";
 import { useSearchSubProductionPlans } from "../hooks/useSearchSubProductionPlans";
-import { getSubProductionPlanByCart } from "../api/getData";
+import { useSubProductionPlanByCart } from "../hooks/useSubProductionPlanByCart";
+import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
 
-export default function ProductionExitForm() {
-  const { control, setValue } = useForm<IExitFormProps>();
-  // const selectedPlan = watch("productionPlanNumber");
+export default function CUManagement() {
+  const { control, setValue, watch } = useForm<ICUManagementFormProps>();
+  const selectedPlan = watch("productionPlanNumber");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showStageDropdown, setShowStageDropdown] = useState(false);
+  const [showMachineDropdown, setShowMachineDropdown] = useState(false);
+  const [selectedStage, setSelectedStage] = useState<string | undefined>(
+    undefined
+  );
+  const [selectedMachine, setSelectedMachine] = useState<string | undefined>(
+    undefined
+  );
 
   const {
     searchResults,
@@ -20,27 +26,60 @@ export default function ProductionExitForm() {
     handleSearch,
   } = useSearchSubProductionPlans();
 
-  // const handleProductionSubmit = async (
-  //   data: IExitFormProps,
-  //   planItem: IDarkhastMavadListItem,
-  //   index: number
-  // ) => {
-  //   return await submitMaterialProductionExit(data, planItem, index);
-  // };
+  const { planDetails, isLoading: planLoading } =
+    useSubProductionPlanByCart(selectedPlan);
 
-  const handleCartSelect = async (cartNumber: string) => {
+  const uniqueStages = useMemo(() => {
+    if (!planDetails || planDetails.length === 0) return [];
+    const stages = planDetails
+      .map((item) => item.namemarhale)
+      .filter(
+        (stage): stage is string => Boolean(stage) && stage.trim().length > 0
+      );
+    const unique = Array.from(new Set(stages));
+    return unique;
+  }, [planDetails]);
+
+  const availableMachines = useMemo(() => {
+    if (!selectedStage || !planDetails || planDetails.length === 0) return [];
+    const machines = planDetails
+      .filter((item) => item.namemarhale === selectedStage)
+      .map((item) => item.namedastghah)
+      .filter((machine): machine is string => Boolean(machine));
+    return Array.from(new Set(machines));
+  }, [planDetails, selectedStage]);
+
+  const filteredPlanDetails = useMemo(() => {
+    if (!planDetails || planDetails.length === 0) return [];
+    if (!selectedStage) return [];
+    if (!selectedMachine) return [];
+
+    return planDetails.filter(
+      (item) =>
+        item.namemarhale === selectedStage &&
+        item.namedastghah === selectedMachine
+    );
+  }, [planDetails, selectedStage, selectedMachine]);
+
+  const handleCartSelect = (cartNumber: string) => {
     setValue("productionPlanNumber", cartNumber);
     setShowSuggestions(false);
+    setSelectedStage(undefined);
+    setSelectedMachine(undefined);
+    setShowStageDropdown(false);
+    setShowMachineDropdown(false);
+  };
 
-    try {
-      const planDetails = await getSubProductionPlanByCart(cartNumber);
-      console.log("اطلاعات کامل آیتم انتخاب شده:", planDetails);
-      if (planDetails.length > 0) {
-        console.log("اولین آیتم:", planDetails[0]);
-      }
-    } catch (error) {
-      console.error("خطا در دریافت اطلاعات آیتم:", error);
-    }
+  const handleStageChange = (stage: string) => {
+    setSelectedStage(stage);
+    setSelectedMachine(undefined);
+    setShowStageDropdown(false);
+    setShowMachineDropdown(false);
+  };
+
+  const handleMachineChange = (machine: string) => {
+    setSelectedMachine(machine);
+    setShowMachineDropdown(false);
   };
 
   return (
@@ -119,7 +158,7 @@ export default function ProductionExitForm() {
         </div>
       </div>
 
-      {/* {selectedPlan && (
+      {selectedPlan && (
         <div className="space-y-4">
           {planLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -131,14 +170,153 @@ export default function ProductionExitForm() {
               </div>
             </div>
           ) : planDetails.length > 0 ? (
-            planDetails.map((planItem, index) => (
-              <ProductionPlanRowForm
-                key={index}
-                index={index}
-                planItem={planItem}
-                onSubmit={handleProductionSubmit}
-              />
-            ))
+            <>
+              {/* فیلتر مرحله */}
+              <div className="flex items-center justify-start gap-3">
+                <label htmlFor="stage-select" className="min-w-[150px]">
+                  مرحله را انتخاب کنید:
+                </label>
+                {uniqueStages.length > 0 ? (
+                  <div className="relative">
+                    <div
+                      onClick={() => setShowStageDropdown(!showStageDropdown)}
+                      onBlur={() =>
+                        setTimeout(() => setShowStageDropdown(false), 200)
+                      }
+                      tabIndex={0}
+                      className="w-[250px] px-3 py-2 text-sm border border-gray-300 rounded-md bg-white cursor-pointer hover:bg-gray-50 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#1e7677]"
+                    >
+                      <span className={selectedStage ? "" : "text-gray-500"}>
+                        {selectedStage || "مرحله را انتخاب کنید..."}
+                      </span>
+                      <svg
+                        className={`w-4 h-4 transition-transform ${
+                          showStageDropdown ? "rotate-180" : ""
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                    {showStageDropdown && (
+                      <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {uniqueStages.map((stage, index) => (
+                          <div
+                            key={`${stage}-${index}`}
+                            className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${
+                              selectedStage === stage
+                                ? "bg-[#1e7677] text-white"
+                                : "hover:bg-gray-100"
+                            }`}
+                            onClick={() => handleStageChange(stage)}
+                          >
+                            {stage}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="w-[250px] px-3 py-2 text-sm text-gray-500 border border-gray-300 rounded-md bg-gray-50">
+                    هیچ مرحله‌ای یافت نشد (تعداد ردیف‌ها: {planDetails.length})
+                  </div>
+                )}
+              </div>
+
+              {/* فیلتر دستگاه */}
+              {selectedStage && (
+                <div className="flex items-center justify-start gap-3">
+                  <label htmlFor="machine-select" className="min-w-[150px]">
+                    دستگاه را انتخاب کنید:
+                  </label>
+                  <div className="relative">
+                    <div
+                      onClick={() =>
+                        setShowMachineDropdown(!showMachineDropdown)
+                      }
+                      onBlur={() =>
+                        setTimeout(() => setShowMachineDropdown(false), 200)
+                      }
+                      tabIndex={0}
+                      className="w-[250px] px-3 py-2 text-sm border border-gray-300 rounded-md bg-white cursor-pointer hover:bg-gray-50 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#1e7677]"
+                    >
+                      <span className={selectedMachine ? "" : "text-gray-500"}>
+                        {selectedMachine || "دستگاه را انتخاب کنید..."}
+                      </span>
+                      <svg
+                        className={`w-4 h-4 transition-transform ${
+                          showMachineDropdown ? "rotate-180" : ""
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                    {showMachineDropdown && (
+                      <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {availableMachines.map((machine, index) => (
+                          <div
+                            key={`${machine}-${index}`}
+                            className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${
+                              selectedMachine === machine
+                                ? "bg-[#1e7677] text-white"
+                                : "hover:bg-gray-100"
+                            }`}
+                            onClick={() => handleMachineChange(machine)}
+                          >
+                            {machine}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* نمایش ردیف‌های فیلتر شده */}
+              {selectedStage && selectedMachine ? (
+                filteredPlanDetails.length > 0 ? (
+                  filteredPlanDetails.map((planItem, index) => (
+                    <ProductionPlanRowForm
+                      key={index}
+                      index={index}
+                      planItem={planItem}
+                    />
+                  ))
+                ) : (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-6 py-4">
+                      <span className="text-yellow-700 font-medium">
+                        هیچ ردیفی برای مرحله "{selectedStage}" و دستگاه "
+                        {selectedMachine}" یافت نشد
+                      </span>
+                    </div>
+                  </div>
+                )
+              ) : (
+                <div className="flex items-center justify-center py-8">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg px-6 py-4">
+                    <span className="text-blue-700 font-medium">
+                      لطفاً مرحله و دستگاه را انتخاب کنید
+                    </span>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="flex items-center justify-center py-8">
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-6 py-4">
@@ -149,7 +327,7 @@ export default function ProductionExitForm() {
             </div>
           )}
         </div>
-      )} */}
+      )}
     </div>
   );
 }
