@@ -189,7 +189,7 @@ export default function CUManagement() {
               </div>
             </div>
           ) : planDetails.length > 0 ? (
-            <>
+            <div className="w-full flex flex-col items-center justify-center gap-5 mt-1">
               <div className="flex items-center justify-start gap-3">
                 <label htmlFor="stage-select" className="min-w-[150px]">
                   مرحله را انتخاب کنید:
@@ -333,7 +333,7 @@ export default function CUManagement() {
                   </div>
                 </div>
               )}
-            </>
+            </div>
           ) : (
             <div className="flex items-center justify-center py-8">
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-6 py-4">
