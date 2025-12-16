@@ -16,6 +16,17 @@ export interface IPersianDatePickerProps {
   value: string | Date | DateObject | null;
 }
 
+export interface IStopReasonSelectorProps {
+  stopReason: string;
+  onStopReasonChange: (value: string) => void;
+  control: any;
+}
+
+export interface IOperatorSelectorProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
 export interface IProductionPlanRowFormProps {
   index?: number;
   onDelete?: () => void;
@@ -43,6 +54,7 @@ export interface ICUManagementFormProps {
   materialExitDate: string;
   isCharge: boolean;
   actualAmountProduction?: string;
+  actualWeight?: string;
   stopTime?: string;
 }
 
