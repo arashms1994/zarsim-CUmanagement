@@ -59,40 +59,40 @@ export default function ProductionPlanRowForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
             <label className="min-w-[150px] font-medium">مرحله:</label>
-            <span className="text-lg font-normal">{planItem.namemarhale}</span>
+            <span className="text-lg font-normal">{planItem.marhale}</span>
           </div>
 
           <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
             <label className="min-w-[150px] font-medium">دستگاه:</label>
-            <span className="text-lg font-normal">{planItem.namedastghah}</span>
+            <span className="text-lg font-normal">{planItem.dasatghah}</span>
           </div>
 
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
+          {/* <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
             <label className="min-w-[150px] font-medium">
               دسته بندی محصول:
             </label>
             <span className="text-lg font-normal">{planItem.typename}</span>
-          </div>
+          </div> */}
 
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
+          {/* <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
             <label className="min-w-[150px] font-medium">نوع محصول:</label>
             <span className="text-lg font-normal">{planItem.typesefaresh}</span>
-          </div>
+          </div> */}
 
           <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
             <label className="min-w-[150px] font-medium">محصول:</label>
             <span className="text-lg font-normal">{planItem.codemahsol}</span>
           </div>
 
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
+          {/* <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
             <label className="min-w-[150px] font-medium">
               تاریخ برنامه ریزی:
             </label>
             <span className="text-lg font-normal">
               {planItem.tarikhbarnamerizi}
             </span>
-          </div>
-        </div>
+          </div>*/}
+        </div> 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
@@ -100,16 +100,16 @@ export default function ProductionPlanRowForm({
               مقدار برنامه ریزی شده:
             </label>
             <span className="text-lg font-normal">
-              {planItem.meghdartoliddaremroz}
+              {planItem.barnamerizi}
             </span>
           </div>
 
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
+          {/* <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
             <label className="min-w-[150px] font-medium">مقدار سفارش:</label>
             <span className="text-lg font-normal">
               {planItem.meghdarkolesefaresh}
             </span>
-          </div>
+          </div> */}
 
           {/* <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">

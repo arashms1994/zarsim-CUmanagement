@@ -2,10 +2,13 @@ import { useState, useMemo } from "react";
 import { Input } from "./ui/input";
 import { Stack } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import type { ICUManagementFormProps } from "../types/type";
-import { useSearchSubProductionPlans } from "../hooks/useSearchSubProductionPlans";
-import { useSubProductionPlanByCart } from "../hooks/useSubProductionPlanByCart";
+import { useSearchPrintTajmi } from "../hooks/useSearchPrintTajmi";
+import { usePrintTajmiByCart } from "../hooks/usePrintTajmiByCart";
 import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
+import type {
+  ICUManagementFormProps,
+  ISubProductionPlanListItem,
+} from "../types/type";
 
 export default function CUManagement() {
   const { control, setValue, watch } = useForm<ICUManagementFormProps>();
@@ -24,60 +27,143 @@ export default function CUManagement() {
     searchResults,
     isLoading: searchLoading,
     handleSearch,
-  } = useSearchSubProductionPlans();
+  } = useSearchPrintTajmi();
 
   const { planDetails, isLoading: planLoading } =
-    useSubProductionPlanByCart(selectedPlan);
+    usePrintTajmiByCart(selectedPlan);
 
   const uniqueStages = useMemo(() => {
-    if (!planDetails || planDetails.length === 0) return [];
-    const stages = planDetails
-      .map((item) => item.namemarhale)
-      .filter(
-        (stage): stage is string => Boolean(stage) && stage.trim().length > 0
-      );
-    const unique = Array.from(new Set(stages));
-    return unique;
+    if (!planDetails) return [];
+    const stage = planDetails.marhale;
+    if (!stage || stage.trim().length === 0) return [];
+    return [stage];
   }, [planDetails]);
 
   const availableMachines = useMemo(() => {
-    if (!selectedStage || !planDetails || planDetails.length === 0) return [];
-    const machines = planDetails
-      .filter((item) => item.namemarhale === selectedStage)
-      .map((item) => item.namedastghah)
-      .filter((machine): machine is string => Boolean(machine));
-    return Array.from(new Set(machines));
+    if (!selectedStage || !planDetails) return [];
+    const machine = planDetails.dasatghah;
+    if (!machine || machine.trim().length === 0) return [];
+    return [machine];
   }, [planDetails, selectedStage]);
 
   const filteredPlanDetails = useMemo(() => {
-    if (!planDetails || planDetails.length === 0) return [];
+    if (!planDetails) return [];
     if (!selectedStage) return [];
     if (!selectedMachine) return [];
 
-    const filtered = planDetails.filter(
-      (item) =>
-        item.namemarhale === selectedStage &&
-        item.namedastghah === selectedMachine
-    );
+    if (
+      planDetails.marhale !== selectedStage ||
+      planDetails.dasatghah !== selectedMachine
+    ) {
+      return [];
+    }
 
-    if (filtered.length === 0) return [];
+    const mappedItem: ISubProductionPlanListItem = {
+      FileSystemObjectType: planDetails.FileSystemObjectType,
+      Priority: "",
+      Id: planDetails.Id,
+      ContentTypeId: planDetails.ContentTypeId,
+      Title: planDetails.Title,
+      meghdartoliddaremroz: Number(planDetails.meghdartolid) || 0,
+      meghdarkolesefaresh: Number(planDetails.meghdar) || 0,
+      shomareradiffactor: planDetails.radiffactor || "",
+      namedastghah: planDetails.dasatghah || "",
+      namemarhale: planDetails.marhale || "",
+      shomarebarnamerizi: planDetails.barnamerizi?.toString() || "",
+      nameoperator: null,
+      namemoshtari: planDetails.moshtari || "",
+      size: planDetails.sizeghale || "",
+      tarhetolid: "",
+      vijegihayekhas: null,
+      productionplanid: null,
+      codemahsol: planDetails.codemahsol || "",
+      sizeghaleb: "",
+      toltabmax: null,
+      toltabmin: null,
+      jahattab: null,
+      mahsoletolidi: "",
+      tozihat: planDetails.tojihat || "",
+      tarikhbarnamerizi: planDetails.barnamerizi?.toString() || "",
+      barnameriziaztarike: "",
+      barnamerizitatarikhe: "",
+      minghotrershte: null,
+      maxghotrershte: null,
+      tedadreshteshte: null,
+      mintoltabmarkaz: null,
+      maxtoltabmarkaz: null,
+      chidemanreshtelayeha: null,
+      sizenazel: "",
+      minghotreayeghshode: null,
+      maxghotreayeghshode: null,
+      rangbandi: planDetails.rang || "",
+      zekhamatmotevaset: "",
+      zekhamatnoghtei: "",
+      ghotremaftolfoladi: null,
+      tedadmaftolfoladi: null,
+      poshesh: null,
+      arzenavar: null,
+      tedadarmor: null,
+      rangrokesh: null,
+      zaribtab: null,
+      arzenavarmailar: null,
+      zekhamatnavarmailar: null,
+      arzenavaralminiom: null,
+      zekhamatenavaralminiom: null,
+      minrotobat: null,
+      zamanotaghbokhar: null,
+      sizesimert: null,
+      mindama: null,
+      idproductionPlanproductgroup1: 0,
+      shomareverjen: 0,
+      tolidvaghei: null,
+      diff: planDetails.def || 0,
+      estefademeghdar: 0,
+      estefadedar: null,
+      akharinmazadtolid: 0,
+      meghdareestefadeshodeazdigharmaz: null,
+      akharin_gerefteshodeazmaza: null,
+      typesefaresh: planDetails.rang || "",
+      typename: planDetails.codemahsol || "",
+      typeertorhadi: null,
+      shomaremarhale: planDetails.shomaremarahel || "",
+      carttolid: planDetails.payantolid || false,
+      shomarecart: planDetails.Title || "",
+      matnechap: "",
+      mavadbari: false,
+      shomarebarnamemavad: null,
+      tozihattolid: null,
+      OData_takara: 0,
+      typekeshesh: planDetails.typekeshesh || null,
+      OData_halate: null,
+      idprint: null,
+      OData_moghavemat: null,
+      akharinmarhale: planDetails.akharinmarhale || false,
+      OData_tas: null,
+      toltabmax2: null,
+      toltabmax3: null,
+      toltabmin2: null,
+      toltabmin3: null,
+      jahattab2: null,
+      jahattab3: null,
+      jahattabm: null,
+      chidemanreshtelayeha2: null,
+      chidemanreshtelayeha3: null,
+      chidemanreshtelayeham: null,
+      OData_perkar1: 0,
+      OData_perkar2: null,
+      bastebandi: null,
+      yyyyyy: null,
+      ID: planDetails.ID,
+      Modified: planDetails.Modified,
+      Created: planDetails.Created,
+      AuthorId: planDetails.AuthorId,
+      EditorId: planDetails.EditorId,
+      OData__UIVersionString: planDetails.OData__UIVersionString,
+      Attachments: planDetails.Attachments,
+      GUID: planDetails.GUID,
+    };
 
-    // ادغام همه ردیف‌ها به یک ردیف واحد
-    const mergedItem = { ...filtered[0] }; // کپی اولین ردیف
-
-    // جمع کردن meghdartoliddaremroz (تبدیل به number قبل از جمع)
-    mergedItem.meghdartoliddaremroz = filtered.reduce((sum, item) => {
-      const value = Number(item.meghdartoliddaremroz) || 0;
-      return sum + value;
-    }, 0);
-
-    // جمع کردن meghdarkolesefaresh (تبدیل به number قبل از جمع)
-    mergedItem.meghdarkolesefaresh = filtered.reduce((sum, item) => {
-      const value = Number(item.meghdarkolesefaresh) || 0;
-      return sum + value;
-    }, 0);
-
-    return [mergedItem];
+    return [mappedItem];
   }, [planDetails, selectedStage, selectedMachine]);
 
   const handleCartSelect = (cartNumber: string) => {
@@ -188,7 +274,7 @@ export default function CUManagement() {
                 </span>
               </div>
             </div>
-          ) : planDetails.length > 0 ? (
+          ) : planDetails ? (
             <div className="w-full flex flex-col items-center justify-center gap-5 mt-1">
               <div className="flex items-center justify-start gap-3">
                 <label htmlFor="stage-select" className="min-w-[150px]">
@@ -243,7 +329,7 @@ export default function CUManagement() {
                   </div>
                 ) : (
                   <div className="w-[250px] px-3 py-2 text-sm text-gray-500 border border-gray-300 rounded-md bg-gray-50">
-                    هیچ مرحله‌ای یافت نشد (تعداد ردیف‌ها: {planDetails.length})
+                    هیچ مرحله‌ای یافت نشد
                   </div>
                 )}
               </div>
@@ -304,7 +390,6 @@ export default function CUManagement() {
                 </div>
               )}
 
-              {/* نمایش ردیف‌های فیلتر شده */}
               {selectedStage && selectedMachine ? (
                 filteredPlanDetails.length > 0 ? (
                   filteredPlanDetails.map((planItem, index) => (
