@@ -4,7 +4,7 @@ import { config } from "../api/config";
 
 export const usePrintTajmiByCart = (cartNumber: string | null | undefined) => {
   const {
-    data: planDetails = null,
+    data: planDetails = [],
     isLoading,
     error,
   } = useQuery({

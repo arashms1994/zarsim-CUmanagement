@@ -21,6 +21,7 @@ export interface IProductionPlanRowFormProps {
   onDelete?: () => void;
   showDeleteButton?: boolean;
   planItem: IPrintTajmiListItem;
+  control?: any; // Control from react-hook-form
   onSubmit?: (
     data: ICUManagementFormProps,
     planItem: IPrintTajmiListItem,
@@ -41,6 +42,8 @@ export interface ICUManagementFormProps {
   responsible: string;
   materialExitDate: string;
   isCharge: boolean;
+  actualAmountProduction?: string;
+  stopTime?: string;
 }
 
 export interface IEnterFormInput {
@@ -294,4 +297,34 @@ export interface IPrintTajmiListItem {
   OData__UIVersionString: string;
   Attachments: boolean;
   GUID: string;
+}
+
+export interface IStopListItem {
+  Id: number;
+  Title: string;
+  Code: string;
+}
+
+export interface ICUManagementListItem {
+  Title: string;
+  actualAmountProduction: string;
+  operator: string;
+  productionPlanAmount: string;
+  preInvoiceRow: string;
+  reelNumber: string;
+  stage: string;
+  device: string;
+  calculatedWeight: string;
+  actualWeight: string;
+  product: string;
+  description: string;
+  lastStage: string;
+  productCode: string;
+  Created: string;
+  Modified: string;
+  CreatedById: number;
+  ModifiedById: number;
+  stopTitle: string;
+  stopCode: string;
+  stopTime: string;
 }
