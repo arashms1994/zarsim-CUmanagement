@@ -3,6 +3,7 @@ import type {
   IEnterFormInput,
   ICUManagementFormProps,
   IDarkhastMavadListItem,
+  IStopListItem,
 } from "../types/type";
 import { BASE_URL } from "./base";
 
@@ -212,5 +213,77 @@ async function getRequestDigest(): Promise<string> {
   } catch (error) {
     console.error("خطا در دریافت Request Digest:", error);
     throw error;
+  }
+}
+
+export async function addStopItem(
+  title: string,
+  code?: string
+): Promise<{ success: boolean; message: string; data?: IStopListItem }> {
+  const listGuid = config.LIST_GUIDS.STOP_LIST;
+
+  if (!listGuid) {
+    throw new Error("GUID لیست STOP_LIST تنظیم نشده است");
+  }
+
+  if (!title || title.trim().length === 0) {
+    return {
+      success: false,
+      message: "عنوان توقف نمی‌تواند خالی باشد",
+    };
+  }
+
+  try {
+    const payload: any = {
+      __metadata: {
+        type: "SP.Data.Stop_x0020_ListListItem",
+      },
+      Title: title.trim(),
+    };
+
+    if (code && code.trim().length > 0) {
+      payload.Code = code.trim();
+    }
+
+    const response = await fetch(
+      `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+          "X-RequestDigest": await getRequestDigest(),
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `خطا در افزودن توقف: ${errorText} (Status: ${response.status})`
+      );
+    }
+
+    const result = await response.json();
+    const newItem: IStopListItem = {
+      Id: result.d.Id,
+      Title: result.d.Title,
+      Code: result.d.Code || "",
+    };
+
+    return {
+      success: true,
+      message: "توقف با موفقیت اضافه شد ✅",
+      data: newItem,
+    };
+  } catch (error) {
+    console.error("خطا در افزودن توقف:", error);
+    return {
+      success: false,
+      message: `خطا در افزودن توقف: ${
+        error instanceof Error ? error.message : "خطای نامشخص"
+      }`,
+    };
   }
 }

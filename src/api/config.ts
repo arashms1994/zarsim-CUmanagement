@@ -9,6 +9,7 @@ export const config = {
     MATERIAL_CHARGE: import.meta.env.VITE_MATERIAL_CHARGE_LIST_GUID,
     SUB_PRODUCTION_PLAN: import.meta.env.VITE_SUB_PRODUCTION_PLAN_LIST_GUID,
     PRINT_TAJMI: import.meta.env.VITE_PRINT_TAJMI_LIST_GUID,
+    STOP_LIST: import.meta.env.VITE_STOP_LIST_GUID,
   },
 
   API_TIMEOUT: parseInt(import.meta.env.VITE_API_TIMEOUT),

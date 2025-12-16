@@ -4,6 +4,7 @@ import type {
   IPersonnelItem,
   ISubProductionPlanListItem,
   IPrintTajmiListItem,
+  IStopListItem,
 } from "../types/type";
 
 export async function getPersonnel(): Promise<IPersonnelItem[]> {
@@ -175,42 +176,101 @@ export async function searchPrintTajmi(term: string): Promise<string[]> {
 
 export async function getPrintTajmi(
   cartNumber: string
-): Promise<IPrintTajmiListItem | null> {
+): Promise<IPrintTajmiListItem[]> {
   const listGuid = config.LIST_GUIDS.PRINT_TAJMI;
-  if (!cartNumber || cartNumber.trim().length === 0) return null;
+  if (!cartNumber || cartNumber.trim().length === 0) return [];
 
   const encodedCartNumber = encodeURIComponent(cartNumber.trim());
-  const url = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$filter=Title eq '${encodedCartNumber}'&$orderby=ID desc&$top=1`;
+
+  let items: IPrintTajmiListItem[] = [];
+  let nextUrl:
+    | string
+    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$filter=Title eq '${encodedCartNumber}'&$orderby=ID desc`;
 
   try {
-    const res = await fetch(url, {
-      headers: {
-        Accept: "application/json;odata=verbose",
-        "Content-Type": "application/json;odata=verbose",
-      },
-    });
+    while (nextUrl) {
+      const res = await fetch(nextUrl, {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(
-        `خطا در گرفتن آیتم کارت ${cartNumber}: ${err} (Status: ${res.status})`
-      );
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(
+          `خطا در گرفتن آیتم‌های کارت ${cartNumber}: ${err} (Status: ${res.status})`
+        );
+      }
+
+      const json: {
+        d: { results: IPrintTajmiListItem[]; __next?: string };
+      } = await res.json();
+
+      const results = json.d?.results;
+      if (!Array.isArray(results)) {
+        throw new Error(
+          "ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست"
+        );
+      }
+
+      items = [...items, ...results];
+      nextUrl = json.d.__next ?? null;
     }
 
-    const json: {
-      d: { results: IPrintTajmiListItem[] };
-    } = await res.json();
-
-    const results = json.d?.results;
-    if (!Array.isArray(results)) {
-      throw new Error(
-        "ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست"
-      );
-    }
-
-    return results.length > 0 ? results[0] : null;
+    return items;
   } catch (err) {
-    console.error(`خطا در دریافت آیتم کارت ${cartNumber}:`, err);
+    console.error(`خطا در دریافت آیتم‌های کارت ${cartNumber}:`, err);
+    throw err;
+  }
+}
+
+export async function getStopList(): Promise<IStopListItem[]> {
+  let items: IStopListItem[] = [];
+
+  const listGuid = config.LIST_GUIDS.STOP_LIST;
+  if (!listGuid) {
+    throw new Error("GUID لیست STOP_LIST تنظیم نشده است");
+  }
+
+  let nextUrl:
+    | string
+    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=Id,Title,Code`;
+
+  try {
+    while (nextUrl) {
+      const res = await fetch(nextUrl, {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(
+          `خطا در گرفتن لیست توقفات: ${err} (Status: ${res.status})`
+        );
+      }
+
+      const json: {
+        d: { results: IStopListItem[]; __next?: string };
+      } = await res.json();
+
+      const results = json.d?.results;
+      if (!Array.isArray(results)) {
+        throw new Error(
+          "ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست"
+        );
+      }
+
+      items = [...items, ...results];
+      nextUrl = json.d.__next ?? null;
+    }
+
+    return items;
+  } catch (err) {
+    console.error("خطا در دریافت لیست توقفات:", err);
     throw err;
   }
 }
