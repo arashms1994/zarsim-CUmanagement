@@ -1,8 +1,8 @@
+import DateObject from "react-date-object";
+import { CalendarSearch } from "lucide-react";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-import { CalendarSearch } from "lucide-react";
-import DateObject from "react-date-object";
 import type { IPersianDatePickerProps } from "../../types/type";
 
 const PersianDatePicker: React.FC<IPersianDatePickerProps> = ({
