@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { searchDarkhastMavadPlans } from "../api/getData";
 import { config } from "../api/config";
 import { useDebounce } from "./useDebounce";
+import { useQuery } from "@tanstack/react-query";
+import { searchPrintTajmi } from "../api/getData";
 
-export const useSearchPlans = () => {
+export const useSearchPrintTajmi = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
@@ -25,8 +25,8 @@ export const useSearchPlans = () => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["search-plans", debouncedSearchTerm],
-    queryFn: () => searchDarkhastMavadPlans(debouncedSearchTerm),
+    queryKey: ["search-print-tajmi", debouncedSearchTerm],
+    queryFn: () => searchPrintTajmi(debouncedSearchTerm),
     enabled: debouncedSearchTerm.length >= 2,
     staleTime: config.CACHE_STALE_TIME,
   });

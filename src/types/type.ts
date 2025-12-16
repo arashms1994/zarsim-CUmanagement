@@ -20,10 +20,10 @@ export interface IProductionPlanRowFormProps {
   index?: number;
   onDelete?: () => void;
   showDeleteButton?: boolean;
-  planItem: ISubProductionPlanListItem;
+  planItem: IPrintTajmiListItem;
   onSubmit?: (
     data: ICUManagementFormProps,
-    planItem: ISubProductionPlanListItem,
+    planItem: IPrintTajmiListItem,
     index: number
   ) => Promise<{ success: boolean; message: string }>;
 }
@@ -242,6 +242,50 @@ export interface ISubProductionPlanListItem {
   OData_perkar2: string | null;
   bastebandi: string | null;
   yyyyyy: string | null;
+  ID: number;
+  Modified: string;
+  Created: string;
+  AuthorId: number;
+  EditorId: number;
+  OData__UIVersionString: string;
+  Attachments: boolean;
+  GUID: string;
+}
+
+export interface IPrintTajmiListItem {
+  FileSystemObjectType: number;
+  Id: number;
+  ContentTypeId: string;
+  Title: string;
+  shomaretajshode: string;
+  moshtari: string;
+  meghdartolid: number;
+  marhale: string;
+  codemahsol: string;
+  rang: string;
+  dasatghah: string;
+  meghdar: string | null;
+  barnamerizi: number;
+  payantolid: boolean;
+  typekeshesh: string | null;
+  OData_estekh: number;
+  idBOM: string | null;
+  shomaremarahel: string;
+  darkhastmavadazanbar: string | null;
+  jamhalat1: string | null;
+  jamehalat2: string | null;
+  jamhalat3: string | null;
+  namehalat1: string | null;
+  namehalat2: string | null;
+  namehalat3: string | null;
+  akharinmarhale: boolean;
+  tojihat: string | null;
+  def: number;
+  test: string | null;
+  OData_pakkak: number;
+  radiffactor: string;
+  sizeghale: string | null;
+  OData_barresi: number;
   ID: number;
   Modified: string;
   Created: string;
