@@ -13,17 +13,22 @@ export default function DeviceSelector({
 
   const {
     searchResults: deviceResults,
+    allDevices,
     isLoading: deviceLoading,
     handleSearch: handleDeviceSearch,
+    searchTerm,
   } = useSearchDevice();
 
-  // فیلتر کردن دستگاه‌ها بر اساس Level === marhale
+  // استفاده از allDevices وقتی searchTerm خالی است، در غیر این صورت از deviceResults
+  const devicesToFilter =
+    searchTerm.trim().length > 0 ? deviceResults : allDevices;
+
   const filteredDevices = useMemo(() => {
-    if (!marhale) return deviceResults;
-    return deviceResults.filter(
+    if (!marhale) return devicesToFilter;
+    return devicesToFilter.filter(
       (device) => device.Level && device.Level.trim() === marhale.trim()
     );
-  }, [deviceResults, marhale]);
+  }, [devicesToFilter, marhale]);
 
   return (
     <div className="flex items-center justify-start gap-2">
@@ -40,8 +45,11 @@ export default function DeviceSelector({
             setShowDeviceSuggestions(true);
           }}
           onFocus={() => {
-            if (value.trim().length > 0) {
-              setShowDeviceSuggestions(true);
+            // همیشه dropdown را باز کن تا کاربر بتواند از لیست انتخاب کند
+            setShowDeviceSuggestions(true);
+            // اگر value خالی است، همه دستگاه‌ها را نشان بده (بدون جستجو)
+            if (value.trim().length === 0) {
+              handleDeviceSearch("");
             }
           }}
           onBlur={() => {

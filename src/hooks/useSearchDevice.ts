@@ -36,7 +36,9 @@ export const useSearchDevice = () => {
       if (!debouncedSearchTerm || debouncedSearchTerm.length < 1)
         return allDevices;
       return allDevices.filter((device) =>
-        device.Title.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase())
+        device.Title.toLocaleLowerCase().includes(
+          debouncedSearchTerm.toLocaleLowerCase()
+        )
       );
     },
     enabled: true,
@@ -53,6 +55,7 @@ export const useSearchDevice = () => {
 
   return {
     searchResults,
+    allDevices, // اضافه کردن allDevices برای استفاده در DeviceSelector
     isLoading: searchLoading || allLoading,
     error: searchError || allError,
     handleSearch,
