@@ -10,6 +10,7 @@ export const config = {
     SUB_PRODUCTION_PLAN: import.meta.env.VITE_SUB_PRODUCTION_PLAN_LIST_GUID,
     PRINT_TAJMI: import.meta.env.VITE_PRINT_TAJMI_LIST_GUID,
     STOP_LIST: import.meta.env.VITE_STOP_LIST_GUID,
+    DEVICES_LIST: import.meta.env.VITE_DEVICES_LIST_GUID,
   },
 
   API_TIMEOUT: parseInt(import.meta.env.VITE_API_TIMEOUT),

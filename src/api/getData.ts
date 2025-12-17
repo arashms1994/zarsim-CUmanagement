@@ -5,15 +5,66 @@ import type {
   ISubProductionPlanListItem,
   IPrintTajmiListItem,
   IStopListItem,
+  IDevicesListItem,
 } from "../types/type";
+
+export async function getDevice(): Promise<IDevicesListItem[]> {
+  let items: IDevicesListItem[] = [];
+
+  const listGuid = config.LIST_GUIDS.DEVICES_LIST;
+  if (!listGuid) {
+    throw new Error("GUID لیست DEVICES_LIST تنظیم نشده است");
+  }
+  let nextUrl:
+    | string
+    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=ID,Title,Level`;
+
+  try {
+    while (nextUrl) {
+      const res = await fetch(nextUrl, {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(
+          `خطا در گرفتن لیست دستگاه ها: ${err} (Status: ${res.status})`
+        );
+      }
+
+      const json: {
+        d: { results: IDevicesListItem[]; __next?: string };
+      } = await res.json();
+
+      const results = json.d?.results;
+      if (!Array.isArray(results)) {
+        throw new Error(
+          "ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست"
+        );
+      }
+
+      items = [...items, ...results];
+      nextUrl = json.d.__next ?? null;
+    }
+
+    return items;
+  } catch (err) {
+    console.error("خطا در دریافت لیست دستگاه ها:", err);
+    throw err;
+  }
+}
 
 export async function getPersonnel(): Promise<IPersonnelItem[]> {
   let items: IPersonnelItem[] = [];
 
   const listGuid = config.LIST_GUIDS.PERSONNEL;
+  const encodedDepartment = encodeURIComponent("کارخانه");
   let nextUrl:
     | string
-    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=ID,Title`;
+    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=ID,Title&$filter=Department eq '${encodedDepartment}'`;
 
   try {
     while (nextUrl) {

@@ -27,12 +27,18 @@ export interface IOperatorSelectorProps {
   onChange: (value: string) => void;
 }
 
+export interface IDeviceSelectorProps {
+  value: string;
+  onChange: (value: string) => void;
+  marhale?: string; // مرحله برای فیلتر کردن دستگاه‌ها بر اساس Level
+}
+
 export interface IProductionPlanRowFormProps {
   index?: number;
   onDelete?: () => void;
   showDeleteButton?: boolean;
   planItem: IPrintTajmiListItem;
-  control?: any; // Control from react-hook-form
+  control?: any;
   onSubmit?: (
     data: ICUManagementFormProps,
     planItem: IPrintTajmiListItem,
@@ -120,9 +126,15 @@ export interface ISupplierItem {
   Supplier: string;
 }
 
-export interface IDevicesItem {
+export interface IDevicesListItem {
   ID: number;
   Title: string;
+  Level: string;
+  dastebandi: string;
+  Report: string;
+  FullNmae: string;
+  DeviceCode: string;
+  Status: string;
 }
 
 export interface IPersonnelItem {
@@ -339,4 +351,9 @@ export interface ICUManagementListItem {
   stopTitle: string;
   stopCode: string;
   stopTime: string;
+  shiftTitle: string;
+  shiftId: string;
+  shiftStartedAt: string;
+  shiftEndedAt: string;
+  deviceId: string;
 }
