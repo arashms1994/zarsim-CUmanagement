@@ -36,18 +36,18 @@ export default function ProductionPlanRowForm({
             <span className="text-lg font-normal">{planItem.marhale}</span>
           </div>
 
-          <DeviceSelector
-            value={deviceName}
-            onChange={setDeviceName}
-            marhale={planItem.marhale}
-          />
-
           <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">
             <label className="min-w-[150px] font-medium">
               مقدار برنامه ریزی شده:
             </label>
             <span className="text-lg font-normal">{planItem.barnamerizi}</span>
           </div>
+
+          <DeviceSelector
+            value={deviceName}
+            onChange={setDeviceName}
+            marhale={planItem.marhale}
+          />
 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">
