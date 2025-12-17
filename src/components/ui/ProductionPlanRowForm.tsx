@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import type { IProductionPlanRowFormProps } from "../../types/type";
+import type { IProductionPlanRowFormProps, IReelItem } from "../../types/type";
 import { Input } from "./input";
 import OperatorSelector from "./OperatorSelector";
 import StopReasonSelector from "./StopReasonSelector";
 import DeviceSelector from "./DeviceSelector";
+import ReelSelector from "./ReelSelector";
 
 export default function ProductionPlanRowForm({
   planItem,
@@ -15,6 +16,8 @@ export default function ProductionPlanRowForm({
   const [operator, setOperator] = useState("");
   const [stopReason, setStopReason] = useState("");
   const [deviceName, setDeviceName] = useState(planItem.dasatghah || "");
+  const [entranceReels, setEntranceReels] = useState<IReelItem[]>([]);
+  const [exitReels, setExitReels] = useState<IReelItem[]>([]);
 
   return (
     <div className="w-full p-5 gap-2 flex justify-between items-center flex-wrap rounded-[4px] border-2 shadow border-[#1e7677] relative">
@@ -38,6 +41,13 @@ export default function ProductionPlanRowForm({
             onChange={setDeviceName}
             marhale={planItem.marhale}
           />
+
+          <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">
+            <label className="min-w-[150px] font-medium">
+              مقدار برنامه ریزی شده:
+            </label>
+            <span className="text-lg font-normal">{planItem.barnamerizi}</span>
+          </div>
 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">
@@ -82,18 +92,25 @@ export default function ProductionPlanRowForm({
             onStopReasonChange={setStopReason}
             control={control}
           />
+        </div>
 
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
-            <label className="min-w-[150px] font-medium">محصول:</label>
-            <span className="text-lg font-normal">{planItem.codemahsol}</span>
-          </div>
+        <div className="w-full space-y-4">
+          <ReelSelector
+            reels={entranceReels}
+            onReelsChange={setEntranceReels}
+            label="قرقره‌های ورودی:"
+          />
 
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
-            <label className="min-w-[150px] font-medium">
-              مقدار برنامه ریزی شده:
-            </label>
-            <span className="text-lg font-normal">{planItem.barnamerizi}</span>
-          </div>
+          <ReelSelector
+            reels={exitReels}
+            onReelsChange={setExitReels}
+            label="قرقره‌های خروجی:"
+          />
+        </div>
+
+        <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
+          <label className="min-w-[150px] font-medium">محصول:</label>
+          <span className="text-lg font-normal">{planItem.codemahsol}</span>
         </div>
       </form>
     </div>

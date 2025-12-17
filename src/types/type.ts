@@ -329,16 +329,39 @@ export interface IStopListItem {
   Code: string;
 }
 
+export interface IReelListItem {
+  Id: number;
+  Title: string;
+  Code?: string;
+}
+
+export interface IReelItem {
+  reelId: number;
+  reelTitle: string;
+  weight: string;
+}
+
+export interface IReelSelectorProps {
+  reels: IReelItem[];
+  onReelsChange: (reels: IReelItem[]) => void;
+  label: string;
+}
+
 export interface ICUManagementListItem {
   Title: string;
   actualAmountProduction: string;
   operator: string;
   productionPlanAmount: string;
   preInvoiceRow: string;
-  reelNumber: string;
+  reelNumberExit: string;
+  reelNumberExitId: string;
+  reelNumberEntrance: string;
+  reelNumberEntranceId: string;
   stage: string;
   device: string;
+  deviceId: string;
   calculatedWeight: string;
+  entranceWeight: string;
   actualWeight: string;
   product: string;
   description: string;
@@ -355,5 +378,4 @@ export interface ICUManagementListItem {
   shiftId: string;
   shiftStartedAt: string;
   shiftEndedAt: string;
-  deviceId: string;
 }
