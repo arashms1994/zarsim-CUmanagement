@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { IProductionPlanRowFormProps, IReelItem } from "../../types/type";
 import { Input } from "./input";
@@ -6,6 +6,8 @@ import OperatorSelector from "./OperatorSelector";
 import StopReasonSelector from "./StopReasonSelector";
 import DeviceSelector from "./DeviceSelector";
 import ReelSelector from "./ReelSelector";
+import ProductsTable from "./ProductsTable";
+import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
 
 export default function ProductionPlanRowForm({
   planItem,
@@ -18,6 +20,58 @@ export default function ProductionPlanRowForm({
   const [deviceName, setDeviceName] = useState(planItem.dasatghah || "");
   const [entranceReels, setEntranceReels] = useState<IReelItem[]>([]);
   const [exitReels, setExitReels] = useState<IReelItem[]>([]);
+
+  // استخراج شماره‌ها از shomaretahshode
+  const planNumbers = useMemo(() => {
+    console.log("🔍 بررسی planItem:", {
+      shomaretahshode: planItem.shomaretahshode,
+      shomaretajshode: planItem.shomaretajshode,
+      codemahsol: planItem.codemahsol,
+      fullItem: planItem,
+    });
+
+    // بررسی shomaretahshode
+    if (
+      planItem.shomaretahshode &&
+      planItem.shomaretahshode.trim().length > 0
+    ) {
+      const numbers = planItem.shomaretahshode
+        .split(",")
+        .map((n: string) => n.trim())
+        .filter((n: string) => n.length > 0);
+      console.log(
+        "📝 استخراج شماره‌ها از shomaretahshode:",
+        planItem.shomaretahshode,
+        "→",
+        numbers
+      );
+      return numbers;
+    }
+
+    // اگر shomaretahshode وجود نداشت، از shomaretajshode استفاده می‌کنیم
+    if (
+      planItem.shomaretajshode &&
+      planItem.shomaretajshode.trim().length > 0
+    ) {
+      const numbers = planItem.shomaretajshode
+        .split(",")
+        .map((n: string) => n.trim())
+        .filter((n: string) => n.length > 0);
+      console.log(
+        "📝 استخراج شماره‌ها از shomaretajshode:",
+        planItem.shomaretajshode,
+        "→",
+        numbers
+      );
+      return numbers;
+    }
+
+    console.log("⚠️ هیچ فیلد shomaretahshode یا shomaretajshode پیدا نشد");
+    return [];
+  }, [planItem.shomaretahshode, planItem.shomaretajshode]);
+
+  const { planItems, isLoading: planItemsLoading } =
+    useSubProductionPlanByNumbers(planNumbers);
 
   return (
     <div className="w-full p-5 gap-2 flex justify-between items-center flex-wrap rounded-[4px] border-2 shadow border-[#1e7677] relative">
@@ -108,9 +162,23 @@ export default function ProductionPlanRowForm({
           />
         </div>
 
-        <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
-          <label className="min-w-[150px] font-medium">محصول:</label>
-          <span className="text-lg font-normal">{planItem.codemahsol}</span>
+        <div className="w-full space-y-2">
+          <label className="font-medium text-lg">محصولات:</label>
+          {planNumbers.length > 0 ? (
+            <ProductsTable items={planItems} isLoading={planItemsLoading} />
+          ) : (
+            <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
+              <label className="min-w-[150px] font-medium">محصول:</label>
+              <span className="text-lg font-normal">{planItem.codemahsol}</span>
+            </div>
+          )}
+        </div>
+
+        <div
+          onClick={() => alert("ثبت اطلاعات با موفقیت انجام شد")}
+          className="px-3 py-2 cursor-pointer w-[150px] text-center mx-auto bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+        >
+          ثبت اطلاعات
         </div>
       </form>
     </div>

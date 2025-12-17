@@ -285,6 +285,7 @@ export interface IPrintTajmiListItem {
   ContentTypeId: string;
   Title: string;
   shomaretajshode: string;
+  shomaretahshode?: string; // شماره تجمیعی که می‌تواند شامل چند شماره باشد (جدا شده با کاما)
   moshtari: string;
   meghdartolid: number;
   marhale: string;

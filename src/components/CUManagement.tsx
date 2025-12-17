@@ -128,7 +128,7 @@ export default function CUManagement() {
   };
 
   return (
-    <div className="space-y-4 flex flex-col items-center justify-center">
+    <div className="space-y-4 flex flex-col w-full items-center justify-center">
       <div className="w-full flex flex-col items-center justify-center relative gap-8">
         <Stack
           direction="row"
