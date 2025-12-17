@@ -4,6 +4,7 @@ import type { IProductionPlanRowFormProps } from "../../types/type";
 import { Input } from "./input";
 import OperatorSelector from "./OperatorSelector";
 import StopReasonSelector from "./StopReasonSelector";
+import DeviceSelector from "./DeviceSelector";
 
 export default function ProductionPlanRowForm({
   planItem,
@@ -13,6 +14,7 @@ export default function ProductionPlanRowForm({
   const control = externalControl || localForm.control;
   const [operator, setOperator] = useState("");
   const [stopReason, setStopReason] = useState("");
+  const [deviceName, setDeviceName] = useState(planItem.dasatghah || "");
 
   return (
     <div className="w-full p-5 gap-2 flex justify-between items-center flex-wrap rounded-[4px] border-2 shadow border-[#1e7677] relative">
@@ -26,31 +28,16 @@ export default function ProductionPlanRowForm({
 
       <form className="w-full space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
+          <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">مرحله:</label>
             <span className="text-lg font-normal">{planItem.marhale}</span>
           </div>
 
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
-            <label className="min-w-[150px] font-medium">دستگاه:</label>
-            <span className="text-lg font-normal">{planItem.dasatghah}</span>
-          </div>
-
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
-            <label className="min-w-[150px] font-medium">محصول:</label>
-            <span className="text-lg font-normal">{planItem.codemahsol}</span>
-          </div>
-
-          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
-            <label className="min-w-[150px] font-medium">
-              مقدار برنامه ریزی شده:
-            </label>
-            <span className="text-lg font-normal">{planItem.barnamerizi}</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <OperatorSelector value={operator} onChange={setOperator} />
+          <DeviceSelector
+            value={deviceName}
+            onChange={setDeviceName}
+            marhale={planItem.marhale}
+          />
 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">
@@ -72,7 +59,6 @@ export default function ProductionPlanRowForm({
 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">
-              {" "}
               وزن خروجی(کیلوگرم):
             </label>
             <Controller
@@ -89,11 +75,25 @@ export default function ProductionPlanRowForm({
             />
           </div>
 
+          <OperatorSelector value={operator} onChange={setOperator} />
+
           <StopReasonSelector
             stopReason={stopReason}
             onStopReasonChange={setStopReason}
             control={control}
           />
+
+          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
+            <label className="min-w-[150px] font-medium">محصول:</label>
+            <span className="text-lg font-normal">{planItem.codemahsol}</span>
+          </div>
+
+          <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
+            <label className="min-w-[150px] font-medium">
+              مقدار برنامه ریزی شده:
+            </label>
+            <span className="text-lg font-normal">{planItem.barnamerizi}</span>
+          </div>
         </div>
       </form>
     </div>
