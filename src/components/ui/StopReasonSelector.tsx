@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useSearchStop } from "../../hooks/useSearchStop";
-import { Controller } from "react-hook-form";
 import { Input } from "./input";
+import { Controller } from "react-hook-form";
 import { SkeletonSearchSuggestion } from "./Skeleton";
+import { useSearchStop } from "../../hooks/useSearchStop";
 import type { IStopReasonSelectorProps } from "../../types/type";
 
 export default function StopReasonSelector({
@@ -19,7 +19,7 @@ export default function StopReasonSelector({
   } = useSearchStop();
 
   return (
-    <div className="contents">
+    <>
       <div className="flex items-center justify-start gap-2">
         <label className="min-w-[150px] font-medium">دلیل توقفات:</label>
         <div className="relative">
@@ -85,6 +85,6 @@ export default function StopReasonSelector({
           )}
         />
       </div>
-    </div>
+    </>
   );
 }
