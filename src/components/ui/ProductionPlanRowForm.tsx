@@ -21,7 +21,6 @@ export default function ProductionPlanRowForm({
   const [entranceReels, setEntranceReels] = useState<IReelItem[]>([]);
   const [exitReels, setExitReels] = useState<IReelItem[]>([]);
 
-  // استخراج شماره‌ها از shomaretahshode
   const planNumbers = useMemo(() => {
     console.log("🔍 بررسی planItem:", {
       shomaretahshode: planItem.shomaretahshode,
@@ -30,7 +29,6 @@ export default function ProductionPlanRowForm({
       fullItem: planItem,
     });
 
-    // بررسی shomaretahshode
     if (
       planItem.shomaretahshode &&
       planItem.shomaretahshode.trim().length > 0
@@ -48,7 +46,6 @@ export default function ProductionPlanRowForm({
       return numbers;
     }
 
-    // اگر shomaretahshode وجود نداشت، از shomaretajshode استفاده می‌کنیم
     if (
       planItem.shomaretajshode &&
       planItem.shomaretajshode.trim().length > 0

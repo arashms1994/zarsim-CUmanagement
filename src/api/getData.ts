@@ -205,8 +205,6 @@ export async function getSubProductionPlanByNumbers(
 
   let items: ISubProductionPlanListItem[] = [];
 
-  // اگر تعداد شماره‌ها بیشتر از 10 باشد، همه را می‌گیریم و در JavaScript فیلتر می‌کنیم
-  // چون URL خیلی طولانی می‌شود و SharePoint خطا می‌دهد
   const MAX_FILTER_ITEMS = 10;
   const selectFields =
     "ID,shomarebarnamerizi,codemahsol,mahsoletolidi,tarhetolid,meghdarkolesefaresh,Title";
@@ -215,7 +213,6 @@ export async function getSubProductionPlanByNumbers(
     const startTime = performance.now();
 
     if (cleanNumbers.length <= MAX_FILTER_ITEMS) {
-      // برای تعداد کم، از فیلتر OData استفاده می‌کنیم
       const filterParts = cleanNumbers.map(
         (num) => `shomarebarnamerizi eq '${num.replace(/'/g, "''")}'`
       );
@@ -257,8 +254,6 @@ export async function getSubProductionPlanByNumbers(
         nextUrl = json.d.__next ?? null;
       }
     } else {
-      // برای تعداد زیاد، همه را می‌گیریم و در JavaScript فیلتر می‌کنیم
-      // یا به چندین درخواست کوچکتر تقسیم می‌کنیم
       const batches: string[][] = [];
       for (let i = 0; i < cleanNumbers.length; i += MAX_FILTER_ITEMS) {
         batches.push(cleanNumbers.slice(i, i + MAX_FILTER_ITEMS));
@@ -268,7 +263,6 @@ export async function getSubProductionPlanByNumbers(
         `📦 تقسیم ${cleanNumbers.length} شماره به ${batches.length} دسته`
       );
 
-      // اجرای موازی درخواست‌ها
       const promises = batches.map(async (batch) => {
         const filterParts = batch.map(
           (num) => `shomarebarnamerizi eq '${num.replace(/'/g, "''")}'`

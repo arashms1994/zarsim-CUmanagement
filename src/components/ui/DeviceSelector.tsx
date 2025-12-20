@@ -19,7 +19,6 @@ export default function DeviceSelector({
     searchTerm,
   } = useSearchDevice();
 
-  // استفاده از allDevices وقتی searchTerm خالی است، در غیر این صورت از deviceResults
   const devicesToFilter =
     searchTerm.trim().length > 0 ? deviceResults : allDevices;
 
@@ -45,9 +44,7 @@ export default function DeviceSelector({
             setShowDeviceSuggestions(true);
           }}
           onFocus={() => {
-            // همیشه dropdown را باز کن تا کاربر بتواند از لیست انتخاب کند
             setShowDeviceSuggestions(true);
-            // اگر value خالی است، همه دستگاه‌ها را نشان بده (بدون جستجو)
             if (value.trim().length === 0) {
               handleDeviceSearch("");
             }

@@ -55,7 +55,7 @@ export const useSearchDevice = () => {
 
   return {
     searchResults,
-    allDevices, // اضافه کردن allDevices برای استفاده در DeviceSelector
+    allDevices,
     isLoading: searchLoading || allLoading,
     error: searchError || allError,
     handleSearch,

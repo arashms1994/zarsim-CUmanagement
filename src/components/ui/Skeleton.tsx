@@ -55,7 +55,6 @@ const Skeleton: React.FC<SkeletonProps> = ({
   );
 };
 
-// Skeleton components for specific use cases
 export const SkeletonText: React.FC<Omit<SkeletonProps, "variant">> = (
   props
 ) => <Skeleton {...props} variant="text" />;
@@ -68,7 +67,6 @@ export const SkeletonCircle: React.FC<Omit<SkeletonProps, "variant">> = (
   props
 ) => <Skeleton {...props} variant="circular" />;
 
-// Form-specific skeleton components
 export const SkeletonInput: React.FC<{ className?: string }> = ({
   className = "",
 }) => (
@@ -99,7 +97,6 @@ export const SkeletonCard: React.FC<{ className?: string }> = ({
   />
 );
 
-// Search suggestion skeleton
 export const SkeletonSearchSuggestion: React.FC<{ count?: number }> = ({
   count = 3,
 }) => (
@@ -115,7 +112,6 @@ export const SkeletonSearchSuggestion: React.FC<{ count?: number }> = ({
   </div>
 );
 
-// Form field skeleton
 export const SkeletonFormField: React.FC<{ className?: string }> = ({
   className = "",
 }) => (

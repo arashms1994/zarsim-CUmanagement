@@ -30,7 +30,7 @@ export interface IOperatorSelectorProps {
 export interface IDeviceSelectorProps {
   value: string;
   onChange: (value: string) => void;
-  marhale?: string; // مرحله برای فیلتر کردن دستگاه‌ها بر اساس Level
+  marhale?: string;
 }
 
 export interface IProductionPlanRowFormProps {
@@ -285,7 +285,7 @@ export interface IPrintTajmiListItem {
   ContentTypeId: string;
   Title: string;
   shomaretajshode: string;
-  shomaretahshode?: string; // شماره تجمیعی که می‌تواند شامل چند شماره باشد (جدا شده با کاما)
+  shomaretahshode?: string;
   moshtari: string;
   meghdartolid: number;
   marhale: string;
