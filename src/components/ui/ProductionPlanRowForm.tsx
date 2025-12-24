@@ -120,10 +120,28 @@ export default function ProductionPlanRowForm({
 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">
-              وزن خروجی(کیلوگرم):
+              وزن خروجی (کیلوگرم):
             </label>
             <Controller
               name="actualWeight"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  type="string"
+                  placeholder="مثلاً 50"
+                  className="w-[250px]"
+                />
+              )}
+            />
+          </div>
+
+          <div className="flex items-center justify-start gap-2">
+            <label className="min-w-[150px] font-medium">
+              ضایعات (کیلوگرم):
+            </label>
+            <Controller
+              name="waste"
               control={control}
               render={({ field }) => (
                 <Input
@@ -162,7 +180,11 @@ export default function ProductionPlanRowForm({
         <div className="w-full space-y-2">
           <label className="font-medium text-lg">محصولات:</label>
           {planNumbers.length > 0 ? (
-            <ProductsTable items={planItems} isLoading={planItemsLoading} />
+            <ProductsTable
+              items={planItems}
+              isLoading={planItemsLoading}
+              control={control}
+            />
           ) : (
             <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">
               <label className="min-w-[150px] font-medium">محصول:</label>

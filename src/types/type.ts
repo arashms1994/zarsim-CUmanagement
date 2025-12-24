@@ -9,6 +9,7 @@ export interface ITabPanelProps {
 export interface IProductsTableProps {
   items: ISubProductionPlanListItem[];
   isLoading: boolean;
+  control?: any;
 }
 
 export interface IMaterialCategory {

@@ -1,11 +1,14 @@
+import { Controller } from "react-hook-form";
 import { calculateCuTicu } from "../../lib/calculateCuTicu";
 import type { IProductsTableProps } from "../../types/type";
 import { useMaterialData } from "../../hooks/useProductMaterial";
 import { Spinner } from "./spinner";
+import { Input } from "./input";
 
 export default function ProductsTable({
   items,
   isLoading,
+  control,
 }: IProductsTableProps) {
   const { data: materials = [], isLoading: materialsLoading } =
     useMaterialData();
@@ -33,8 +36,8 @@ export default function ProductsTable({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse border border-[#1e7677] rounded-lg">
+    <div className="overflow-x-auto rounded-[4px]">
+      <table className="w-full border-collapse border border-[#1e7677] rounded-[4px]">
         <thead>
           <tr className="bg-[#1e7677] text-white">
             <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
@@ -48,6 +51,15 @@ export default function ProductsTable({
             </th>
             <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
               مقدار مواد مصرفی بر اساس BOM
+            </th>
+            <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
+              تولید واقعی
+            </th>
+            <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
+              مصرف واقعی مواد
+            </th>
+            <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
+              ضایعات (کیلوگرم)
             </th>
           </tr>
         </thead>
@@ -66,9 +78,12 @@ export default function ProductsTable({
               tarh
             );
 
+            const itemId = item.ID || index;
+            const fieldPrefix = `products.${itemId}`;
+
             return (
               <tr
-                key={item.ID || index}
+                key={itemId}
                 className="bg-gray-50 hover:bg-gray-100 transition-colors"
               >
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
@@ -89,13 +104,53 @@ export default function ProductsTable({
                   ) : (
                     <div className="flex flex-col gap-1">
                       <span className="text-sm text-red-500">
-                        <span className="font-medium">CU:</span>{cu.toFixed(2)}
+                        <span className="font-medium">CU:</span>
+                        {cu.toFixed(2)}
                       </span>
                       <span className="text-sm text-green-500">
                         <span className="font-medium">TICU:</span>
                         {ticu.toFixed(2)}
                       </span>
                     </div>
+                  )}
+                </td>
+                <td className="border border-[#1e7677] px-4 py-2 text-right">
+                  {control ? (
+                    <Controller
+                      name={`${fieldPrefix}.actualProduction`}
+                      control={control}
+                      render={({ field }) => (
+                        <Input {...field} type="text" className="w-24" />
+                      )}
+                    />
+                  ) : (
+                    <Input type="text" className="w-24" disabled />
+                  )}
+                </td>
+                <td className="border border-[#1e7677] px-4 py-2 text-right">
+                  {control ? (
+                    <Controller
+                      name={`${fieldPrefix}.actualMaterialConsumption`}
+                      control={control}
+                      render={({ field }) => (
+                        <Input {...field} type="text" className="w-24" />
+                      )}
+                    />
+                  ) : (
+                    <Input type="text" className="w-24" disabled />
+                  )}
+                </td>
+                <td className="border border-[#1e7677] px-4 py-2 text-right">
+                  {control ? (
+                    <Controller
+                      name={`${fieldPrefix}.waste`}
+                      control={control}
+                      render={({ field }) => (
+                        <Input {...field} type="text" className="w-24" />
+                      )}
+                    />
+                  ) : (
+                    <Input type="text" className="w-24" disabled />
                   )}
                 </td>
               </tr>
