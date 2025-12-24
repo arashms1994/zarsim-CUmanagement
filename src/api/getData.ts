@@ -6,6 +6,7 @@ import type {
   IPrintTajmiListItem,
   IStopListItem,
   IDevicesListItem,
+  IProductMaterialCuTicu,
 } from "../types/type";
 
 export async function getDevice(): Promise<IDevicesListItem[]> {
@@ -470,5 +471,38 @@ export async function getStopList(): Promise<IStopListItem[]> {
   } catch (err) {
     console.error("خطا در دریافت لیست توقفات:", err);
     throw err;
+  }
+}
+
+export async function getProductMaterialCuTicu(): Promise<
+  IProductMaterialCuTicu[]
+> {
+  const listGuid = config.LIST_GUIDS.PRODUCT_MATERIAL_CU_TICU;
+  if (!listGuid) {
+    throw new Error("GUID لیست PRODUCT_MATERIAL_CU_TICU تنظیم نشده است");
+  }
+
+  let allResults: IProductMaterialCuTicu[] = [];
+  let nextUrl = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$filter=faal eq 1 and (materialname eq 'CU' or materialname eq 'TICU')`;
+  try {
+    while (nextUrl) {
+      const response = await fetch(nextUrl, {
+        method: "GET",
+        headers: {
+          Accept: "application/json;odata=verbose",
+        },
+      });
+
+      const data = await response.json();
+
+      allResults = [...allResults, ...data.d.results];
+
+      nextUrl = data.d.__next || null;
+    }
+
+    return allResults;
+  } catch (err) {
+    console.error("خطا در دریافت آیتم‌ها:", err);
+    return [];
   }
 }

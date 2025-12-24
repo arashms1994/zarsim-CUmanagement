@@ -11,6 +11,7 @@ export const config = {
     PRINT_TAJMI: import.meta.env.VITE_PRINT_TAJMI_LIST_GUID,
     STOP_LIST: import.meta.env.VITE_STOP_LIST_GUID,
     DEVICES_LIST: import.meta.env.VITE_DEVICES_LIST_GUID,
+    PRODUCT_MATERIAL_CU_TICU: import.meta.env.VITE_PRODUCT_MATERIAL_CU_TICU_LIST_GUID,
   },
 
   API_TIMEOUT: parseInt(import.meta.env.VITE_API_TIMEOUT),
