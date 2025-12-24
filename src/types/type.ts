@@ -6,6 +6,11 @@ export interface ITabPanelProps {
   children?: React.ReactNode;
 }
 
+export interface IProductsTableProps {
+  items: ISubProductionPlanListItem[];
+  isLoading: boolean;
+}
+
 export interface IMaterialCategory {
   id: number;
   value: string;
@@ -379,4 +384,35 @@ export interface ICUManagementListItem {
   shiftId: string;
   shiftStartedAt: string;
   shiftEndedAt: string;
+}
+
+export interface IProductMaterialCuTicu {
+  FileSystemObjectType: number;
+  Id: number;
+  ContentTypeId: string;
+  Title: string;
+  materialname: string;
+  vahed: number;
+  tozihat: string | null;
+  marhale: number;
+  idproductionPlanproductgroup1: number;
+  idproductionPlanlevel: number;
+  percentageerror: number | null;
+  RelatedIDLevelId: number;
+  OData__x067e__x0631__x06a9__x0631__x06: string | null;
+  faal: boolean;
+  numberone: string;
+  send_to_history: string;
+  sendtohi: string | null;
+  test: string;
+  OData__x0627__x0641__x0632__x0648__x06: string | null;
+  OData__x062a__x063a__x06cc__x06cc__x06: string | null;
+  ID: number;
+  Modified: string;
+  Created: string;
+  AuthorId: number;
+  EditorId: number;
+  OData__UIVersionString: string;
+  Attachments: boolean;
+  GUID: string;
 }
