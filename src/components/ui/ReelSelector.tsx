@@ -78,11 +78,11 @@ export default function ReelSelector({
           key={index}
           className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
         >
-          <div className="flex-1 relative">
+          <div className="relative">
             <Input
               value={reel.reelTitle}
               placeholder="شماره قرقره..."
-              className="w-full"
+              className="w-full max-w-[250px]"
               onChange={(e) => {
                 const value = e.target.value;
                 handleReelChange(index, "reelTitle", value);
