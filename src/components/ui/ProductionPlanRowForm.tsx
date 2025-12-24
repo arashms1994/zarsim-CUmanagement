@@ -65,7 +65,7 @@ export default function ProductionPlanRowForm({
 
     console.log("⚠️ هیچ فیلد shomaretahshode یا shomaretajshode پیدا نشد");
     return [];
-  }, [planItem.shomaretahshode, planItem.shomaretajshode]);
+  }, [planItem]);
 
   const { planItems, isLoading: planItemsLoading } =
     useSubProductionPlanByNumbers(planNumbers);
