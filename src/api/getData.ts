@@ -208,7 +208,7 @@ export async function getSubProductionPlanByNumbers(
 
   const MAX_FILTER_ITEMS = 10;
   const selectFields =
-    "ID,shomarebarnamerizi,codemahsol,mahsoletolidi,tarhetolid,meghdarkolesefaresh,Title";
+    "ID,shomarebarnamerizi,codemahsol,mahsoletolidi,tarhetolid,meghdarkolesefaresh,Title,namemarhale,shomareradiffactor";
 
   try {
     const startTime = performance.now();

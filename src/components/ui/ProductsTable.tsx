@@ -81,6 +81,39 @@ export default function ProductsTable({
             const itemId = item.ID || index;
             const fieldPrefix = `products.${itemId}`;
 
+            // ساخت URL با فیلتر shomareradiffactor
+            const buildReportUrl = () => {
+              const baseUrl =
+                "https://portal.zarsim.com/Lists/Subproductionplan/Control.aspx";
+              const viewId = "7ABE9D36-A211-4E6A-B92E-E940005F2C3A";
+              const filterValue =
+                item.shomareradiffactor && item.shomareradiffactor.trim()
+                  ? item.shomareradiffactor.trim()
+                  : "";
+
+              console.log("🔍 اطلاعات ردیف:", {
+                itemId: itemId,
+                shomareradiffactor: item.shomareradiffactor,
+                filterValue: filterValue,
+                fullItem: item,
+              });
+
+              const params = new URLSearchParams({
+                View: `{${viewId}}`,
+                FilterField1: "shomareradiffactor",
+                FilterValue1: filterValue,
+              });
+
+              const finalUrl = `${baseUrl}?${params.toString()}`;
+              console.log("🔗 URL ساخته شده:", finalUrl);
+              console.log("📋 پارامترهای URL:", Object.fromEntries(params));
+
+              return finalUrl;
+            };
+
+            const reportUrl = buildReportUrl();
+            const productName = item.codemahsol || item.mahsoletolidi || "-";
+
             return (
               <tr
                 key={itemId}
@@ -90,7 +123,25 @@ export default function ProductsTable({
                   {item.tarhetolid || "-"}
                 </td>
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
-                  {item.codemahsol || item.mahsoletolidi || "-"}
+                  {productName !== "-" ? (
+                    <a
+                      href={reportUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                      onClick={() => {
+                        console.log("🖱️ کلیک روی لینک:", {
+                          productName,
+                          reportUrl,
+                          itemId,
+                        });
+                      }}
+                    >
+                      {productName}
+                    </a>
+                  ) : (
+                    "-"
+                  )}
                 </td>
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {item.meghdarkolesefaresh || "-"}
