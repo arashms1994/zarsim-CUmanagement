@@ -13,11 +13,7 @@ export default function CUManagement() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showColorDropdown, setShowColorDropdown] = useState(false);
   const [showStageDropdown, setShowStageDropdown] = useState(false);
-  const [showMachineDropdown, setShowMachineDropdown] = useState(false);
   const [selectedStage, setSelectedStage] = useState<string | undefined>(
-    undefined
-  );
-  const [selectedMachine, setSelectedMachine] = useState<string | undefined>(
     undefined
   );
   const [selectedColor, setSelectedColor] = useState<string | undefined>(
@@ -58,7 +54,7 @@ export default function CUManagement() {
     return uniq;
   }, [planDetails, selectedStage]);
 
-  const availableMachines = useMemo(() => {
+  const filteredPlanDetails = useMemo(() => {
     if (!planDetails || planDetails.length === 0) return [];
     if (!selectedStage) return [];
 
@@ -69,62 +65,23 @@ export default function CUManagement() {
       items = items.filter((item) => item.rang === selectedColor);
     }
 
-    const machines = items
-      .map((item) => item.dasatghah)
-      .filter((m): m is string => !!m && m.trim().length > 0);
-
-    const uniq = Array.from(new Set(machines));
-
-    return uniq;
-  }, [planDetails, selectedStage, selectedColor, uniqueColors.length]);
-
-  const filteredPlanDetails = useMemo(() => {
-    if (!planDetails || planDetails.length === 0) return [];
-    if (!selectedStage) return [];
-    if (!selectedMachine) return [];
-
-    let items = planDetails.filter(
-      (item) =>
-        item.marhale === selectedStage && item.dasatghah === selectedMachine
-    );
-
-    if (uniqueColors.length > 0) {
-      if (!selectedColor) return [];
-      items = items.filter((item) => item.rang === selectedColor);
-    }
-
     return items;
-  }, [
-    planDetails,
-    selectedStage,
-    selectedMachine,
-    selectedColor,
-    uniqueColors.length,
-  ]);
+  }, [planDetails, selectedStage, selectedColor, uniqueColors.length]);
 
   const handleCartSelect = (cartNumber: string) => {
     setValue("productionPlanNumber", cartNumber);
     setShowSuggestions(false);
     setSelectedStage(undefined);
-    setSelectedMachine(undefined);
     setSelectedColor(undefined);
     setShowStageDropdown(false);
-    setShowMachineDropdown(false);
     setShowColorDropdown(false);
   };
 
   const handleStageChange = (stage: string) => {
     setSelectedStage(stage);
-    setSelectedMachine(undefined);
     setSelectedColor(undefined);
     setShowStageDropdown(false);
-    setShowMachineDropdown(false);
     setShowColorDropdown(false);
-  };
-
-  const handleMachineChange = (machine: string) => {
-    setSelectedMachine(machine);
-    setShowMachineDropdown(false);
   };
 
   return (
@@ -331,66 +288,7 @@ export default function CUManagement() {
                 </div>
               )}
 
-              {selectedStage &&
-                (uniqueColors.length === 0 || selectedColor) && (
-                  <div className="flex items-center justify-start gap-3">
-                    <label htmlFor="machine-select" className="min-w-[150px]">
-                      دستگاه را انتخاب کنید:
-                    </label>
-                    <div className="relative">
-                      <div
-                        onClick={() =>
-                          setShowMachineDropdown(!showMachineDropdown)
-                        }
-                        onBlur={() =>
-                          setTimeout(() => setShowMachineDropdown(false), 200)
-                        }
-                        tabIndex={0}
-                        className="w-[250px] px-3 py-2 text-sm border border-gray-300 rounded-md bg-white cursor-pointer hover:bg-gray-50 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#1e7677]"
-                      >
-                        <span
-                          className={selectedMachine ? "" : "text-gray-500"}
-                        >
-                          {selectedMachine || "دستگاه را انتخاب کنید..."}
-                        </span>
-                        <svg
-                          className={`w-4 h-4 transition-transform ${
-                            showMachineDropdown ? "rotate-180" : ""
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </div>
-                      {showMachineDropdown && (
-                        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                          {availableMachines.map((machine, index) => (
-                            <div
-                              key={`${machine}-${index}`}
-                              className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                                selectedMachine === machine
-                                  ? "bg-[#1e7677] text-white"
-                                  : "hover:bg-gray-100"
-                              }`}
-                              onClick={() => handleMachineChange(machine)}
-                            >
-                              {machine}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-              {selectedStage && selectedMachine ? (
+              {selectedStage ? (
                 filteredPlanDetails.length > 0 ? (
                   filteredPlanDetails.map((planItem, index) => (
                     <ProductionPlanRowForm
@@ -404,8 +302,7 @@ export default function CUManagement() {
                   <div className="flex items-center justify-center py-8">
                     <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-6 py-4">
                       <span className="text-yellow-700 font-medium">
-                        هیچ ردیفی برای مرحله "{selectedStage}" و دستگاه "
-                        {selectedMachine}" یافت نشد
+                        هیچ ردیفی برای مرحله "{selectedStage}" یافت نشد
                       </span>
                     </div>
                   </div>
@@ -414,7 +311,7 @@ export default function CUManagement() {
                 <div className="flex items-center justify-center py-8">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg px-6 py-4">
                     <span className="text-blue-700 font-medium">
-                      لطفاً مرحله و دستگاه را انتخاب کنید
+                      لطفاً مرحله را انتخاب کنید
                     </span>
                   </div>
                 </div>
