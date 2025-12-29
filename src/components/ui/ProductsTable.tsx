@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { Controller } from "react-hook-form";
-import { calculateCuTicu } from "../../lib/calculateCuTicu";
+import { useQueries } from "@tanstack/react-query";
 import type { IProductsTableProps } from "../../types/type";
-import { useMaterialData } from "../../hooks/useProductMaterial";
+import { getProductMaterialPerStage } from "../../api/getData";
+import type { IProductMaterialPerStage } from "../../types/type";
 import { Spinner } from "./spinner";
 import { Input } from "./input";
 
@@ -10,8 +12,39 @@ export default function ProductsTable({
   isLoading,
   control,
 }: IProductsTableProps) {
-  const { data: materials = [], isLoading: materialsLoading } =
-    useMaterialData();
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+      const meghdar = item.meghdarkolesefaresh
+        ? parseFloat(item.meghdarkolesefaresh.toString())
+        : 0;
+      return meghdar >= 10;
+    });
+  }, [items]);
+
+  const uniqueTarhetolids = useMemo(() => {
+    const tarhetolids = filteredItems
+      .map((item) => item.tarhetolid)
+      .filter((t): t is string => !!t && t.trim().length > 0);
+    return Array.from(new Set(tarhetolids));
+  }, [filteredItems]);
+
+  const materialQueries = useQueries({
+    queries: uniqueTarhetolids.map((tarhetolid) => ({
+      queryKey: ["product-material-per-stage", tarhetolid],
+      queryFn: () => getProductMaterialPerStage(tarhetolid),
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+    })),
+  });
+
+  const allMaterials = useMemo(() => {
+    return materialQueries
+      .flatMap((query) => query.data || [])
+      .filter((m): m is IProductMaterialPerStage => !!m);
+  }, [materialQueries]);
+
+  const isLoadingMaterials = materialQueries.some((query) => query.isLoading);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-4">
@@ -23,7 +56,7 @@ export default function ProductsTable({
     );
   }
 
-  if (items.length === 0) {
+  if (filteredItems.length === 0) {
     return (
       <div className="flex items-center justify-center py-4">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2">
@@ -64,24 +97,10 @@ export default function ProductsTable({
           </tr>
         </thead>
         <tbody>
-          {items.map((item, index) => {
-            const meghdar = item.meghdarkolesefaresh
-              ? parseFloat(item.meghdarkolesefaresh.toString())
-              : 0;
-            const tarh = item.tarhetolid || "";
-            const vahed = "متر";
-
-            const { cu, ticu } = calculateCuTicu(
-              materials,
-              meghdar,
-              vahed,
-              tarh
-            );
-
+          {filteredItems.map((item, index) => {
             const itemId = item.ID || index;
             const fieldPrefix = `products.${itemId}`;
 
-            // ساخت URL با فیلتر shomareradiffactor
             const buildReportUrl = () => {
               const baseUrl =
                 "https://portal.zarsim.com/Lists/Subproductionplan/Control.aspx";
@@ -91,28 +110,52 @@ export default function ProductsTable({
                   ? item.shomareradiffactor.trim()
                   : "";
 
-              console.log("🔍 اطلاعات ردیف:", {
-                itemId: itemId,
-                shomareradiffactor: item.shomareradiffactor,
-                filterValue: filterValue,
-                fullItem: item,
-              });
-
               const params = new URLSearchParams({
                 View: `{${viewId}}`,
                 FilterField1: "shomareradiffactor",
                 FilterValue1: filterValue,
               });
 
-              const finalUrl = `${baseUrl}?${params.toString()}`;
-              console.log("🔗 URL ساخته شده:", finalUrl);
-              console.log("📋 پارامترهای URL:", Object.fromEntries(params));
-
-              return finalUrl;
+              return `${baseUrl}?${params.toString()}`;
             };
 
             const reportUrl = buildReportUrl();
             const productName = item.codemahsol || item.mahsoletolidi || "-";
+
+            const stageNumber =
+              item.shomaremarhale && item.shomaremarhale.trim()
+                ? parseFloat(item.shomaremarhale.trim())
+                : null;
+
+            const stageMaterials = allMaterials.filter((material) => {
+              if (item.tarhetolid) {
+                if (
+                  !material.Title ||
+                  !material.Title.includes(item.tarhetolid)
+                ) {
+                  return false;
+                }
+              }
+
+              if (stageNumber === null || isNaN(stageNumber)) return false;
+
+              const marhaleString = String(material.marhale).trim();
+              if (!marhaleString) return false;
+
+              if (marhaleString.includes(";")) {
+                const marhaleNumbers = marhaleString
+                  .split(";")
+                  .map((m: string) => m.trim())
+                  .filter((m: string) => m.length > 0)
+                  .map((m: string) => parseFloat(m))
+                  .filter((n: number) => !isNaN(n));
+
+                return marhaleNumbers.includes(stageNumber);
+              }
+
+              const marhaleNumber = parseFloat(marhaleString);
+              return !isNaN(marhaleNumber) && marhaleNumber === stageNumber;
+            });
 
             return (
               <tr
@@ -147,22 +190,36 @@ export default function ProductsTable({
                   {item.meghdarkolesefaresh || "-"}
                 </td>
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
-                  {materialsLoading ? (
+                  {isLoadingMaterials ? (
                     <span className="text-purple-500 text-sm flex justify-start items-center">
                       <Spinner className="size-8 text-purple-500" />
                       در حال محاسبه...
                     </span>
-                  ) : (
+                  ) : stageMaterials.length > 0 ? (
                     <div className="flex flex-col gap-1">
-                      <span className="text-sm text-red-500">
-                        <span className="font-medium">CU:</span>
-                        {cu.toFixed(2)}
-                      </span>
-                      <span className="text-sm text-green-500">
-                        <span className="font-medium">TICU:</span>
-                        {ticu.toFixed(2)}
-                      </span>
+                      {stageMaterials.map((material, idx) => {
+                        const meghdar = item.meghdarkolesefaresh
+                          ? parseFloat(item.meghdarkolesefaresh.toString())
+                          : 0;
+                        const weightInKg = (
+                          (material.vahed * meghdar) /
+                          1000
+                        ).toFixed(2);
+                        return (
+                          <div
+                            key={idx}
+                            className="text-sm text-red-500 flex flex-row items-center gap-2"
+                          >
+                            <span>کیلوگرم {weightInKg}</span>
+                            <span className="font-medium">
+                              :{material.materialname}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
+                  ) : (
+                    <span className="text-red-500 text-sm">-</span>
                   )}
                 </td>
                 <td className="border border-[#1e7677] px-4 py-2 text-right">

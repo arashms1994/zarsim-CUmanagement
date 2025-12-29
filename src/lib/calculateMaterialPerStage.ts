@@ -1,7 +1,7 @@
-import type { IProductMaterialCuTicu } from "../types/type";
+import type { IProductMaterialPerStage } from "../types/type";
 
-export function calculateCuTicu(
-  materials: IProductMaterialCuTicu[],
+export function calculateMaterialPerStage(
+  materials: IProductMaterialPerStage[],
   meghdarjahattolid: number,
   vahed: string,
   tarh?: string

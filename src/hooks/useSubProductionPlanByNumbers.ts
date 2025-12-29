@@ -13,20 +13,11 @@ export const useSubProductionPlanByNumbers = (numbers: string[]) => {
   } = useQuery({
     queryKey: ["sub-production-plan-by-numbers", sortedNumbers],
     queryFn: () => {
-      console.log("🚀 شروع دریافت داده برای شماره‌ها:", numbers);
       return getSubProductionPlanByNumbers(numbers);
     },
     enabled: numbers.length > 0,
     staleTime: config.CACHE_STALE_TIME,
     gcTime: 5 * 60 * 1000,
-  });
-
-  console.log("📊 Hook State:", {
-    numbers,
-    planItemsCount: planItems.length,
-    isLoading,
-    isFetching,
-    enabled: numbers.length > 0,
   });
 
   return {

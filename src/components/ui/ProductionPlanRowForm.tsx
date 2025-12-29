@@ -22,13 +22,6 @@ export default function ProductionPlanRowForm({
   const [exitReels, setExitReels] = useState<IReelItem[]>([]);
 
   const planNumbers = useMemo(() => {
-    console.log("🔍 بررسی planItem:", {
-      shomaretahshode: planItem.shomaretahshode,
-      shomaretajshode: planItem.shomaretajshode,
-      codemahsol: planItem.codemahsol,
-      fullItem: planItem,
-    });
-
     if (
       planItem.shomaretahshode &&
       planItem.shomaretahshode.trim().length > 0
@@ -37,12 +30,7 @@ export default function ProductionPlanRowForm({
         .split(",")
         .map((n: string) => n.trim())
         .filter((n: string) => n.length > 0);
-      console.log(
-        "📝 استخراج شماره‌ها از shomaretahshode:",
-        planItem.shomaretahshode,
-        "→",
-        numbers
-      );
+
       return numbers;
     }
 
@@ -54,16 +42,10 @@ export default function ProductionPlanRowForm({
         .split(",")
         .map((n: string) => n.trim())
         .filter((n: string) => n.length > 0);
-      console.log(
-        "📝 استخراج شماره‌ها از shomaretajshode:",
-        planItem.shomaretajshode,
-        "→",
-        numbers
-      );
+
       return numbers;
     }
 
-    console.log("⚠️ هیچ فیلد shomaretahshode یا shomaretajshode پیدا نشد");
     return [];
   }, [planItem]);
 
@@ -92,6 +74,13 @@ export default function ProductionPlanRowForm({
               مقدار برنامه ریزی شده:
             </label>
             <span className="text-lg font-normal">{planItem.barnamerizi}</span>
+          </div>
+
+          <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">
+            <label className="min-w-[150px] font-medium">
+              توضیحات کارت:
+            </label>
+            <span className="text-lg font-normal">{planItem.tojihat}</span>
           </div>
 
           <DeviceSelector
