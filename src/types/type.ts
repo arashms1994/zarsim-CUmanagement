@@ -339,13 +339,15 @@ export interface IStopListItem {
 export interface IReelListItem {
   Id: number;
   Title: string;
-  Code?: string;
+  Size?: string;
+  Weight?: string;
 }
 
 export interface IReelItem {
   reelId: number;
   reelTitle: string;
   weight: string;
+  amount: string;
 }
 
 export interface IReelSelectorProps {
@@ -387,7 +389,7 @@ export interface ICUManagementListItem {
   shiftEndedAt: string;
 }
 
-export interface IProductMaterialCuTicu {
+export interface IProductMaterialPerStage {
   FileSystemObjectType: number;
   Id: number;
   ContentTypeId: string;

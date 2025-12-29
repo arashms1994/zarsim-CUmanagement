@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Input } from "./input";
-import { REELS_LIST } from "../../lib/constants";
+import { useSearchReels } from "../../hooks/useSearchReels";
+import { SkeletonSearchSuggestion } from "./Skeleton";
 import type { IReelSelectorProps, IReelItem } from "../../types/type";
 
 export default function ReelSelector({
@@ -11,13 +12,19 @@ export default function ReelSelector({
   const [showReelSuggestions, setShowReelSuggestions] = useState<number | null>(
     null
   );
-  const [newReelTitle, setNewReelTitle] = useState("");
+
+  const {
+    searchResults: reelResults,
+    isLoading: reelLoading,
+    handleSearch: handleReelSearch,
+  } = useSearchReels();
 
   const handleAddReel = () => {
     const newReel: IReelItem = {
       reelId: 0,
       reelTitle: "",
       weight: "",
+      amount: "",
     };
     onReelsChange([...reels, newReel]);
   };
@@ -50,17 +57,6 @@ export default function ReelSelector({
     setShowReelSuggestions(null);
   };
 
-  const handleAddNewReel = (index: number) => {
-    if (newReelTitle.trim().length > 0) {
-      const maxId =
-        REELS_LIST.length > 0 ? Math.max(...REELS_LIST.map((r) => r.id)) : 0;
-
-      const newReelId = maxId + 1;
-      handleSelectReel(index, newReelId, newReelTitle.trim());
-      setNewReelTitle("");
-    }
-  };
-
   return (
     <div className="w-full space-y-3">
       <div className="flex items-center w-[400px] justify-between gap-12 mb-2">
@@ -81,16 +77,18 @@ export default function ReelSelector({
           <div className="relative">
             <Input
               value={reel.reelTitle}
-              placeholder="شماره قرقره..."
+              placeholder="جستجو قرقره..."
               className="w-full max-w-[250px]"
               onChange={(e) => {
                 const value = e.target.value;
                 handleReelChange(index, "reelTitle", value);
-                setNewReelTitle(value);
+                handleReelSearch(value);
                 setShowReelSuggestions(index);
               }}
               onFocus={() => {
-                setShowReelSuggestions(index);
+                if (reel.reelTitle.trim().length > 0) {
+                  setShowReelSuggestions(index);
+                }
               }}
               onBlur={() => {
                 setTimeout(() => setShowReelSuggestions(null), 200);
@@ -99,54 +97,27 @@ export default function ReelSelector({
 
             {showReelSuggestions === index && (
               <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {REELS_LIST.filter((r) =>
-                  r.title.toLowerCase().includes(reel.reelTitle.toLowerCase())
-                ).length > 0 ? (
-                  <>
-                    {REELS_LIST.filter((r) =>
-                      r.title
-                        .toLowerCase()
-                        .includes(reel.reelTitle.toLowerCase())
-                    ).map((reelOption) => (
-                      <div
-                        key={reelOption.id}
-                        className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                        onClick={() => {
-                          handleSelectReel(
-                            index,
-                            reelOption.id,
-                            reelOption.title
-                          );
-                        }}
-                      >
-                        {reelOption.title}
-                      </div>
-                    ))}
-                    {reel.reelTitle.trim().length > 0 &&
-                      !REELS_LIST.some(
-                        (r) =>
-                          r.title.toLowerCase() === reel.reelTitle.toLowerCase()
-                      ) && (
-                        <div
-                          className="px-3 py-2 text-sm bg-blue-50 hover:bg-blue-100 cursor-pointer border-t border-gray-200 font-medium text-blue-700"
-                          onClick={() => handleAddNewReel(index)}
-                        >
-                          افزودن "{reel.reelTitle}"
-                        </div>
-                      )}
-                  </>
+                {reelLoading ? (
+                  <SkeletonSearchSuggestion count={3} />
+                ) : reelResults.length > 0 ? (
+                  reelResults.map((reelOption) => (
+                    <div
+                      key={reelOption.Id}
+                      className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      onClick={() => {
+                        handleSelectReel(
+                          index,
+                          reelOption.Id,
+                          reelOption.Title
+                        );
+                      }}
+                    >
+                      {reelOption.Title}
+                    </div>
+                  ))
                 ) : (
                   <div className="px-3 py-2 text-sm text-gray-500">
-                    {reel.reelTitle.trim().length > 0 ? (
-                      <div
-                        className="cursor-pointer hover:bg-blue-50 p-2 rounded bg-blue-50 text-blue-700 font-medium"
-                        onClick={() => handleAddNewReel(index)}
-                      >
-                        افزودن "{reel.reelTitle}"
-                      </div>
-                    ) : (
-                      "قرقره‌ای یافت نشد"
-                    )}
+                    قرقره‌ای یافت نشد
                   </div>
                 )}
               </div>
@@ -165,9 +136,21 @@ export default function ReelSelector({
             />
           </div>
 
+          <div className="w-[200px]">
+            <Input
+              value={reel.amount}
+              placeholder="متراژ (متر)..."
+              type="string"
+              className="w-full"
+              onChange={(e) => {
+                handleReelChange(index, "amount", e.target.value);
+              }}
+            />
+          </div>
+
           <div
             onClick={() => handleRemoveReel(index)}
-            className="px-3 py-2 cursor-pointer bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+            className="px-3 py-2 cursor-pointer bg-red-500 text-white rounded-lg hover:bg-red-700 duration-300 transition-colors text-sm"
           >
             حذف
           </div>

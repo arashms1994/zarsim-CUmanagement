@@ -6,7 +6,8 @@ import type {
   IPrintTajmiListItem,
   IStopListItem,
   IDevicesListItem,
-  IProductMaterialCuTicu,
+  IProductMaterialPerStage,
+  IReelListItem,
 } from "../types/type";
 
 export async function getDevice(): Promise<IDevicesListItem[]> {
@@ -202,17 +203,13 @@ export async function getSubProductionPlanByNumbers(
 
   if (cleanNumbers.length === 0) return [];
 
-  console.log("🔍 جستجوی ردیف‌های برنامه‌ریزی برای شماره‌ها:", cleanNumbers);
-
   let items: ISubProductionPlanListItem[] = [];
 
   const MAX_FILTER_ITEMS = 10;
   const selectFields =
-    "ID,shomarebarnamerizi,codemahsol,mahsoletolidi,tarhetolid,meghdarkolesefaresh,Title,namemarhale,shomareradiffactor";
+    "ID,shomarebarnamerizi,codemahsol,mahsoletolidi,tarhetolid,meghdarkolesefaresh,Title,namemarhale,shomareradiffactor,shomaremarhale";
 
   try {
-    const startTime = performance.now();
-
     if (cleanNumbers.length <= MAX_FILTER_ITEMS) {
       const filterParts = cleanNumbers.map(
         (num) => `shomarebarnamerizi eq '${num.replace(/'/g, "''")}'`
@@ -259,10 +256,6 @@ export async function getSubProductionPlanByNumbers(
       for (let i = 0; i < cleanNumbers.length; i += MAX_FILTER_ITEMS) {
         batches.push(cleanNumbers.slice(i, i + MAX_FILTER_ITEMS));
       }
-
-      console.log(
-        `📦 تقسیم ${cleanNumbers.length} شماره به ${batches.length} دسته`
-      );
 
       const promises = batches.map(async (batch) => {
         const filterParts = batch.map(
@@ -313,24 +306,6 @@ export async function getSubProductionPlanByNumbers(
       const results = await Promise.all(promises);
       items = results.flat();
     }
-
-    const endTime = performance.now();
-    const duration = ((endTime - startTime) / 1000).toFixed(2);
-
-    console.log(
-      `✅ دریافت ${items.length} ردیف برنامه‌ریزی در ${duration} ثانیه`
-    );
-    console.log("📦 داده‌های دریافت شده از subProductionPlan:", items);
-    console.log("🔢 شماره‌های جستجو شده:", cleanNumbers);
-    console.log(
-      "📋 ردیف‌های پیدا شده:",
-      items.map((item) => ({
-        ID: item.ID,
-        shomarebarnamerizi: item.shomarebarnamerizi,
-        codemahsol: item.codemahsol,
-        mahsoletolidi: item.mahsoletolidi,
-      }))
-    );
 
     return items;
   } catch (err) {
@@ -474,16 +449,26 @@ export async function getStopList(): Promise<IStopListItem[]> {
   }
 }
 
-export async function getProductMaterialCuTicu(): Promise<
-  IProductMaterialCuTicu[]
-> {
-  const listGuid = config.LIST_GUIDS.PRODUCT_MATERIAL_CU_TICU;
+export async function getProductMaterialPerStage(
+  tarhetolid?: string
+): Promise<IProductMaterialPerStage[]> {
+  const listGuid = config.LIST_GUIDS.PRODUCT_MATERIAL_PER_STAGE;
   if (!listGuid) {
-    throw new Error("GUID لیست PRODUCT_MATERIAL_CU_TICU تنظیم نشده است");
+    throw new Error("GUID لیست PRODUCT_MATERIAL_PER_STAGE تنظیم نشده است");
   }
 
-  let allResults: IProductMaterialCuTicu[] = [];
-  let nextUrl = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$filter=faal eq 1 and (materialname eq 'CU' or materialname eq 'TICU')`;
+  let allResults: IProductMaterialPerStage[] = [];
+  let filter = "faal eq 1";
+
+  if (tarhetolid) {
+    const encodedTarhetolid = tarhetolid;
+    filter += ` and substringof('${encodedTarhetolid}', Title)`;
+  }
+
+  let nextUrl = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$filter=${encodeURIComponent(
+    filter
+  )}`;
+
   try {
     while (nextUrl) {
       const response = await fetch(nextUrl, {
@@ -504,5 +489,55 @@ export async function getProductMaterialCuTicu(): Promise<
   } catch (err) {
     console.error("خطا در دریافت آیتم‌ها:", err);
     return [];
+  }
+}
+
+export async function getReels(): Promise<IReelListItem[]> {
+  let items: IReelListItem[] = [];
+
+  const listGuid = config.LIST_GUIDS.REELS_LIST;
+  if (!listGuid) {
+    throw new Error("GUID لیست REELS_LIST تنظیم نشده است");
+  }
+
+  let nextUrl:
+    | string
+    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=Id,Title,Size,Weight`;
+
+  try {
+    while (nextUrl) {
+      const res = await fetch(nextUrl, {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(
+          `خطا در گرفتن لیست قرقره‌ها: ${err} (Status: ${res.status})`
+        );
+      }
+
+      const json: {
+        d: { results: IReelListItem[]; __next?: string };
+      } = await res.json();
+
+      const results = json.d?.results;
+      if (!Array.isArray(results)) {
+        throw new Error(
+          "ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست"
+        );
+      }
+
+      items = [...items, ...results];
+      nextUrl = json.d.__next ?? null;
+    }
+
+    return items;
+  } catch (err) {
+    console.error("خطا در دریافت لیست قرقره‌ها:", err);
+    throw err;
   }
 }
