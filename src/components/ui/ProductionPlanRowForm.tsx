@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import type { IProductionPlanRowFormProps, IReelItem } from "../../types/type";
 import { Input } from "./input";
 import OperatorSelector from "./OperatorSelector";
@@ -15,6 +15,7 @@ export default function ProductionPlanRowForm({
 }: IProductionPlanRowFormProps) {
   const localForm = useForm();
   const control = externalControl || localForm.control;
+  const setValue = externalControl?.setValue || localForm.setValue;
   const [operator, setOperator] = useState("");
   const [stopReason, setStopReason] = useState("");
   const [deviceName, setDeviceName] = useState(planItem.dasatghah || "");
@@ -52,6 +53,11 @@ export default function ProductionPlanRowForm({
   const { planItems, isLoading: planItemsLoading } =
     useSubProductionPlanByNumbers(planNumbers);
 
+  const actualAmountProduction = useWatch({
+    control,
+    name: "actualAmountProduction",
+  });
+
   return (
     <div className="w-full p-5 gap-2 flex justify-between items-center flex-wrap rounded-[4px] border-2 shadow border-[#1e7677] relative">
       <div className="w-full flex justify-between items-center mb-4">
@@ -74,13 +80,6 @@ export default function ProductionPlanRowForm({
               مقدار برنامه ریزی شده:
             </label>
             <span className="text-lg font-normal">{planItem.barnamerizi}</span>
-          </div>
-
-          <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">
-            <label className="min-w-[150px] font-medium">
-              توضیحات کارت:
-            </label>
-            <span className="text-lg font-normal">{planItem.tojihat}</span>
           </div>
 
           <DeviceSelector
@@ -173,6 +172,8 @@ export default function ProductionPlanRowForm({
               items={planItems}
               isLoading={planItemsLoading}
               control={control}
+              actualAmountProduction={actualAmountProduction}
+              setValue={setValue}
             />
           ) : (
             <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">

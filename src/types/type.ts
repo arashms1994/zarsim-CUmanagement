@@ -10,6 +10,8 @@ export interface IProductsTableProps {
   items: ISubProductionPlanListItem[];
   isLoading: boolean;
   control?: any;
+  actualAmountProduction?: string;
+  setValue?: (name: string, value: any, options?: any) => void;
 }
 
 export interface IMaterialCategory {

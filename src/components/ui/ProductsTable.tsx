@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { Controller } from "react-hook-form";
 import { useQueries } from "@tanstack/react-query";
 import type { IProductsTableProps } from "../../types/type";
@@ -11,6 +11,8 @@ export default function ProductsTable({
   items,
   isLoading,
   control,
+  actualAmountProduction,
+  setValue,
 }: IProductsTableProps) {
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
@@ -20,6 +22,143 @@ export default function ProductsTable({
       return meghdar >= 10;
     });
   }, [items]);
+
+  // مرتب‌سازی بر اساس اولویت (از کوچک به بزرگ)
+  const sortedItems = useMemo(() => {
+    return [...filteredItems].sort((a, b) => {
+      const priorityA =
+        a.Priority && a.Priority.trim()
+          ? parseFloat(a.Priority.trim())
+          : Infinity;
+      const priorityB =
+        b.Priority && b.Priority.trim()
+          ? parseFloat(b.Priority.trim())
+          : Infinity;
+
+      // اگر اولویت معتبر نبود، به انتها می‌رود
+      if (isNaN(priorityA) && isNaN(priorityB)) return 0;
+      if (isNaN(priorityA)) return 1;
+      if (isNaN(priorityB)) return -1;
+
+      return priorityA - priorityB;
+    });
+  }, [filteredItems]);
+
+  // محاسبه مقادیر actualProduction بر اساس اولویت
+  const productionValues = useMemo(() => {
+    if (!control || !actualAmountProduction) {
+      return {};
+    }
+
+    const totalProduction = parseFloat(actualAmountProduction);
+    if (isNaN(totalProduction) || totalProduction <= 0) {
+      return {};
+    }
+
+    if (sortedItems.length === 0) {
+      return {};
+    }
+
+    const values: Record<string, string> = {};
+
+    // بررسی اینکه آیا همه آیتم‌ها اولویت دارند یا نه
+    const itemsWithPriority = sortedItems.filter(
+      (item) =>
+        item.Priority &&
+        item.Priority.trim() &&
+        !isNaN(parseFloat(item.Priority.trim()))
+    );
+
+    // ابتدا همه را صفر می‌کنیم
+    sortedItems.forEach((item) => {
+      const itemPreInvoiceRowId = item.shomareradiffactor;
+      if (itemPreInvoiceRowId) {
+        values[`${itemPreInvoiceRowId}.actualProduction`] = "0";
+      }
+    });
+
+    if (itemsWithPriority.length === 0) {
+      // اگر هیچ اولویتی وجود نداشت، به طور مساوی تقسیم می‌کنیم
+      const equalValue = (totalProduction / sortedItems.length).toFixed(2);
+      sortedItems.forEach((item) => {
+        const itemPreInvoiceRowId = item.shomareradiffactor;
+        if (itemPreInvoiceRowId) {
+          values[`${itemPreInvoiceRowId}.actualProduction`] = equalValue;
+        }
+      });
+    } else {
+      // تقسیم بر اساس اولویت
+      let remainingProduction = totalProduction;
+      const priorityGroups = new Map<number, typeof sortedItems>();
+
+      // گروه‌بندی بر اساس اولویت
+      itemsWithPriority.forEach((item) => {
+        const priority = parseFloat(item.Priority.trim());
+        if (!priorityGroups.has(priority)) {
+          priorityGroups.set(priority, []);
+        }
+        priorityGroups.get(priority)!.push(item);
+      });
+
+      // مرتب‌سازی اولویت‌ها
+      const sortedPriorities = Array.from(priorityGroups.keys()).sort(
+        (a, b) => a - b
+      );
+
+      // تقسیم بر اساس اولویت
+      for (const priority of sortedPriorities) {
+        const itemsInPriority = priorityGroups.get(priority)!;
+
+        for (const item of itemsInPriority) {
+          if (remainingProduction <= 0) {
+            break;
+          }
+
+          const itemPreInvoiceRowId = item.shomareradiffactor;
+          if (!itemPreInvoiceRowId) {
+            continue;
+          }
+
+          const meghdar = item.meghdarkolesefaresh
+            ? parseFloat(item.meghdarkolesefaresh.toString())
+            : 0;
+
+          // مقدار قابل تخصیص برای این آیتم
+          const allocated = Math.min(meghdar, remainingProduction);
+
+          if (allocated > 0) {
+            values[`${itemPreInvoiceRowId}.actualProduction`] =
+              allocated.toFixed(2);
+            remainingProduction -= allocated;
+          }
+        }
+
+        if (remainingProduction <= 0) {
+          break;
+        }
+      }
+    }
+
+    return values;
+  }, [sortedItems, actualAmountProduction, control]);
+
+  // تنظیم مقادیر در فرم
+  useEffect(() => {
+    if (setValue && Object.keys(productionValues).length > 0) {
+      // استفاده از setTimeout برای اطمینان از اینکه Controller ها render شده‌اند
+      const timeoutId = setTimeout(() => {
+        Object.entries(productionValues).forEach(([fieldName, value]) => {
+          setValue(fieldName, value, {
+            shouldValidate: false,
+            shouldDirty: false,
+            shouldTouch: false,
+          });
+        });
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [productionValues, setValue]);
 
   const uniqueTarhetolids = useMemo(() => {
     const tarhetolids = filteredItems
@@ -56,7 +195,7 @@ export default function ProductsTable({
     );
   }
 
-  if (filteredItems.length === 0) {
+  if (sortedItems.length === 0) {
     return (
       <div className="flex items-center justify-center py-4">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2">
@@ -73,6 +212,9 @@ export default function ProductsTable({
       <table className="w-full border-collapse border border-[#1e7677] rounded-[4px]">
         <thead>
           <tr className="bg-[#1e7677] text-white">
+            <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
+              اولویت
+            </th>
             <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
               کد طرح
             </th>
@@ -97,9 +239,8 @@ export default function ProductsTable({
           </tr>
         </thead>
         <tbody>
-          {filteredItems.map((item, index) => {
-            const itemId = item.ID || index;
-            const fieldPrefix = `products.${itemId}`;
+          {sortedItems.map((item) => {
+            const itemPreInvoiceRowId = item.shomareradiffactor;
 
             const buildReportUrl = () => {
               const baseUrl =
@@ -122,10 +263,25 @@ export default function ProductsTable({
             const reportUrl = buildReportUrl();
             const productName = item.codemahsol || item.mahsoletolidi || "-";
 
-            const stageNumber =
-              item.shomaremarhale && item.shomaremarhale.trim()
-                ? parseFloat(item.shomaremarhale.trim())
-                : null;
+            let maxStageNumber: number | null = null;
+            if (item.shomaremarhale && item.shomaremarhale.trim()) {
+              const stageString = item.shomaremarhale.trim();
+
+              if (stageString.includes(";")) {
+                const stageNumbers = stageString
+                  .split(";")
+                  .map((s: string) => s.trim())
+                  .filter((s: string) => s.length > 0)
+                  .map((s: string) => parseFloat(s))
+                  .filter((n: number) => !isNaN(n));
+
+                maxStageNumber =
+                  stageNumbers.length > 0 ? Math.max(...stageNumbers) : null;
+              } else {
+                const stageNumber = parseFloat(stageString);
+                maxStageNumber = !isNaN(stageNumber) ? stageNumber : null;
+              }
+            }
 
             const stageMaterials = allMaterials.filter((material) => {
               if (item.tarhetolid) {
@@ -137,10 +293,14 @@ export default function ProductsTable({
                 }
               }
 
-              if (stageNumber === null || isNaN(stageNumber)) return false;
+              if (maxStageNumber === null || isNaN(maxStageNumber)) {
+                return false;
+              }
 
               const marhaleString = String(material.marhale).trim();
               if (!marhaleString) return false;
+
+              let materialMarhale: number | null = null;
 
               if (marhaleString.includes(";")) {
                 const marhaleNumbers = marhaleString
@@ -150,18 +310,30 @@ export default function ProductsTable({
                   .map((m: string) => parseFloat(m))
                   .filter((n: number) => !isNaN(n));
 
-                return marhaleNumbers.includes(stageNumber);
+                materialMarhale =
+                  marhaleNumbers.length > 0
+                    ? Math.max(...marhaleNumbers)
+                    : null;
+              } else {
+                const marhaleNumber = parseFloat(marhaleString);
+                materialMarhale = !isNaN(marhaleNumber) ? marhaleNumber : null;
               }
 
-              const marhaleNumber = parseFloat(marhaleString);
-              return !isNaN(marhaleNumber) && marhaleNumber === stageNumber;
+              if (materialMarhale === null || isNaN(materialMarhale)) {
+                return false;
+              }
+
+              return materialMarhale <= maxStageNumber;
             });
 
             return (
               <tr
-                key={itemId}
+                key={itemPreInvoiceRowId}
                 className="bg-gray-50 hover:bg-gray-100 transition-colors"
               >
+                <td className="border border-[#1e7677] px-4 py-2 text-right">
+                  {item.Priority && item.Priority.trim() ? item.Priority : "-"}
+                </td>
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {item.tarhetolid || "-"}
                 </td>
@@ -176,7 +348,7 @@ export default function ProductsTable({
                         console.log("🖱️ کلیک روی لینک:", {
                           productName,
                           reportUrl,
-                          itemId,
+                          itemPreInvoiceRowId,
                         });
                       }}
                     >
@@ -223,9 +395,37 @@ export default function ProductsTable({
                   )}
                 </td>
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
+                  {control && itemPreInvoiceRowId ? (
+                    <Controller
+                      name={`${itemPreInvoiceRowId}.actualProduction`}
+                      control={control}
+                      render={({ field }) => {
+                        // استفاده از مقدار از productionValues اگر موجود باشد
+                        const valueFromProduction =
+                          productionValues[
+                            `${itemPreInvoiceRowId}.actualProduction`
+                          ];
+                        return (
+                          <Input
+                            {...field}
+                            value={field.value || valueFromProduction || ""}
+                            onChange={(e) => {
+                              field.onChange(e);
+                            }}
+                            type="text"
+                            className="w-24"
+                          />
+                        );
+                      }}
+                    />
+                  ) : (
+                    <Input type="text" className="w-24" disabled />
+                  )}
+                </td>
+                <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {control ? (
                     <Controller
-                      name={`${fieldPrefix}.actualProduction`}
+                      name={`${itemPreInvoiceRowId}.actualMaterialConsumption`}
                       control={control}
                       render={({ field }) => (
                         <Input {...field} type="text" className="w-24" />
@@ -238,20 +438,7 @@ export default function ProductsTable({
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {control ? (
                     <Controller
-                      name={`${fieldPrefix}.actualMaterialConsumption`}
-                      control={control}
-                      render={({ field }) => (
-                        <Input {...field} type="text" className="w-24" />
-                      )}
-                    />
-                  ) : (
-                    <Input type="text" className="w-24" disabled />
-                  )}
-                </td>
-                <td className="border border-[#1e7677] px-4 py-2 text-right">
-                  {control ? (
-                    <Controller
-                      name={`${fieldPrefix}.waste`}
+                      name={`${itemPreInvoiceRowId}.waste`}
                       control={control}
                       render={({ field }) => (
                         <Input {...field} type="text" className="w-24" />
