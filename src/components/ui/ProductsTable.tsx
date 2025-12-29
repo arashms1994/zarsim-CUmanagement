@@ -15,12 +15,14 @@ import { calculateProductionValues } from "../../lib/calculateProductionValues";
 import { getActualProductionFromForm } from "../../lib/getActualProductionFromForm";
 import { calculateMaterialWeightInKg } from "../../lib/calculateMaterialWeightInKg";
 import { calculateActualMaterialConsumption } from "../../lib/calculateActualMaterialConsumption";
+import { calculateWasteValues } from "../../lib/calculateWasteValues";
 
 export default function ProductsTable({
   items,
   isLoading,
   control,
   actualAmountProduction,
+  waste,
   setValue,
 }: IProductsTableProps) {
   const [materialConsumptionValues, setMaterialConsumptionValues] = useState<
@@ -62,6 +64,14 @@ export default function ProductsTable({
     return calculateProductionValues(sortedItems, actualAmountProduction);
   }, [sortedItems, actualAmountProduction, control]);
 
+  const wasteValues = useMemo(() => {
+    if (!control || !waste) {
+      return {};
+    }
+
+    return calculateWasteValues(sortedItems, waste);
+  }, [sortedItems, waste, control]);
+
   useEffect(() => {
     if (setValue && Object.keys(productionValues).length > 0) {
       const timeoutId = setTimeout(() => {
@@ -77,6 +87,38 @@ export default function ProductsTable({
       return () => clearTimeout(timeoutId);
     }
   }, [productionValues, setValue]);
+
+  useEffect(() => {
+    if (setValue && Object.keys(wasteValues).length > 0) {
+      const timeoutId = setTimeout(() => {
+        Object.entries(wasteValues).forEach(([fieldName, value]) => {
+          setValue(fieldName, value, {
+            shouldValidate: false,
+            shouldDirty: false,
+            shouldTouch: false,
+          });
+        });
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [wasteValues, setValue]);
+
+  useEffect(() => {
+    if (setValue && Object.keys(wasteValues).length > 0) {
+      const timeoutId = setTimeout(() => {
+        Object.entries(wasteValues).forEach(([fieldName, value]) => {
+          setValue(fieldName, value, {
+            shouldValidate: false,
+            shouldDirty: false,
+            shouldTouch: false,
+          });
+        });
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [wasteValues, setValue]);
 
   useEffect(() => {
     if (
@@ -213,13 +255,6 @@ export default function ProductsTable({
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-                      onClick={() => {
-                        console.log("🖱️ کلیک روی لینک:", {
-                          productName,
-                          reportUrl,
-                          itemPreInvoiceRowId,
-                        });
-                      }}
                     >
                       {productName}
                     </a>
@@ -355,9 +390,21 @@ export default function ProductsTable({
                     <Controller
                       name={`${itemPreInvoiceRowId}.waste`}
                       control={control}
-                      render={({ field }) => (
-                        <Input {...field} type="text" className="w-24" />
-                      )}
+                      render={({ field }) => {
+                        const valueFromWaste =
+                          wasteValues[`${itemPreInvoiceRowId}.waste`];
+                        return (
+                          <Input
+                            {...field}
+                            value={field.value || valueFromWaste || ""}
+                            onChange={(e) => {
+                              field.onChange(e);
+                            }}
+                            type="text"
+                            className="w-24"
+                          />
+                        );
+                      }}
                     />
                   ) : (
                     <Input type="text" className="w-24" disabled />

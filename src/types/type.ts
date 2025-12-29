@@ -11,6 +11,7 @@ export interface IProductsTableProps {
   isLoading: boolean;
   control?: any;
   actualAmountProduction?: string;
+  waste?: string;
   setValue?: (name: string, value: any, options?: any) => void;
 }
 

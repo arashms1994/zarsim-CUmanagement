@@ -58,6 +58,11 @@ export default function ProductionPlanRowForm({
     name: "actualAmountProduction",
   });
 
+  const waste = useWatch({
+    control,
+    name: "waste",
+  });
+
   return (
     <div className="w-full p-5 gap-2 flex justify-between items-center flex-wrap rounded-[4px] border-2 shadow border-[#1e7677] relative">
       <div className="w-full flex justify-between items-center mb-4">
@@ -173,6 +178,7 @@ export default function ProductionPlanRowForm({
               isLoading={planItemsLoading}
               control={control}
               actualAmountProduction={actualAmountProduction}
+              waste={waste}
               setValue={setValue}
             />
           ) : (
