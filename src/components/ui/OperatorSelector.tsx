@@ -8,6 +8,7 @@ import { SHIFT_LIST } from "../../lib/constants";
 export default function OperatorSelector({
   value,
   onChange,
+  onShiftChange,
 }: IOperatorSelectorProps) {
   const [showPersonnelSuggestions, setShowPersonnelSuggestions] =
     useState(false);
@@ -81,6 +82,15 @@ export default function OperatorSelector({
           onChange={(e) => {
             const id = e.target.value === "" ? "" : Number(e.target.value);
             setShiftId(id);
+            const selectedShift = SHIFT_LIST.find((s) => s.id === id);
+            if (onShiftChange) {
+              onShiftChange({
+                id,
+                title: selectedShift?.title || "",
+                start: shiftStart,
+                end: shiftEnd,
+              });
+            }
           }}
         >
           <option value="">انتخاب شیفت...</option>
@@ -98,7 +108,18 @@ export default function OperatorSelector({
           value={shiftStart}
           placeholder="مثلاً 08:00"
           className="w-[250px]"
-          onChange={(e) => setShiftStart(e.target.value)}
+          onChange={(e) => {
+            setShiftStart(e.target.value);
+            if (onShiftChange) {
+              const selectedShift = SHIFT_LIST.find((s) => s.id === shiftId);
+              onShiftChange({
+                id: shiftId,
+                title: selectedShift?.title || "",
+                start: e.target.value,
+                end: shiftEnd,
+              });
+            }
+          }}
         />
       </div>
 
@@ -108,7 +129,18 @@ export default function OperatorSelector({
           value={shiftEnd}
           placeholder="مثلاً 16:00"
           className="w-[250px]"
-          onChange={(e) => setShiftEnd(e.target.value)}
+          onChange={(e) => {
+            setShiftEnd(e.target.value);
+            if (onShiftChange) {
+              const selectedShift = SHIFT_LIST.find((s) => s.id === shiftId);
+              onShiftChange({
+                id: shiftId,
+                title: selectedShift?.title || "",
+                start: shiftStart,
+                end: e.target.value,
+              });
+            }
+          }}
         />
       </div>
     </>

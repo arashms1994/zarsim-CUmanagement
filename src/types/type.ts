@@ -29,17 +29,25 @@ export interface IStopReasonSelectorProps {
   stopReason: string;
   onStopReasonChange: (value: string) => void;
   control: any;
+  onStopItemChange?: (stopItem: IStopListItem | null) => void;
 }
 
 export interface IOperatorSelectorProps {
   value: string;
   onChange: (value: string) => void;
+  onShiftChange?: (shift: {
+    id: number | "";
+    title: string;
+    start: string;
+    end: string;
+  }) => void;
 }
 
 export interface IDeviceSelectorProps {
   value: string;
   onChange: (value: string) => void;
   marhale?: string;
+  onDeviceChange?: (device: { id: number; title: string }) => void;
 }
 
 export interface IProductionPlanRowFormProps {
@@ -48,6 +56,7 @@ export interface IProductionPlanRowFormProps {
   showDeleteButton?: boolean;
   planItem: IPrintTajmiListItem;
   control?: any;
+  productionPlanNumber?: string;
   onSubmit?: (
     data: ICUManagementFormProps,
     planItem: IPrintTajmiListItem,
@@ -365,31 +374,27 @@ export interface ICUManagementListItem {
   operator: string;
   productionPlanAmount: string;
   preInvoiceRow: string;
-  reelNumberExit: string;
-  reelNumberExitId: string;
-  reelNumberEntrance: string;
-  reelNumberEntranceId: string;
   stage: string;
   device: string;
-  deviceId: string;
   calculatedWeight: string;
-  entranceWeight: string;
   actualWeight: string;
+  entranceWeight: string;
+  waste: string;
   product: string;
-  description: string;
-  lastStage: string;
   productCode: string;
-  Created: string;
-  Modified: string;
-  CreatedById: number;
-  ModifiedById: number;
+  description: string;
   stopTitle: string;
   stopCode: string;
   stopTime: string;
   shiftTitle: string;
-  shiftId: string;
   shiftStartedAt: string;
   shiftEndedAt: string;
+  shiftId: string;
+  deviceId: string;
+  Created: string;
+  Modified: string;
+  CreatedById: number;
+  ModifiedById: number;
 }
 
 export interface IProductMaterialPerStage {
@@ -421,4 +426,43 @@ export interface IProductMaterialPerStage {
   OData__UIVersionString: string;
   Attachments: boolean;
   GUID: string;
+}
+
+export interface ICUManagementSubmitData {
+  productionPlanNumber: string;
+  actualAmountProduction: string;
+  operator: string;
+  productionPlanAmount: string;
+  preInvoiceRow: string;
+  stage: string;
+  device: string;
+  calculatedWeight: string;
+  actualWeight: string;
+  product: string;
+  description: string;
+  productCode: string;
+  stopTitle: string;
+  stopCode: string;
+  stopTime: string;
+  shiftTitle: string;
+  shiftStartedAt: string;
+  shiftEndedAt: string;
+  shiftId: number | string;
+  deviceId: string;
+  entranceWeight: string;
+  waste: string;
+}
+
+export interface ICUManagementRowListItem {
+  Title: string;
+  productionPlanItem: string;
+  actualAmount: string;
+  orderAmount: string;
+  orderWeight: string;
+  actualWeight: string;
+  waste: string;
+  product: string;
+  productCode: string;
+  priority: string;
+  customer: string;
 }

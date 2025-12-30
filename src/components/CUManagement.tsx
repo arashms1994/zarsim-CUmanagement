@@ -296,6 +296,7 @@ export default function CUManagement() {
                       index={index}
                       planItem={planItem}
                       control={control}
+                      productionPlanNumber={selectedPlan}
                     />
                   ))
                 ) : (

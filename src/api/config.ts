@@ -12,6 +12,8 @@ export const config = {
     STOP_LIST: import.meta.env.VITE_STOP_LIST_GUID,
     DEVICES_LIST: import.meta.env.VITE_DEVICES_LIST_GUID,
     REELS_LIST: import.meta.env.VITE_REELS_LIST_GUID,
+    CU_MANAGEMENT: import.meta.env.VITE_CU_MANAGEMENT_LIST_GUID,
+    CU_MANAGEMENT_ROW: import.meta.env.VITE_CU_MANAGEMENT_ROW_LIST_GUID,
     PRODUCT_MATERIAL_PER_STAGE: import.meta.env
       .VITE_PRODUCT_MATERIAL_PER_STAGE_LIST_GUID,
   },

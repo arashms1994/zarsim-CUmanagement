@@ -8,6 +8,7 @@ export default function DeviceSelector({
   value,
   onChange,
   marhale,
+  onDeviceChange,
 }: IDeviceSelectorProps) {
   const [showDeviceSuggestions, setShowDeviceSuggestions] = useState(false);
 
@@ -65,6 +66,9 @@ export default function DeviceSelector({
                   className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                   onClick={() => {
                     onChange(device.Title);
+                    if (onDeviceChange) {
+                      onDeviceChange({ id: device.ID, title: device.Title });
+                    }
                     setShowDeviceSuggestions(false);
                   }}
                 >

@@ -4,11 +4,13 @@ import { Controller } from "react-hook-form";
 import { SkeletonSearchSuggestion } from "./Skeleton";
 import { useSearchStop } from "../../hooks/useSearchStop";
 import type { IStopReasonSelectorProps } from "../../types/type";
+import type { IStopListItem } from "../../types/type";
 
 export default function StopReasonSelector({
   stopReason,
   onStopReasonChange,
   control,
+  onStopItemChange,
 }: IStopReasonSelectorProps) {
   const [showStopSuggestions, setShowStopSuggestions] = useState(false);
 
@@ -48,12 +50,15 @@ export default function StopReasonSelector({
               {stopLoading ? (
                 <SkeletonSearchSuggestion count={3} />
               ) : stopResults.length > 0 ? (
-                stopResults.map((stop) => (
+                stopResults.map((stop: IStopListItem) => (
                   <div
                     key={stop.Id}
                     className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                     onClick={() => {
                       onStopReasonChange(stop.Title);
+                      if (onStopItemChange) {
+                        onStopItemChange(stop);
+                      }
                       setShowStopSuggestions(false);
                     }}
                   >
