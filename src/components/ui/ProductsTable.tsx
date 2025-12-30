@@ -245,9 +245,11 @@ export default function ProductsTable({
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {item.Priority && item.Priority.trim() ? item.Priority : "-"}
                 </td>
+
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {item.tarhetolid || "-"}
                 </td>
+
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {productName !== "-" ? (
                     <a
@@ -262,9 +264,11 @@ export default function ProductsTable({
                     "-"
                   )}
                 </td>
+
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {item.meghdarkolesefaresh || "-"}
                 </td>
+
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {isLoadingMaterials ? (
                     <span className="text-purple-500 text-sm flex justify-start items-center">
@@ -290,11 +294,26 @@ export default function ProductsTable({
                           </div>
                         );
                       })}
+                      <div className="text-sm font-bold text-blue-600 border-t border-gray-300 pt-1 mt-1 flex flex-row items-center gap-2">
+                        <span>
+                          مجموع:
+                          {stageMaterials
+                            .reduce((sum, material) => {
+                              return (
+                                sum +
+                                calculateMaterialWeightInKg(material, item)
+                              );
+                            }, 0)
+                            .toFixed(2)}
+                          کیلوگرم
+                        </span>
+                      </div>
                     </div>
                   ) : (
                     <span className="text-red-500 text-sm">-</span>
                   )}
                 </td>
+
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {control && itemPreInvoiceRowId ? (
                     <Controller
@@ -358,6 +377,7 @@ export default function ProductsTable({
                     <Input type="text" className="w-24" disabled />
                   )}
                 </td>
+
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {control ? (
                     <Controller
@@ -385,6 +405,7 @@ export default function ProductsTable({
                     <Input type="text" className="w-24" disabled />
                   )}
                 </td>
+
                 <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {control ? (
                     <Controller
