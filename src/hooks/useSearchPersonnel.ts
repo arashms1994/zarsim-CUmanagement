@@ -1,8 +1,8 @@
-import { useState, useCallback, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getPersonnel } from "../api/getData";
 import { config } from "../api/config";
 import { useDebounce } from "./useDebounce";
+import { getPersonnel } from "../api/getData";
+import { useQuery } from "@tanstack/react-query";
+import { useState, useCallback, useEffect } from "react";
 
 export const useSearchPersonnel = () => {
   const [searchTerm, setSearchTerm] = useState("");

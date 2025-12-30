@@ -3,11 +3,11 @@ import { prefixer } from "stylis";
 import theme from "./theme/theme.ts";
 import createCache from "@emotion/cache";
 import rtlPlugin from "stylis-plugin-rtl";
-import { Bounce, ToastContainer } from "react-toastify";
 import { CssBaseline } from "@mui/material";
+import { Bounce, ToastContainer } from "react-toastify";
 import AppProvider from "./providers/AppProvider.tsx";
-import { CacheProvider, ThemeProvider } from "@emotion/react";
 import CUManagement from "./components/CUManagement.tsx";
+import { CacheProvider, ThemeProvider } from "@emotion/react";
 
 const cacheRtl = createCache({
   key: "muirtl",

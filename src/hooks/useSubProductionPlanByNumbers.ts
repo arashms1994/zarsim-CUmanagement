@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
 import { config } from "../api/config";
+import { useQuery } from "@tanstack/react-query";
 import { getSubProductionPlanByNumbers } from "../api/getData";
 
 export const useSubProductionPlanByNumbers = (numbers: string[]) => {

@@ -1,12 +1,12 @@
 import { useState, useMemo } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import type { IProductionPlanRowFormProps, IReelItem } from "../../types/type";
 import { Input } from "./input";
-import OperatorSelector from "./OperatorSelector";
-import StopReasonSelector from "./StopReasonSelector";
-import DeviceSelector from "./DeviceSelector";
 import ReelSelector from "./ReelSelector";
 import ProductsTable from "./ProductsTable";
+import DeviceSelector from "./DeviceSelector";
+import OperatorSelector from "./OperatorSelector";
+import StopReasonSelector from "./StopReasonSelector";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import type { IProductionPlanRowFormProps, IReelItem } from "../../types/type";
 import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
 
 export default function ProductionPlanRowForm({

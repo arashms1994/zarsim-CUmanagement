@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getReels } from "../api/getData";
 import { config } from "../api/config";
+import { getReels } from "../api/getData";
 import { useDebounce } from "./useDebounce";
+import { useQuery } from "@tanstack/react-query";
 
 export const useSearchReels = () => {
   const [searchTerm, setSearchTerm] = useState("");

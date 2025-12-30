@@ -1,12 +1,12 @@
-declare module 'lucide-react' {
-  import { FC, SVGProps } from 'react';
-  
+declare module "lucide-react" {
+  import { FC, SVGProps } from "react";
+
   export interface IconProps extends SVGProps<SVGSVGElement> {
     size?: string | number;
     strokeWidth?: string | number;
     absoluteStrokeWidth?: boolean;
   }
-  
+
   export const CheckIcon: FC<IconProps>;
   export const ChevronDownIcon: FC<IconProps>;
   export const ChevronUpIcon: FC<IconProps>;
@@ -19,4 +19,3 @@ declare module 'lucide-react' {
   export const OctagonXIcon: FC<IconProps>;
   export const TriangleAlertIcon: FC<IconProps>;
 }
-

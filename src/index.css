@@ -124,7 +124,6 @@ button {
   }
 }
 
-/* Skeleton Loading Animations */
 @keyframes wave {
   0% {
     background-position: -200px 0;

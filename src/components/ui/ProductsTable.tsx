@@ -8,6 +8,7 @@ import type { IProductsTableProps } from "../../types/type";
 import { getProductMaterialPerStage } from "../../api/getData";
 import type { IProductMaterialPerStage } from "../../types/type";
 import { sortItemsByPriority } from "../../lib/sortItemsByPriority";
+import { calculateWasteValues } from "../../lib/calculateWasteValues";
 import { filterMaterialsByStage } from "../../lib/filterMaterialsByStage";
 import { extractUniqueTarhetolids } from "../../lib/extractUniqueTarhetolids";
 import { filterItemsByMinQuantity } from "../../lib/filterItemsByMinQuantity";
@@ -15,7 +16,6 @@ import { calculateProductionValues } from "../../lib/calculateProductionValues";
 import { getActualProductionFromForm } from "../../lib/getActualProductionFromForm";
 import { calculateMaterialWeightInKg } from "../../lib/calculateMaterialWeightInKg";
 import { calculateActualMaterialConsumption } from "../../lib/calculateActualMaterialConsumption";
-import { calculateWasteValues } from "../../lib/calculateWasteValues";
 
 export default function ProductsTable({
   items,

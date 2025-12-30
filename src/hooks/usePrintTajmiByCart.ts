@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { getPrintTajmi } from "../api/getData";
 import { config } from "../api/config";
+import { getPrintTajmi } from "../api/getData";
+import { useQuery } from "@tanstack/react-query";
 
 export const usePrintTajmiByCart = (cartNumber: string | null | undefined) => {
   const {

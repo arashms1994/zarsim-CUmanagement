@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Input } from "./input";
-import { useSearchReels } from "../../hooks/useSearchReels";
 import { SkeletonSearchSuggestion } from "./Skeleton";
+import { useSearchReels } from "../../hooks/useSearchReels";
 import type { IReelSelectorProps, IReelItem } from "../../types/type";
 
 export default function ReelSelector({

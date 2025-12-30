@@ -22,7 +22,6 @@ export function calculateProductionValues(
       !isNaN(parseFloat(item.Priority.trim()))
   );
 
-  // ابتدا همه را صفر می‌کنیم
   sortedItems.forEach((item) => {
     const itemPreInvoiceRowId = item.shomareradiffactor;
     if (itemPreInvoiceRowId) {
@@ -31,7 +30,6 @@ export function calculateProductionValues(
   });
 
   if (itemsWithPriority.length === 0) {
-    // اگر هیچ اولویتی وجود نداشت، به طور مساوی تقسیم می‌کنیم
     const equalValue = (totalProduction / sortedItems.length).toFixed(2);
     sortedItems.forEach((item) => {
       const itemPreInvoiceRowId = item.shomareradiffactor;
@@ -40,11 +38,9 @@ export function calculateProductionValues(
       }
     });
   } else {
-    // تقسیم بر اساس اولویت
     let remainingProduction = totalProduction;
     const priorityGroups = new Map<number, ISubProductionPlanListItem[]>();
 
-    // گروه‌بندی بر اساس اولویت
     itemsWithPriority.forEach((item) => {
       const priority = parseFloat(item.Priority.trim());
       if (!priorityGroups.has(priority)) {
@@ -53,12 +49,10 @@ export function calculateProductionValues(
       priorityGroups.get(priority)!.push(item);
     });
 
-    // مرتب‌سازی اولویت‌ها
     const sortedPriorities = Array.from(priorityGroups.keys()).sort(
       (a, b) => a - b
     );
 
-    // تقسیم بر اساس اولویت
     for (const priority of sortedPriorities) {
       const itemsInPriority = priorityGroups.get(priority)!;
 
