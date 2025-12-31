@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useMemo, useEffect } from "react";
 import { Input } from "./input";
 import ReelSelector from "./ReelSelector";
 import ProductsTable from "./ProductsTable";
-import DeviceSelector from "./DeviceSelector";
 import OperatorSelector from "./OperatorSelector";
 import { useQueries } from "@tanstack/react-query";
 import StopReasonSelector from "./StopReasonSelector";
@@ -15,6 +15,7 @@ import { submitCUManagement, submitCUManagementRow } from "../../api/addData";
 import { calculateProductionValues } from "../../lib/calculateProductionValues";
 import { prepareRowDataForSubmission } from "../../lib/prepareRowDataForSubmission";
 import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
+import { useProducts } from "../../hooks/useProducts";
 import type {
   IProductionPlanRowFormProps,
   IReelItem,
@@ -30,12 +31,15 @@ export default function ProductionPlanRowForm({
   const localForm = useForm();
   const control = externalControl || localForm.control;
   const setValue = externalControl?.setValue || localForm.setValue;
+
   const [operator, setOperator] = useState("");
   const [stopReason, setStopReason] = useState("");
-  const [deviceName, setDeviceName] = useState(planItem.dasatghah || "");
-  const [deviceId, setDeviceId] = useState<number | null>(null);
-  const [entranceReels, setEntranceReels] = useState<IReelItem[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [exitReels, setExitReels] = useState<IReelItem[]>([]);
+  const [entranceReels, setEntranceReels] = useState<IReelItem[]>([]);
+  const [stopItem, setStopItem] = useState<IStopListItem | null>(null);
+  const [ordersTotalWeight, setOrdersTotalWeight] = useState<string>("");
+  const [ordersTotalAmount, setOrdersTotalAmount] = useState<string>("");
   const [shiftData, setShiftData] = useState<{
     id: number | "";
     title: string;
@@ -47,10 +51,6 @@ export default function ProductionPlanRowForm({
     start: "",
     end: "",
   });
-  const [stopItem, setStopItem] = useState<IStopListItem | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [ordersTotalWeight, setOrdersTotalWeight] = useState<string>("");
-  const [ordersTotalAmount, setOrdersTotalAmount] = useState<string>("");
 
   const planNumbers = useMemo(() => {
     if (
@@ -94,6 +94,27 @@ export default function ProductionPlanRowForm({
       .filter((t): t is string => !!t && t.trim().length > 0);
     return Array.from(new Set(tarhetolids));
   }, [filteredPlanItems]);
+
+  const { products } = useProducts();
+
+  // مقایسه کد طرح با code در لیست محصولات و console.log کردن maghta
+  useEffect(() => {
+    if (products.length > 0 && uniqueTarhetolids.length > 0) {
+      uniqueTarhetolids.forEach((tarhetolid) => {
+        const tarhetolidNumber = parseFloat(tarhetolid);
+        if (!isNaN(tarhetolidNumber)) {
+          const matchedProduct = products.find(
+            (product) => product.code === tarhetolidNumber
+          );
+          if (matchedProduct) {
+            console.log(
+              `کد طرح: ${tarhetolid}, maghta: ${matchedProduct.maghta}`
+            );
+          }
+        }
+      });
+    }
+  }, [products, uniqueTarhetolids]);
 
   const materialQueries = useQueries({
     queries: uniqueTarhetolids.map((tarhetolid) => ({
@@ -196,7 +217,7 @@ export default function ProductionPlanRowForm({
         productionPlanAmount: String(planItem.barnamerizi || ""),
         preInvoiceRow: preInvoiceRow || "",
         stage: String(planItem.marhale || ""),
-        device: deviceName || "",
+        device: planItem.dasatghah || "",
         calculatedWeight: String(planItem.barnamerizi || ""),
         actualWeight: actualWeight || "",
         product: product || "",
@@ -209,7 +230,7 @@ export default function ProductionPlanRowForm({
         shiftStartedAt: shiftData.start || "",
         shiftEndedAt: shiftData.end || "",
         shiftId: shiftData.id || "",
-        deviceId: deviceId ? String(deviceId) : "",
+        deviceId: "",
         entranceWeight: entranceWeight || "",
         waste: waste || "",
         ordersTotalWeight: ordersTotalWeight || "",
@@ -220,7 +241,6 @@ export default function ProductionPlanRowForm({
 
       if (result.success) {
         const formValues = control.getValues ? control.getValues() : {};
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formValuesInternal = (control as any)._formValues || {};
 
         const rowPromises = filteredPlanItems.map(async (item) => {
@@ -234,7 +254,8 @@ export default function ProductionPlanRowForm({
             productionValues,
             waste || "",
             productionPlanNumber || "",
-            selectedStage
+            selectedStage,
+            planItem.dasatghah || ""
           );
 
           if (!rowData) return null;
@@ -262,7 +283,6 @@ export default function ProductionPlanRowForm({
           alert(`ثبت با موفقیت انجام شد ✅\n${successRows} ردیف ثبت شد`);
         }
 
-        // Refresh صفحه بعد از ثبت موفق
         window.location.reload();
       } else {
         alert(result.message);
@@ -309,15 +329,10 @@ export default function ProductionPlanRowForm({
             <span className="text-lg font-normal">{planItem.barnamerizi}</span>
           </div>
 
-          <DeviceSelector
-            value={deviceName}
-            onChange={setDeviceName}
-            marhale={planItem.marhale}
-            onDeviceChange={(device) => {
-              setDeviceName(device.title);
-              setDeviceId(device.id);
-            }}
-          />
+          <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">
+            <label className="min-w-[150px] font-medium">دستگاه:</label>
+            <span className="text-lg font-normal">{planItem.dasatghah}</span>
+          </div>
 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">

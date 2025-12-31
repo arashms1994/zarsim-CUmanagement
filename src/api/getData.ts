@@ -8,6 +8,7 @@ import type {
   IDevicesListItem,
   IProductMaterialPerStage,
   IReelListItem,
+  IProductListItem,
 } from "../types/type";
 
 export async function getDevice(): Promise<IDevicesListItem[]> {
@@ -539,5 +540,55 @@ export async function getReels(): Promise<IReelListItem[]> {
   } catch (err) {
     console.error("خطا در دریافت لیست قرقره‌ها:", err);
     throw err;
+  }
+}
+
+export async function getProducts(): Promise<IProductListItem[]> {
+  let items: IProductListItem[] = [];
+
+  const listGuid = config.LIST_GUIDS.PRODUCTS_LIST;
+  if (!listGuid) {
+    throw new Error("GUID لیست PRODUCTS_LIST تنظیم نشده است");
+  }
+
+  let nextUrl:
+    | string
+    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=ID,Title,code,maghta&$orderby=ID desc`;
+
+  try {
+    while (nextUrl) {
+      const res = await fetch(nextUrl, {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(
+          `خطا در گرفتن لیست محصولات: ${err} (Status: ${res.status})`
+        );
+      }
+
+      const json: {
+        d: { results: IProductListItem[]; __next?: string };
+      } = await res.json();
+
+      const results = json.d?.results;
+      if (!Array.isArray(results)) {
+        throw new Error(
+          "ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست"
+        );
+      }
+
+      items = items.concat(results);
+      nextUrl = json.d?.__next || null;
+    }
+
+    return items;
+  } catch (error) {
+    console.error("خطا در دریافت لیست محصولات:", error);
+    throw error;
   }
 }

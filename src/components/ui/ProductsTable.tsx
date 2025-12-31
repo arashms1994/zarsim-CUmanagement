@@ -177,13 +177,11 @@ export default function ProductsTable({
 
   const isLoadingMaterials = materialQueries.some((query) => query.isLoading);
 
-  // محاسبه مجموع مقدار سفارش و مجموع وزن مواد مصرفی
   const totals = useMemo(() => {
     let totalOrderAmount = 0;
     let totalMaterialWeight = 0;
 
     sortedItems.forEach((item) => {
-      // مجموع مقدار سفارش
       const orderAmount = item.meghdarkolesefaresh
         ? parseFloat(item.meghdarkolesefaresh.toString())
         : 0;
@@ -191,7 +189,6 @@ export default function ProductsTable({
         totalOrderAmount += orderAmount;
       }
 
-      // مجموع وزن مواد مصرفی بر اساس BOM
       const stageMaterials = filterMaterialsByStage(allMaterials, item);
       const itemMaterialWeight = stageMaterials.reduce((sum, material) => {
         return sum + calculateMaterialWeightInKg(material, item);
@@ -205,7 +202,6 @@ export default function ProductsTable({
     };
   }, [sortedItems, allMaterials]);
 
-  // ارسال مقادیر مجموع به parent
   useEffect(() => {
     if (onTotalsChange && !isLoadingMaterials) {
       onTotalsChange(totals);
@@ -472,7 +468,10 @@ export default function ProductsTable({
           })}
           {/* ردیف مجموع */}
           <tr className="bg-blue-100 font-bold">
-            <td className="border border-[#1e7677] px-4 py-2 text-right" colSpan={3}>
+            <td
+              className="border border-[#1e7677] px-4 py-2 text-right"
+              colSpan={3}
+            >
               مجموع:
             </td>
             <td className="border border-[#1e7677] px-4 py-2 text-right">
@@ -480,12 +479,17 @@ export default function ProductsTable({
             </td>
             <td className="border border-[#1e7677] px-4 py-2 text-right">
               {isLoadingMaterials ? (
-                <span className="text-purple-500 text-sm">در حال محاسبه...</span>
+                <span className="text-purple-500 text-sm">
+                  در حال محاسبه...
+                </span>
               ) : (
                 `${totals.ordersTotalWeight} کیلوگرم`
               )}
             </td>
-            <td className="border border-[#1e7677] px-4 py-2 text-right" colSpan={3}>
+            <td
+              className="border border-[#1e7677] px-4 py-2 text-right"
+              colSpan={3}
+            >
               -
             </td>
           </tr>

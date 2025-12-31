@@ -20,7 +20,8 @@ export function prepareRowDataForSubmission(
   productionValues: Record<string, string>,
   waste: string,
   productionPlanNumber: string,
-  selectedStage?: string
+  selectedStage?: string,
+  device?: string
 ): ICUManagementRowListItem | null {
   const itemPreInvoiceRowId = item.shomareradiffactor;
   if (!itemPreInvoiceRowId) return null;
@@ -76,6 +77,7 @@ export function prepareRowDataForSubmission(
     priority: priorityValue,
     level: selectedStage || "",
     levelNumber: item.shomaremarhale || "",
+    device: device || "",
   };
 
   return rowData;

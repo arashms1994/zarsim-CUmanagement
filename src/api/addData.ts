@@ -437,6 +437,9 @@ export async function submitCUManagementRow(
     if (rowData.levelNumber) {
       payload.levelNumber = String(rowData.levelNumber);
     }
+    if (rowData.device) {
+      payload.device = String(rowData.device);
+    }
 
     const response = await fetch(
       `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items`,
