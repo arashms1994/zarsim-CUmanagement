@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { filterMaterialsByStage } from "./filterMaterialsByStage";
 import { calculateActualMaterialConsumption } from "./calculateActualMaterialConsumption";
 import type {

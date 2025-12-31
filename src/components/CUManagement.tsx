@@ -69,17 +69,6 @@ export default function CUManagement() {
     setShowColorDropdown(false);
   };
 
-  const handleFormSuccess = () => {
-    // Reset همه state های CUManagement بعد از ثبت موفق
-    setSelectedStage(undefined);
-    setSelectedColor(undefined);
-    setShowSuggestions(false);
-    setShowColorDropdown(false);
-    setShowStageDropdown(false);
-    // Reset فرم اصلی
-    setValue("productionPlanNumber", "");
-  };
-
   return (
     <div className="space-y-4 flex flex-col w-full items-center justify-center">
       <div className="w-full flex flex-col items-center justify-center relative gap-8">
@@ -288,13 +277,14 @@ export default function CUManagement() {
                 filteredPlanDetails.length > 0 ? (
                   filteredPlanDetails.map((planItem, index) => (
                     <ProductionPlanRowForm
-                      key={index}
+                      key={`${selectedPlan}-${selectedStage}-${
+                        selectedColor || "no-color"
+                      }-${index}`}
                       index={index}
                       planItem={planItem}
                       control={control}
                       productionPlanNumber={selectedPlan}
                       selectedStage={selectedStage}
-                      onSuccess={handleFormSuccess}
                     />
                   ))
                 ) : (

@@ -6,7 +6,6 @@ import DeviceSelector from "./DeviceSelector";
 import OperatorSelector from "./OperatorSelector";
 import { useQueries } from "@tanstack/react-query";
 import StopReasonSelector from "./StopReasonSelector";
-import { resetFormFields } from "../../lib/resetFormFields";
 import { getProductMaterialPerStage } from "../../api/getData";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { IProductMaterialPerStage } from "../../types/type";
@@ -27,12 +26,10 @@ export default function ProductionPlanRowForm({
   control: externalControl,
   productionPlanNumber,
   selectedStage,
-  onSuccess,
 }: IProductionPlanRowFormProps) {
   const localForm = useForm();
   const control = externalControl || localForm.control;
   const setValue = externalControl?.setValue || localForm.setValue;
-  const reset = externalControl?.reset || localForm.reset;
   const [operator, setOperator] = useState("");
   const [stopReason, setStopReason] = useState("");
   const [deviceName, setDeviceName] = useState(planItem.dasatghah || "");
@@ -52,6 +49,8 @@ export default function ProductionPlanRowForm({
   });
   const [stopItem, setStopItem] = useState<IStopListItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ordersTotalWeight, setOrdersTotalWeight] = useState<string>("");
+  const [ordersTotalAmount, setOrdersTotalAmount] = useState<string>("");
 
   const planNumbers = useMemo(() => {
     if (
@@ -213,6 +212,8 @@ export default function ProductionPlanRowForm({
         deviceId: deviceId ? String(deviceId) : "",
         entranceWeight: entranceWeight || "",
         waste: waste || "",
+        ordersTotalWeight: ordersTotalWeight || "",
+        ordersTotalAmount: ordersTotalAmount || "",
       };
 
       const result = await submitCUManagement(submitData);
@@ -261,25 +262,8 @@ export default function ProductionPlanRowForm({
           alert(`ثبت با موفقیت انجام شد ✅\n${successRows} ردیف ثبت شد`);
         }
 
-        resetFormFields({
-          reset,
-          setValue,
-          setOperator,
-          setStopReason,
-          setDeviceName,
-          setDeviceId,
-          setEntranceReels,
-          setExitReels,
-          setShiftData,
-          setStopItem,
-          filteredPlanItems,
-          planItem,
-        });
-
-        // فراخوانی callback برای reset کردن state های parent (CUManagement)
-        if (onSuccess) {
-          onSuccess();
-        }
+        // Refresh صفحه بعد از ثبت موفق
+        window.location.reload();
       } else {
         alert(result.message);
       }
@@ -443,6 +427,10 @@ export default function ProductionPlanRowForm({
               actualAmountProduction={actualAmountProduction}
               waste={waste}
               setValue={setValue}
+              onTotalsChange={(totals) => {
+                setOrdersTotalWeight(totals.ordersTotalWeight);
+                setOrdersTotalAmount(totals.ordersTotalAmount);
+              }}
             />
           ) : (
             <div className="flex items-center justify-start gap-2 border border-[#1e7677] rounded-lg py-2 px-3">

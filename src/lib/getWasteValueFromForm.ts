@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { calculateWasteValues } from "./calculateWasteValues";
 import type { ISubProductionPlanListItem } from "../types/type";
 

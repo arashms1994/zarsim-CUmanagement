@@ -304,6 +304,14 @@ export async function submitCUManagement(
       payload.entranceWeight = String(formData.entranceWeight);
     }
 
+    if (formData.ordersTotalWeight) {
+      payload.ordersTotalWeight = String(formData.ordersTotalWeight);
+    }
+
+    if (formData.ordersTotalAmount) {
+      payload.ordersTotalAmount = String(formData.ordersTotalAmount);
+    }
+
     const response = await fetch(
       `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items`,
       {

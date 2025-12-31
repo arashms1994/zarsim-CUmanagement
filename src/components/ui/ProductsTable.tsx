@@ -24,6 +24,7 @@ export default function ProductsTable({
   actualAmountProduction,
   waste,
   setValue,
+  onTotalsChange,
 }: IProductsTableProps) {
   const [materialConsumptionValues, setMaterialConsumptionValues] = useState<
     Record<string, string>
@@ -175,6 +176,41 @@ export default function ProductsTable({
   }, [sortedItems, allMaterials, control, setValue, productionValues]);
 
   const isLoadingMaterials = materialQueries.some((query) => query.isLoading);
+
+  // محاسبه مجموع مقدار سفارش و مجموع وزن مواد مصرفی
+  const totals = useMemo(() => {
+    let totalOrderAmount = 0;
+    let totalMaterialWeight = 0;
+
+    sortedItems.forEach((item) => {
+      // مجموع مقدار سفارش
+      const orderAmount = item.meghdarkolesefaresh
+        ? parseFloat(item.meghdarkolesefaresh.toString())
+        : 0;
+      if (!isNaN(orderAmount)) {
+        totalOrderAmount += orderAmount;
+      }
+
+      // مجموع وزن مواد مصرفی بر اساس BOM
+      const stageMaterials = filterMaterialsByStage(allMaterials, item);
+      const itemMaterialWeight = stageMaterials.reduce((sum, material) => {
+        return sum + calculateMaterialWeightInKg(material, item);
+      }, 0);
+      totalMaterialWeight += itemMaterialWeight;
+    });
+
+    return {
+      ordersTotalAmount: totalOrderAmount.toFixed(2),
+      ordersTotalWeight: totalMaterialWeight.toFixed(2),
+    };
+  }, [sortedItems, allMaterials]);
+
+  // ارسال مقادیر مجموع به parent
+  useEffect(() => {
+    if (onTotalsChange && !isLoadingMaterials) {
+      onTotalsChange(totals);
+    }
+  }, [totals, onTotalsChange, isLoadingMaterials]);
 
   if (isLoading) {
     return (
@@ -434,6 +470,25 @@ export default function ProductsTable({
               </tr>
             );
           })}
+          {/* ردیف مجموع */}
+          <tr className="bg-blue-100 font-bold">
+            <td className="border border-[#1e7677] px-4 py-2 text-right" colSpan={3}>
+              مجموع:
+            </td>
+            <td className="border border-[#1e7677] px-4 py-2 text-right">
+              {totals.ordersTotalAmount}
+            </td>
+            <td className="border border-[#1e7677] px-4 py-2 text-right">
+              {isLoadingMaterials ? (
+                <span className="text-purple-500 text-sm">در حال محاسبه...</span>
+              ) : (
+                `${totals.ordersTotalWeight} کیلوگرم`
+              )}
+            </td>
+            <td className="border border-[#1e7677] px-4 py-2 text-right" colSpan={3}>
+              -
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>

@@ -13,6 +13,10 @@ export interface IProductsTableProps {
   actualAmountProduction?: string;
   waste?: string;
   setValue?: (name: string, value: any, options?: any) => void;
+  onTotalsChange?: (totals: {
+    ordersTotalWeight: string;
+    ordersTotalAmount: string;
+  }) => void;
 }
 
 export interface IMaterialCategory {
@@ -58,7 +62,6 @@ export interface IProductionPlanRowFormProps {
   control?: any;
   productionPlanNumber?: string;
   selectedStage?: string;
-  onSuccess?: () => void;
   onSubmit?: (
     data: ICUManagementFormProps,
     planItem: IPrintTajmiListItem,
@@ -393,6 +396,8 @@ export interface ICUManagementListItem {
   shiftEndedAt: string;
   shiftId: string;
   deviceId: string;
+  ordersTotalWeight: string;
+  ordersTotalAmount: string;
   Created: string;
   Modified: string;
   CreatedById: number;
@@ -453,6 +458,8 @@ export interface ICUManagementSubmitData {
   deviceId: string;
   entranceWeight: string;
   waste: string;
+  ordersTotalWeight: string;
+  ordersTotalAmount: string;
 }
 
 export interface ICUManagementRowListItem {
