@@ -27,6 +27,7 @@ export default function ProductionPlanRowForm({
   control: externalControl,
   productionPlanNumber,
   selectedStage,
+  onSuccess,
 }: IProductionPlanRowFormProps) {
   const localForm = useForm();
   const control = externalControl || localForm.control;
@@ -274,6 +275,11 @@ export default function ProductionPlanRowForm({
           filteredPlanItems,
           planItem,
         });
+
+        // فراخوانی callback برای reset کردن state های parent (CUManagement)
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
         alert(result.message);
       }

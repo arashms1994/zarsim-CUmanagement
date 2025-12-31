@@ -1,5 +1,7 @@
-import type { ISubProductionPlanListItem } from "../types/type";
-import type { IPrintTajmiListItem } from "../types/type";
+import type {
+  IPrintTajmiListItem,
+  ISubProductionPlanListItem,
+} from "../types/type";
 
 export interface ResetFormFieldsParams {
   reset?: () => void;
@@ -72,4 +74,3 @@ export function resetFormFields(params: ResetFormFieldsParams): void {
     });
   }
 }
-

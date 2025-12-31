@@ -1,5 +1,5 @@
-import type { ISubProductionPlanListItem } from "../types/type";
 import { calculateWasteValues } from "./calculateWasteValues";
+import type { ISubProductionPlanListItem } from "../types/type";
 
 export function getWasteValueFromForm(
   control: any,
@@ -33,4 +33,3 @@ export function getWasteValueFromForm(
 
   return wasteValue;
 }
-

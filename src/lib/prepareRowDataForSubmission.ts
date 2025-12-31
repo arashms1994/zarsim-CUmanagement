@@ -1,13 +1,13 @@
+import { getWasteValueFromForm } from "./getWasteValueFromForm";
+import { filterMaterialsByStage } from "./filterMaterialsByStage";
+import { getActualProductionFromForm } from "./getActualProductionFromForm";
+import { calculateMaterialWeightInKg } from "./calculateMaterialWeightInKg";
+import { getActualMaterialConsumptionFromForm } from "./getActualMaterialConsumptionFromForm";
 import type {
   ISubProductionPlanListItem,
   IProductMaterialPerStage,
   ICUManagementRowListItem,
 } from "../types/type";
-import { filterMaterialsByStage } from "./filterMaterialsByStage";
-import { calculateMaterialWeightInKg } from "./calculateMaterialWeightInKg";
-import { getActualMaterialConsumptionFromForm } from "./getActualMaterialConsumptionFromForm";
-import { getWasteValueFromForm } from "./getWasteValueFromForm";
-import { getActualProductionFromForm } from "./getActualProductionFromForm";
 
 export function prepareRowDataForSubmission(
   item: ISubProductionPlanListItem,
@@ -59,9 +59,7 @@ export function prepareRowDataForSubmission(
     .toFixed(2);
 
   const priorityValue =
-    item.Priority && item.Priority.trim()
-      ? String(item.Priority.trim())
-      : "";
+    item.Priority && item.Priority.trim() ? String(item.Priority.trim()) : "";
 
   const rowData: ICUManagementRowListItem = {
     Title: item.shomareradiffactor || "",
@@ -81,4 +79,3 @@ export function prepareRowDataForSubmission(
 
   return rowData;
 }
-

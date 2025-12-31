@@ -1,6 +1,9 @@
-import type { IProductMaterialPerStage, ISubProductionPlanListItem } from "../types/type";
 import { filterMaterialsByStage } from "./filterMaterialsByStage";
 import { calculateActualMaterialConsumption } from "./calculateActualMaterialConsumption";
+import type {
+  IProductMaterialPerStage,
+  ISubProductionPlanListItem,
+} from "../types/type";
 
 export function getActualMaterialConsumptionFromForm(
   control: any,
@@ -15,9 +18,7 @@ export function getActualMaterialConsumptionFromForm(
   let actualMaterialConsumption =
     formValues[actualMaterialConsumptionField] ||
     formValuesInternal[actualMaterialConsumptionField] ||
-    (control.watch
-      ? control.watch(actualMaterialConsumptionField)
-      : null) ||
+    (control.watch ? control.watch(actualMaterialConsumptionField) : null) ||
     "0";
 
   if (
@@ -44,4 +45,3 @@ export function getActualMaterialConsumptionFromForm(
 
   return actualMaterialConsumption;
 }
-

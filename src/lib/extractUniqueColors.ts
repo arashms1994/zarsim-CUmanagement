@@ -14,4 +14,3 @@ export function extractUniqueColors(
 
   return Array.from(new Set(colors));
 }
-

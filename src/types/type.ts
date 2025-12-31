@@ -58,6 +58,7 @@ export interface IProductionPlanRowFormProps {
   control?: any;
   productionPlanNumber?: string;
   selectedStage?: string;
+  onSuccess?: () => void;
   onSubmit?: (
     data: ICUManagementFormProps,
     planItem: IPrintTajmiListItem,

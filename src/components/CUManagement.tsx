@@ -3,12 +3,12 @@ import { Input } from "./ui/input";
 import { Stack } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import type { ICUManagementFormProps } from "../types/type";
+import { filterPlanDetails } from "../lib/filterPlanDetails";
 import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
-import { usePrintTajmiByCart } from "../hooks/usePrintTajmiByCart";
-import { useSearchPrintTajmi } from "../hooks/useSearchPrintTajmi";
 import { extractUniqueStages } from "../lib/extractUniqueStages";
 import { extractUniqueColors } from "../lib/extractUniqueColors";
-import { filterPlanDetails } from "../lib/filterPlanDetails";
+import { useSearchPrintTajmi } from "../hooks/useSearchPrintTajmi";
+import { usePrintTajmiByCart } from "../hooks/usePrintTajmiByCart";
 
 export default function CUManagement() {
   const { control, setValue, watch } = useForm<ICUManagementFormProps>();
@@ -67,6 +67,17 @@ export default function CUManagement() {
     setSelectedColor(undefined);
     setShowStageDropdown(false);
     setShowColorDropdown(false);
+  };
+
+  const handleFormSuccess = () => {
+    // Reset همه state های CUManagement بعد از ثبت موفق
+    setSelectedStage(undefined);
+    setSelectedColor(undefined);
+    setShowSuggestions(false);
+    setShowColorDropdown(false);
+    setShowStageDropdown(false);
+    // Reset فرم اصلی
+    setValue("productionPlanNumber", "");
   };
 
   return (
@@ -283,6 +294,7 @@ export default function CUManagement() {
                       control={control}
                       productionPlanNumber={selectedPlan}
                       selectedStage={selectedStage}
+                      onSuccess={handleFormSuccess}
                     />
                   ))
                 ) : (
