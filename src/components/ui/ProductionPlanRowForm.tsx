@@ -6,6 +6,7 @@ import ProductsTable from "./ProductsTable";
 import OperatorSelector from "./OperatorSelector";
 import { useQueries } from "@tanstack/react-query";
 import StopReasonSelector from "./StopReasonSelector";
+import { Spinner } from "./spinner";
 import { getProductMaterialPerStage } from "../../api/getData";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { IProductMaterialPerStage } from "../../types/type";
@@ -16,6 +17,7 @@ import { calculateProductionValues } from "../../lib/calculateProductionValues";
 import { prepareRowDataForSubmission } from "../../lib/prepareRowDataForSubmission";
 import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
 import { useProducts } from "../../hooks/useProducts";
+import { filterMaterialsByStage } from "../../lib/filterMaterialsByStage";
 import type {
   IProductionPlanRowFormProps,
   IReelItem,
@@ -40,6 +42,8 @@ export default function ProductionPlanRowForm({
   const [stopItem, setStopItem] = useState<IStopListItem | null>(null);
   const [ordersTotalWeight, setOrdersTotalWeight] = useState<string>("");
   const [ordersTotalAmount, setOrdersTotalAmount] = useState<string>("");
+  const [materialConsumptionPerString, setMaterialConsumptionPerString] =
+    useState<number | null>(null);
   const [shiftData, setShiftData] = useState<{
     id: number | "";
     title: string;
@@ -95,26 +99,7 @@ export default function ProductionPlanRowForm({
     return Array.from(new Set(tarhetolids));
   }, [filteredPlanItems]);
 
-  const { products } = useProducts();
-
-  // مقایسه کد طرح با code در لیست محصولات و console.log کردن maghta
-  useEffect(() => {
-    if (products.length > 0 && uniqueTarhetolids.length > 0) {
-      uniqueTarhetolids.forEach((tarhetolid) => {
-        const tarhetolidNumber = parseFloat(tarhetolid);
-        if (!isNaN(tarhetolidNumber)) {
-          const matchedProduct = products.find(
-            (product) => product.code === tarhetolidNumber
-          );
-          if (matchedProduct) {
-            console.log(
-              `کد طرح: ${tarhetolid}, maghta: ${matchedProduct.maghta}`
-            );
-          }
-        }
-      });
-    }
-  }, [products, uniqueTarhetolids]);
+  const { products, isLoading: isLoadingProducts } = useProducts();
 
   const materialQueries = useQueries({
     queries: uniqueTarhetolids.map((tarhetolid) => ({
@@ -130,6 +115,138 @@ export default function ProductionPlanRowForm({
       .flatMap((query) => query.data || [])
       .filter((m): m is IProductMaterialPerStage => !!m);
   }, [materialQueries]);
+
+  const isLoadingMaterials = materialQueries.some((query) => query.isLoading);
+
+  useEffect(() => {
+    console.log("🔍 بررسی محاسبه مصرف مواد:", {
+      productsCount: products.length,
+      uniqueTarhetolidsCount: uniqueTarhetolids.length,
+      uniqueTarhetolids: uniqueTarhetolids,
+      allMaterialsCount: allMaterials.length,
+      filteredPlanItemsCount: filteredPlanItems.length,
+    });
+
+    if (
+      products.length > 0 &&
+      uniqueTarhetolids.length > 0 &&
+      allMaterials.length > 0 &&
+      filteredPlanItems.length > 0
+    ) {
+      for (const tarhetolid of uniqueTarhetolids) {
+        const tarhetolidNumber = parseFloat(tarhetolid);
+        console.log(
+          `🔍 بررسی کد طرح: ${tarhetolid} (عدد: ${tarhetolidNumber})`
+        );
+
+        if (!isNaN(tarhetolidNumber)) {
+          const matchedProduct = products.find(
+            (product) => product.code === tarhetolidNumber
+          );
+
+          console.log(`🔍 محصول پیدا شده:`, matchedProduct);
+          console.log(
+            `🔍 تمام فیلدهای محصول:`,
+            Object.keys(matchedProduct || {})
+          );
+          console.log(`🔍 String محصول (مقدار):`, matchedProduct?.String);
+          console.log(`🔍 String محصول (نوع):`, typeof matchedProduct?.String);
+
+          if (matchedProduct) {
+            // بررسی String - ممکن است 0 باشد که falsy است
+            const stringValue = matchedProduct.String;
+            console.log(
+              `🔍 String محصول (مقدار خام):`,
+              stringValue,
+              `نوع:`,
+              typeof stringValue
+            );
+
+            if (stringValue !== null && stringValue !== undefined) {
+              const stringCount =
+                typeof stringValue === "number"
+                  ? stringValue
+                  : parseFloat(String(stringValue));
+              console.log(`🔍 String تبدیل شده به عدد:`, stringCount);
+
+              if (!isNaN(stringCount) && stringCount > 0) {
+                const planItemForTarhetolid = filteredPlanItems.find(
+                  (item) => item.tarhetolid === tarhetolid
+                );
+
+                console.log(`🔍 آیتم برنامه پیدا شده:`, planItemForTarhetolid);
+
+                if (planItemForTarhetolid) {
+                  const stageMaterials = filterMaterialsByStage(
+                    allMaterials,
+                    planItemForTarhetolid
+                  );
+
+                  console.log(
+                    `🔍 مواد فیلتر شده:`,
+                    stageMaterials.length,
+                    stageMaterials
+                  );
+
+                  // محاسبه مجموع vahed تمام مواد (به گرم)
+                  const totalVahed = stageMaterials.reduce(
+                    (sum: number, material: IProductMaterialPerStage) => {
+                      return sum + (material.vahed || 0);
+                    },
+                    0
+                  );
+
+                  console.log(`🔍 مجموع vahed (گرم):`, totalVahed);
+
+                  if (totalVahed > 0 && stringCount > 0) {
+                    // تقسیم vahed بر تعداد رشته و تبدیل به کیلوگرم (تقسیم بر 1000)
+                    const result = totalVahed / stringCount / 1000;
+                    setMaterialConsumptionPerString(result);
+                    console.log(
+                      `✅ کد طرح: ${tarhetolid}, تعداد رشته: ${stringCount}, مجموع vahed: ${totalVahed.toFixed(
+                        2
+                      )} گرم, مصرف مواد تقسیم بر رشته: ${result.toFixed(
+                        4
+                      )} کیلوگرم`
+                    );
+                  } else {
+                    console.log(
+                      `⚠️ vahed یا تعداد رشته صفر است - vahed: ${totalVahed}, تعداد رشته: ${stringCount}`
+                    );
+                    setMaterialConsumptionPerString(null);
+                  }
+                  break;
+                } else {
+                  console.log(
+                    `⚠️ آیتم برنامه برای کد طرح ${tarhetolid} پیدا نشد`
+                  );
+                }
+              } else {
+                console.log(
+                  `⚠️ String نامعتبر یا صفر - مقدار: ${stringValue}, تبدیل شده: ${stringCount}`
+                );
+              }
+            } else {
+              console.log(
+                `⚠️ String برای محصول با code ${tarhetolidNumber} null یا undefined است - مقدار: ${stringValue}`
+              );
+            }
+          } else {
+            console.log(`⚠️ محصول با code ${tarhetolidNumber} پیدا نشد`);
+          }
+        } else {
+          console.log(`⚠️ کد طرح ${tarhetolid} عدد معتبر نیست`);
+        }
+      }
+    } else {
+      console.log("⚠️ یکی از شرایط لازم برقرار نیست:", {
+        products: products.length > 0,
+        uniqueTarhetolids: uniqueTarhetolids.length > 0,
+        allMaterials: allMaterials.length > 0,
+        filteredPlanItems: filteredPlanItems.length > 0,
+      });
+    }
+  }, [products, uniqueTarhetolids, allMaterials, filteredPlanItems]);
 
   const sortedFilteredItems = useMemo(
     () => sortItemsByPriority(filteredPlanItems),
@@ -326,7 +443,23 @@ export default function ProductionPlanRowForm({
             <label className="min-w-[150px] font-medium">
               مقدار مصرف موادبراساس BOM (کیلوگرم):
             </label>
-            <span className="text-lg font-normal">{planItem.barnamerizi}</span>
+            {isLoadingMaterials ||
+            isLoadingProducts ||
+            materialConsumptionPerString === null ? (
+              <span className="text-purple-500 text-sm flex justify-start items-center">
+                <Spinner className="size-8 text-purple-500" />
+                در حال محاسبه...
+              </span>
+            ) : (
+              <span className="text-lg font-normal">
+                {materialConsumptionPerString !== null && planItem.barnamerizi
+                  ? (
+                      materialConsumptionPerString *
+                      parseFloat(planItem.barnamerizi.toString())
+                    ).toFixed(2)
+                  : "-"}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">

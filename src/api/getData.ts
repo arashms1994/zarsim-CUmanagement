@@ -553,7 +553,7 @@ export async function getProducts(): Promise<IProductListItem[]> {
 
   let nextUrl:
     | string
-    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=ID,Title,code,maghta&$orderby=ID desc`;
+    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=ID,Title,code,maghta,String&$orderby=ID desc`;
 
   try {
     while (nextUrl) {
