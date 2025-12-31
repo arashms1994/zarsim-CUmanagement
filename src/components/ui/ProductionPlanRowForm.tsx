@@ -6,19 +6,16 @@ import DeviceSelector from "./DeviceSelector";
 import OperatorSelector from "./OperatorSelector";
 import { useQueries } from "@tanstack/react-query";
 import StopReasonSelector from "./StopReasonSelector";
+import { resetFormFields } from "../../lib/resetFormFields";
 import { getProductMaterialPerStage } from "../../api/getData";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { IProductMaterialPerStage } from "../../types/type";
 import { sortItemsByPriority } from "../../lib/sortItemsByPriority";
-import { calculateWasteValues } from "../../lib/calculateWasteValues";
-import { filterMaterialsByStage } from "../../lib/filterMaterialsByStage";
-import { submitCUManagement, submitCUManagementRow } from "../../api/addData";
 import { filterItemsByMinQuantity } from "../../lib/filterItemsByMinQuantity";
+import { submitCUManagement, submitCUManagementRow } from "../../api/addData";
 import { calculateProductionValues } from "../../lib/calculateProductionValues";
-import { calculateMaterialWeightInKg } from "../../lib/calculateMaterialWeightInKg";
-import { getActualProductionFromForm } from "../../lib/getActualProductionFromForm";
+import { prepareRowDataForSubmission } from "../../lib/prepareRowDataForSubmission";
 import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
-import { calculateActualMaterialConsumption } from "../../lib/calculateActualMaterialConsumption";
 import type {
   IProductionPlanRowFormProps,
   IReelItem,
@@ -224,95 +221,19 @@ export default function ProductionPlanRowForm({
         const formValuesInternal = (control as any)._formValues || {};
 
         const rowPromises = filteredPlanItems.map(async (item) => {
-          const itemPreInvoiceRowId = item.shomareradiffactor;
-          if (!itemPreInvoiceRowId) return null;
-
-          const actualProductionField = `${itemPreInvoiceRowId}.actualProduction`;
-          const actualProductionValue = getActualProductionFromForm(
+          const rowData = prepareRowDataForSubmission(
+            item,
             control,
-            actualProductionField,
-            productionValues
+            formValues,
+            formValuesInternal,
+            allMaterials,
+            sortedFilteredItems,
+            productionValues,
+            waste || "",
+            productionPlanNumber || ""
           );
-          const actualProduction = actualProductionValue || "0";
 
-          const actualMaterialConsumptionField = `${itemPreInvoiceRowId}.actualMaterialConsumption`;
-          let actualMaterialConsumption =
-            formValues[actualMaterialConsumptionField] ||
-            formValuesInternal[actualMaterialConsumptionField] ||
-            (control.watch
-              ? control.watch(actualMaterialConsumptionField)
-              : null) ||
-            "0";
-
-          if (
-            actualMaterialConsumption === "0" ||
-            !actualMaterialConsumption ||
-            actualMaterialConsumption === ""
-          ) {
-            const actualProd = parseFloat(actualProduction);
-            if (!isNaN(actualProd) && actualProd > 0) {
-              const stageMaterials = filterMaterialsByStage(allMaterials, item);
-              const consumption = calculateActualMaterialConsumption(
-                stageMaterials,
-                item,
-                actualProd
-              );
-              actualMaterialConsumption = consumption.toFixed(2);
-            }
-          } else {
-            const consumptionNum = parseFloat(actualMaterialConsumption);
-            if (!isNaN(consumptionNum) && consumptionNum > 1000) {
-              actualMaterialConsumption = (consumptionNum / 1000).toFixed(2);
-            }
-          }
-
-          const wasteField = `${itemPreInvoiceRowId}.waste`;
-          const wasteValuesForItem = waste
-            ? calculateWasteValues(sortedFilteredItems, waste)
-            : {};
-          let wasteValue =
-            formValues[wasteField] ||
-            formValuesInternal[wasteField] ||
-            wasteValuesForItem[wasteField] ||
-            (control.watch ? control.watch(wasteField) : null) ||
-            "0";
-
-          const wasteNum = parseFloat(wasteValue);
-          if (!isNaN(wasteNum) && wasteNum > 0) {
-            if (wasteNum > 1000) {
-              wasteValue = (wasteNum / 1000).toFixed(2);
-            } else {
-              wasteValue = wasteNum.toFixed(2);
-            }
-          } else {
-            wasteValue = "0";
-          }
-
-          const stageMaterials = filterMaterialsByStage(allMaterials, item);
-          const orderWeight = stageMaterials
-            .reduce((sum, material) => {
-              return sum + calculateMaterialWeightInKg(material, item);
-            }, 0)
-            .toFixed(2);
-
-          const priorityValue =
-            item.Priority && item.Priority.trim()
-              ? String(item.Priority.trim())
-              : "";
-
-          const rowData = {
-            Title: item.shomareradiffactor || "",
-            customer: item.namemoshtari ? String(item.namemoshtari) : "",
-            productionPlanItem: productionPlanNumber || "",
-            actualAmount: actualProduction,
-            orderAmount: String(item.meghdarkolesefaresh || "0"),
-            orderWeight: orderWeight,
-            actualWeight: String(actualMaterialConsumption),
-            waste: String(wasteValue),
-            product: item.codemahsol || "",
-            productCode: item.tarhetolid || "",
-            priority: priorityValue,
-          };
+          if (!rowData) return null;
 
           console.log("📋 Row Data:", {
             Title: rowData.Title,
@@ -320,15 +241,6 @@ export default function ProductionPlanRowForm({
             priority: rowData.priority,
             actualWeight: rowData.actualWeight,
             waste: rowData.waste,
-            formValues: {
-              actualMaterialConsumption:
-                formValues[actualMaterialConsumptionField],
-              waste: formValues[wasteField],
-            },
-            item: {
-              namemoshtari: item.namemoshtari,
-              Priority: item.Priority,
-            },
           });
 
           return submitCUManagementRow(rowData);
@@ -346,40 +258,20 @@ export default function ProductionPlanRowForm({
           alert(`ثبت با موفقیت انجام شد ✅\n${successRows} ردیف ثبت شد`);
         }
 
-        if (reset) {
-          reset();
-        }
-
-        setOperator("");
-        setStopReason("");
-        setDeviceName(planItem.dasatghah || "");
-        setDeviceId(null);
-        setEntranceReels([]);
-        setExitReels([]);
-        setShiftData({
-          id: "",
-          title: "",
-          start: "",
-          end: "",
+        resetFormFields({
+          reset,
+          setValue,
+          setOperator,
+          setStopReason,
+          setDeviceName,
+          setDeviceId,
+          setEntranceReels,
+          setExitReels,
+          setShiftData,
+          setStopItem,
+          filteredPlanItems,
+          planItem,
         });
-        setStopItem(null);
-
-        if (setValue) {
-          setValue("actualAmountProduction", "");
-          setValue("actualWeight", "");
-          setValue("waste", "");
-          setValue("description", "");
-          setValue("stopTime", "");
-
-          filteredPlanItems.forEach((item) => {
-            const itemPreInvoiceRowId = item.shomareradiffactor;
-            if (itemPreInvoiceRowId) {
-              setValue(`${itemPreInvoiceRowId}.actualProduction`, "");
-              setValue(`${itemPreInvoiceRowId}.actualMaterialConsumption`, "");
-              setValue(`${itemPreInvoiceRowId}.waste`, "");
-            }
-          });
-        }
       } else {
         alert(result.message);
       }

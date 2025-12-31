@@ -304,12 +304,6 @@ export async function submitCUManagement(
       payload.entranceWeight = String(formData.entranceWeight);
     }
 
-    // لاگ برای دیباگ
-    console.log(
-      "📤 Payload ارسالی به CU_MANAGEMENT:",
-      JSON.stringify(payload, null, 2)
-    );
-
     const response = await fetch(
       `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items`,
       {
@@ -355,7 +349,6 @@ export async function submitCUManagementRow(
   }
 
   try {
-    // دریافت type از SharePoint
     const listInfoResponse = await fetch(
       `${BASE_URL}/_api/web/lists(guid'${listGuid}')?$select=ListItemEntityTypeFullName`,
       {
