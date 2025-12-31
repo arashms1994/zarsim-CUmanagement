@@ -297,6 +297,7 @@ export default function CUManagement() {
                       planItem={planItem}
                       control={control}
                       productionPlanNumber={selectedPlan}
+                      selectedStage={selectedStage}
                     />
                   ))
                 ) : (

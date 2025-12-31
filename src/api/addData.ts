@@ -423,6 +423,12 @@ export async function submitCUManagementRow(
     if (rowData.priority) {
       payload.priority = String(rowData.priority);
     }
+    if (rowData.level) {
+      payload.level = String(rowData.level);
+    }
+    if (rowData.levelNumber) {
+      payload.levelNumber = String(rowData.levelNumber);
+    }
 
     const response = await fetch(
       `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items`,

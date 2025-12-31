@@ -18,7 +18,8 @@ export function prepareRowDataForSubmission(
   sortedFilteredItems: ISubProductionPlanListItem[],
   productionValues: Record<string, string>,
   waste: string,
-  productionPlanNumber: string
+  productionPlanNumber: string,
+  selectedStage?: string
 ): ICUManagementRowListItem | null {
   const itemPreInvoiceRowId = item.shomareradiffactor;
   if (!itemPreInvoiceRowId) return null;
@@ -74,6 +75,8 @@ export function prepareRowDataForSubmission(
     product: item.codemahsol || "",
     productCode: item.tarhetolid || "",
     priority: priorityValue,
+    level: selectedStage || "",
+    levelNumber: item.shomaremarhale || "",
   };
 
   return rowData;

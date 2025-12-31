@@ -26,6 +26,7 @@ export default function ProductionPlanRowForm({
   planItem,
   control: externalControl,
   productionPlanNumber,
+  selectedStage,
 }: IProductionPlanRowFormProps) {
   const localForm = useForm();
   const control = externalControl || localForm.control;
@@ -230,7 +231,8 @@ export default function ProductionPlanRowForm({
             sortedFilteredItems,
             productionValues,
             waste || "",
-            productionPlanNumber || ""
+            productionPlanNumber || "",
+            selectedStage
           );
 
           if (!rowData) return null;

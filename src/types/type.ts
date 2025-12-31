@@ -57,6 +57,7 @@ export interface IProductionPlanRowFormProps {
   planItem: IPrintTajmiListItem;
   control?: any;
   productionPlanNumber?: string;
+  selectedStage?: string;
   onSubmit?: (
     data: ICUManagementFormProps,
     planItem: IPrintTajmiListItem,
@@ -465,4 +466,6 @@ export interface ICUManagementRowListItem {
   productCode: string;
   priority: string;
   customer: string;
+  level: string;
+  levelNumber: string;
 }
