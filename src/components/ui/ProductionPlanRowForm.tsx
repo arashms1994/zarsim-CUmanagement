@@ -1,27 +1,29 @@
 import { useState, useMemo } from "react";
-import { useQueries } from "@tanstack/react-query";
-import { getProductMaterialPerStage } from "../../api/getData";
-import type { IProductMaterialPerStage } from "../../types/type";
 import { Input } from "./input";
 import ReelSelector from "./ReelSelector";
 import ProductsTable from "./ProductsTable";
 import DeviceSelector from "./DeviceSelector";
 import OperatorSelector from "./OperatorSelector";
+import { useQueries } from "@tanstack/react-query";
 import StopReasonSelector from "./StopReasonSelector";
+import { getProductMaterialPerStage } from "../../api/getData";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import type { IProductMaterialPerStage } from "../../types/type";
+import { sortItemsByPriority } from "../../lib/sortItemsByPriority";
+import { calculateWasteValues } from "../../lib/calculateWasteValues";
+import { filterMaterialsByStage } from "../../lib/filterMaterialsByStage";
+import { submitCUManagement, submitCUManagementRow } from "../../api/addData";
+import { filterItemsByMinQuantity } from "../../lib/filterItemsByMinQuantity";
+import { calculateProductionValues } from "../../lib/calculateProductionValues";
+import { calculateMaterialWeightInKg } from "../../lib/calculateMaterialWeightInKg";
+import { getActualProductionFromForm } from "../../lib/getActualProductionFromForm";
+import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
+import { calculateActualMaterialConsumption } from "../../lib/calculateActualMaterialConsumption";
 import type {
   IProductionPlanRowFormProps,
   IReelItem,
   IStopListItem,
 } from "../../types/type";
-import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
-import { submitCUManagement, submitCUManagementRow } from "../../api/addData";
-import { filterItemsByMinQuantity } from "../../lib/filterItemsByMinQuantity";
-import { filterMaterialsByStage } from "../../lib/filterMaterialsByStage";
-import { calculateMaterialWeightInKg } from "../../lib/calculateMaterialWeightInKg";
-import { getActualProductionFromForm } from "../../lib/getActualProductionFromForm";
-import { calculateProductionValues } from "../../lib/calculateProductionValues";
-import { sortItemsByPriority } from "../../lib/sortItemsByPriority";
 
 export default function ProductionPlanRowForm({
   planItem,
@@ -83,13 +85,11 @@ export default function ProductionPlanRowForm({
   const { planItems, isLoading: planItemsLoading } =
     useSubProductionPlanByNumbers(planNumbers);
 
-  // فیلتر کردن آیتم‌های زیر 10 متر
   const filteredPlanItems = useMemo(
     () => filterItemsByMinQuantity(planItems),
     [planItems]
   );
 
-  // استخراج tarhetolid های منحصر به فرد برای دریافت مواد
   const uniqueTarhetolids = useMemo(() => {
     const tarhetolids = filteredPlanItems
       .map((item) => item.tarhetolid)
@@ -97,7 +97,6 @@ export default function ProductionPlanRowForm({
     return Array.from(new Set(tarhetolids));
   }, [filteredPlanItems]);
 
-  // دریافت مواد برای هر tarhetolid
   const materialQueries = useQueries({
     queries: uniqueTarhetolids.map((tarhetolid) => ({
       queryKey: ["product-material-per-stage", tarhetolid],
@@ -113,7 +112,6 @@ export default function ProductionPlanRowForm({
       .filter((m): m is IProductMaterialPerStage => !!m);
   }, [materialQueries]);
 
-  // مرتب‌سازی آیتم‌ها بر اساس اولویت
   const sortedFilteredItems = useMemo(
     () => sortItemsByPriority(filteredPlanItems),
     [filteredPlanItems]
@@ -124,7 +122,6 @@ export default function ProductionPlanRowForm({
     name: "actualAmountProduction",
   });
 
-  // محاسبه productionValues برای استفاده در getActualProductionFromForm
   const productionValues = useMemo(() => {
     if (!control || !actualAmountProduction) {
       return {};
@@ -160,7 +157,6 @@ export default function ProductionPlanRowForm({
     const tarhetolids = filteredPlanItems
       .map((item) => item.tarhetolid)
       .filter((t): t is string => !!t && t.trim().length > 0);
-    // حذف مقادیر تکراری
     const uniqueTarhetolids = Array.from(new Set(tarhetolids));
     return uniqueTarhetolids.join("-");
   }, [filteredPlanItems]);
@@ -170,7 +166,6 @@ export default function ProductionPlanRowForm({
     const radiffactors = filteredPlanItems
       .map((item) => item.shomareradiffactor)
       .filter((r): r is string => !!r && r.trim().length > 0);
-    // حذف مقادیر تکراری
     const uniqueRadiffactors = Array.from(new Set(radiffactors));
     return uniqueRadiffactors.join("-");
   }, [filteredPlanItems]);
@@ -224,15 +219,14 @@ export default function ProductionPlanRowForm({
       const result = await submitCUManagement(submitData);
 
       if (result.success) {
-        // ارسال ردیف‌های جدول به CU_MANAGEMENT_ROW
-        // دریافت همه مقادیر form یکبار در ابتدا
         const formValues = control.getValues ? control.getValues() : {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const formValuesInternal = (control as any)._formValues || {};
 
         const rowPromises = filteredPlanItems.map(async (item) => {
           const itemPreInvoiceRowId = item.shomareradiffactor;
           if (!itemPreInvoiceRowId) return null;
 
-          // دریافت مقادیر از form
           const actualProductionField = `${itemPreInvoiceRowId}.actualProduction`;
           const actualProductionValue = getActualProductionFromForm(
             control,
@@ -242,18 +236,57 @@ export default function ProductionPlanRowForm({
           const actualProduction = actualProductionValue || "0";
 
           const actualMaterialConsumptionField = `${itemPreInvoiceRowId}.actualMaterialConsumption`;
-          const actualMaterialConsumption =
+          let actualMaterialConsumption =
             formValues[actualMaterialConsumptionField] ||
+            formValuesInternal[actualMaterialConsumptionField] ||
             (control.watch
               ? control.watch(actualMaterialConsumptionField)
               : null) ||
             "0";
 
+          if (
+            actualMaterialConsumption === "0" ||
+            !actualMaterialConsumption ||
+            actualMaterialConsumption === ""
+          ) {
+            const actualProd = parseFloat(actualProduction);
+            if (!isNaN(actualProd) && actualProd > 0) {
+              const stageMaterials = filterMaterialsByStage(allMaterials, item);
+              const consumption = calculateActualMaterialConsumption(
+                stageMaterials,
+                item,
+                actualProd
+              );
+              actualMaterialConsumption = consumption.toFixed(2);
+            }
+          } else {
+            const consumptionNum = parseFloat(actualMaterialConsumption);
+            if (!isNaN(consumptionNum) && consumptionNum > 1000) {
+              actualMaterialConsumption = (consumptionNum / 1000).toFixed(2);
+            }
+          }
+
           const wasteField = `${itemPreInvoiceRowId}.waste`;
-          const wasteValue =
+          const wasteValuesForItem = waste
+            ? calculateWasteValues(sortedFilteredItems, waste)
+            : {};
+          let wasteValue =
             formValues[wasteField] ||
+            formValuesInternal[wasteField] ||
+            wasteValuesForItem[wasteField] ||
             (control.watch ? control.watch(wasteField) : null) ||
             "0";
+
+          const wasteNum = parseFloat(wasteValue);
+          if (!isNaN(wasteNum) && wasteNum > 0) {
+            if (wasteNum > 1000) {
+              wasteValue = (wasteNum / 1000).toFixed(2);
+            } else {
+              wasteValue = wasteNum.toFixed(2);
+            }
+          } else {
+            wasteValue = "0";
+          }
 
           const stageMaterials = filterMaterialsByStage(allMaterials, item);
           const orderWeight = stageMaterials
@@ -262,7 +295,6 @@ export default function ProductionPlanRowForm({
             }, 0)
             .toFixed(2);
 
-          // بررسی Priority - ممکن است string خالی یا null باشد
           const priorityValue =
             item.Priority && item.Priority.trim()
               ? String(item.Priority.trim())
@@ -314,11 +346,10 @@ export default function ProductionPlanRowForm({
           alert(`ثبت با موفقیت انجام شد ✅\n${successRows} ردیف ثبت شد`);
         }
 
-        // خالی کردن فرم بعد از ثبت موفق
         if (reset) {
           reset();
         }
-        // Reset state variables
+
         setOperator("");
         setStopReason("");
         setDeviceName(planItem.dasatghah || "");
@@ -332,6 +363,23 @@ export default function ProductionPlanRowForm({
           end: "",
         });
         setStopItem(null);
+
+        if (setValue) {
+          setValue("actualAmountProduction", "");
+          setValue("actualWeight", "");
+          setValue("waste", "");
+          setValue("description", "");
+          setValue("stopTime", "");
+
+          filteredPlanItems.forEach((item) => {
+            const itemPreInvoiceRowId = item.shomareradiffactor;
+            if (itemPreInvoiceRowId) {
+              setValue(`${itemPreInvoiceRowId}.actualProduction`, "");
+              setValue(`${itemPreInvoiceRowId}.actualMaterialConsumption`, "");
+              setValue(`${itemPreInvoiceRowId}.waste`, "");
+            }
+          });
+        }
       } else {
         alert(result.message);
       }
