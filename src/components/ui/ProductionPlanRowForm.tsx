@@ -31,6 +31,7 @@ export default function ProductionPlanRowForm({
   const localForm = useForm();
   const control = externalControl || localForm.control;
   const setValue = externalControl?.setValue || localForm.setValue;
+  const reset = externalControl?.reset || localForm.reset;
   const [operator, setOperator] = useState("");
   const [stopReason, setStopReason] = useState("");
   const [deviceName, setDeviceName] = useState(planItem.dasatghah || "");
@@ -224,6 +225,9 @@ export default function ProductionPlanRowForm({
 
       if (result.success) {
         // ارسال ردیف‌های جدول به CU_MANAGEMENT_ROW
+        // دریافت همه مقادیر form یکبار در ابتدا
+        const formValues = control.getValues ? control.getValues() : {};
+
         const rowPromises = filteredPlanItems.map(async (item) => {
           const itemPreInvoiceRowId = item.shomareradiffactor;
           if (!itemPreInvoiceRowId) return null;
@@ -238,30 +242,18 @@ export default function ProductionPlanRowForm({
           const actualProduction = actualProductionValue || "0";
 
           const actualMaterialConsumptionField = `${itemPreInvoiceRowId}.actualMaterialConsumption`;
-          // استفاده از getValues برای دریافت مقدار از form (بهترین روش برای submit)
-          let actualMaterialConsumption = "0";
-          if (control.getValues) {
-            const formValues = control.getValues();
-            actualMaterialConsumption =
-              formValues[actualMaterialConsumptionField] || "0";
-          } else if (control._formValues) {
-            actualMaterialConsumption =
-              control._formValues[actualMaterialConsumptionField] || "0";
-          } else if (control.watch) {
-            actualMaterialConsumption =
-              control.watch(actualMaterialConsumptionField) || "0";
-          }
+          const actualMaterialConsumption =
+            formValues[actualMaterialConsumptionField] ||
+            (control.watch
+              ? control.watch(actualMaterialConsumptionField)
+              : null) ||
+            "0";
 
           const wasteField = `${itemPreInvoiceRowId}.waste`;
-          let wasteValue = "0";
-          if (control.getValues) {
-            const formValues = control.getValues();
-            wasteValue = formValues[wasteField] || "0";
-          } else if (control._formValues) {
-            wasteValue = control._formValues[wasteField] || "0";
-          } else if (control.watch) {
-            wasteValue = control.watch(wasteField) || "0";
-          }
+          const wasteValue =
+            formValues[wasteField] ||
+            (control.watch ? control.watch(wasteField) : null) ||
+            "0";
 
           const stageMaterials = filterMaterialsByStage(allMaterials, item);
           const orderWeight = stageMaterials
@@ -270,6 +262,12 @@ export default function ProductionPlanRowForm({
             }, 0)
             .toFixed(2);
 
+          // بررسی Priority - ممکن است string خالی یا null باشد
+          const priorityValue =
+            item.Priority && item.Priority.trim()
+              ? String(item.Priority.trim())
+              : "";
+
           const rowData = {
             Title: item.shomareradiffactor || "",
             customer: item.namemoshtari ? String(item.namemoshtari) : "",
@@ -277,11 +275,11 @@ export default function ProductionPlanRowForm({
             actualAmount: actualProduction,
             orderAmount: String(item.meghdarkolesefaresh || "0"),
             orderWeight: orderWeight,
-            actualWeight: actualMaterialConsumption,
-            waste: wasteValue,
+            actualWeight: String(actualMaterialConsumption),
+            waste: String(wasteValue),
             product: item.codemahsol || "",
             productCode: item.tarhetolid || "",
-            priority: item.Priority ? String(item.Priority) : "",
+            priority: priorityValue,
           };
 
           console.log("📋 Row Data:", {
@@ -290,6 +288,11 @@ export default function ProductionPlanRowForm({
             priority: rowData.priority,
             actualWeight: rowData.actualWeight,
             waste: rowData.waste,
+            formValues: {
+              actualMaterialConsumption:
+                formValues[actualMaterialConsumptionField],
+              waste: formValues[wasteField],
+            },
             item: {
               namemoshtari: item.namemoshtari,
               Priority: item.Priority,
@@ -310,6 +313,25 @@ export default function ProductionPlanRowForm({
         } else {
           alert(`ثبت با موفقیت انجام شد ✅\n${successRows} ردیف ثبت شد`);
         }
+
+        // خالی کردن فرم بعد از ثبت موفق
+        if (reset) {
+          reset();
+        }
+        // Reset state variables
+        setOperator("");
+        setStopReason("");
+        setDeviceName(planItem.dasatghah || "");
+        setDeviceId(null);
+        setEntranceReels([]);
+        setExitReels([]);
+        setShiftData({
+          id: "",
+          title: "",
+          start: "",
+          end: "",
+        });
+        setStopItem(null);
       } else {
         alert(result.message);
       }
