@@ -6,6 +6,9 @@ import type { ICUManagementFormProps } from "../types/type";
 import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
 import { usePrintTajmiByCart } from "../hooks/usePrintTajmiByCart";
 import { useSearchPrintTajmi } from "../hooks/useSearchPrintTajmi";
+import { extractUniqueStages } from "../lib/extractUniqueStages";
+import { extractUniqueColors } from "../lib/extractUniqueColors";
+import { filterPlanDetails } from "../lib/filterPlanDetails";
 
 export default function CUManagement() {
   const { control, setValue, watch } = useForm<ICUManagementFormProps>();
@@ -29,44 +32,26 @@ export default function CUManagement() {
   const { planDetails, isLoading: planLoading } =
     usePrintTajmiByCart(selectedPlan);
 
-  const uniqueStages = useMemo(() => {
-    if (!planDetails || planDetails.length === 0) return [];
-    const stages = planDetails
-      .map((item) => item.marhale)
-      .filter((s): s is string => !!s && s.trim().length > 0);
+  const uniqueStages = useMemo(
+    () => extractUniqueStages(planDetails || []),
+    [planDetails]
+  );
 
-    const uniq = Array.from(new Set(stages));
+  const uniqueColors = useMemo(
+    () => extractUniqueColors(planDetails || [], selectedStage),
+    [planDetails, selectedStage]
+  );
 
-    return uniq;
-  }, [planDetails]);
-
-  const uniqueColors = useMemo(() => {
-    if (!planDetails || planDetails.length === 0) return [];
-    if (!selectedStage) return [];
-
-    const colors = planDetails
-      .filter((item) => item.marhale === selectedStage)
-      .map((item) => item.rang)
-      .filter((c): c is string => !!c && c.trim().length > 0);
-
-    const uniq = Array.from(new Set(colors));
-
-    return uniq;
-  }, [planDetails, selectedStage]);
-
-  const filteredPlanDetails = useMemo(() => {
-    if (!planDetails || planDetails.length === 0) return [];
-    if (!selectedStage) return [];
-
-    let items = planDetails.filter((item) => item.marhale === selectedStage);
-
-    if (uniqueColors.length > 0) {
-      if (!selectedColor) return [];
-      items = items.filter((item) => item.rang === selectedColor);
-    }
-
-    return items;
-  }, [planDetails, selectedStage, selectedColor, uniqueColors.length]);
+  const filteredPlanDetails = useMemo(
+    () =>
+      filterPlanDetails(
+        planDetails || [],
+        selectedStage,
+        selectedColor,
+        uniqueColors
+      ),
+    [planDetails, selectedStage, selectedColor, uniqueColors]
+  );
 
   const handleCartSelect = (cartNumber: string) => {
     setValue("productionPlanNumber", cartNumber);
