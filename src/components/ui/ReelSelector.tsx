@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "./input";
 import { SkeletonSearchSuggestion } from "./Skeleton";
 import { useWasteList } from "../../hooks/useWasteList";
@@ -23,7 +23,27 @@ export default function ReelSelector({
   const [showWasteDropdown, setShowWasteDropdown] = useState<number | null>(
     null
   );
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const wasteDropdownRef = useRef<HTMLDivElement>(null);
+
+  // بستن dropdown با کلیک خارج از آن
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        wasteDropdownRef.current &&
+        !wasteDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowWasteDropdown(null);
+      }
+    };
+
+    if (showWasteDropdown !== null) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showWasteDropdown]);
 
   const {
     searchResults: reelResults,
@@ -61,6 +81,13 @@ export default function ReelSelector({
       ...updatedReels[index],
       [field]: value,
     };
+    console.log("🔄 handleReelChange:", {
+      index,
+      field,
+      value,
+      updatedReel: updatedReels[index],
+      allReels: updatedReels,
+    });
     onReelsChange(updatedReels);
   };
 
@@ -75,12 +102,21 @@ export default function ReelSelector({
   };
 
   const handleEdit = (index: number) => {
-    setEditingIndex(index);
+    // در اینجا می‌توانید منطق ویرایش را اضافه کنید
+    console.log("🔍 ویرایش قرقره:", { index, reel: reels[index] });
   };
 
   const handleSave = async (index: number) => {
     const reel = reels[index];
     if (!reel) return;
+
+    console.log("💾 handleSave - reel قبل از ساخت reelData:", {
+      reel,
+      index,
+      allReels: reels,
+      wasteCategory: reel.wasteCategory,
+      wasteCategoryId: reel.wasteCategoryId,
+    });
 
     // تعیین statusId و status بر اساس label
     const isEntrance = label === "قرقره‌های ورودی:";
@@ -104,15 +140,27 @@ export default function ReelSelector({
       Modified: "",
     };
 
+    console.log("📋 اطلاعات قرقره برای ثبت:", {
+      reel,
+      reelData,
+      index,
+      label,
+      isEntrance,
+      statusId,
+      status,
+      wasteCategoryValue: reel.wasteCategory,
+      wasteCategoryIdValue: reel.wasteCategoryId,
+    });
+
     try {
       const result = await submitCUManagementReels(reelData);
       if (result.success) {
-        setEditingIndex(null);
         alert("قرقره با موفقیت ثبت شد ✅");
       } else {
         alert(result.message);
       }
     } catch (error) {
+      console.error("❌ خطا در ثبت قرقره:", error);
       alert(
         `خطا در ثبت قرقره: ${
           error instanceof Error ? error.message : "خطای نامشخص"
@@ -218,15 +266,14 @@ export default function ReelSelector({
 
           {label === "قرقره‌های خروجی:" && (
             <>
-              <div className="relative w-[200px]">
+              <div className="relative w-[200px]" ref={index === 0 ? wasteDropdownRef : undefined}>
                 <div
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setShowWasteDropdown(
                       showWasteDropdown === index ? null : index
                     );
-                  }}
-                  onBlur={() => {
-                    setTimeout(() => setShowWasteDropdown(null), 200);
                   }}
                   tabIndex={0}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white cursor-pointer hover:bg-gray-50 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#1e7677]"
@@ -266,17 +313,30 @@ export default function ReelSelector({
                               ? "bg-[#1e7677] text-white"
                               : "hover:bg-gray-100"
                           }`}
-                          onClick={() => {
-                            handleReelChange(
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log("🔍 انتخاب دسته‌بندی ضایعات:", {
+                              waste,
+                              reel,
                               index,
-                              "wasteCategory",
-                              waste.Title
-                            );
-                            handleReelChange(
+                              wasteTitle: waste.Title,
+                              wasteId: waste.ID,
+                            });
+                            
+                            // به‌روزرسانی هر دو فیلد در یک فراخوانی
+                            const updatedReels = [...reels];
+                            updatedReels[index] = {
+                              ...updatedReels[index],
+                              wasteCategory: waste.Title,
+                              wasteCategoryId: waste.ID,
+                            };
+                            console.log("🔄 به‌روزرسانی قرقره:", {
                               index,
-                              "wasteCategoryId",
-                              waste.ID
-                            );
+                              updatedReel: updatedReels[index],
+                              allReels: updatedReels,
+                            });
+                            onReelsChange(updatedReels);
                             setShowWasteDropdown(null);
                           }}
                         >
@@ -310,7 +370,6 @@ export default function ReelSelector({
             onEdit={handleEdit}
             onSave={handleSave}
             onDelete={handleDelete}
-            isEditing={editingIndex === index}
           />
         </div>
       ))}

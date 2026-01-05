@@ -677,5 +677,4 @@ export interface IReelsActionsComponentProps {
   onEdit: (index: number) => void;
   onSave: (index: number) => void;
   onDelete: (index: number) => void;
-  isEditing?: boolean;
 }
