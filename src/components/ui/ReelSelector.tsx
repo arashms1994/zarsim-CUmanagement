@@ -81,13 +81,7 @@ export default function ReelSelector({
       ...updatedReels[index],
       [field]: value,
     };
-    console.log("🔄 handleReelChange:", {
-      index,
-      field,
-      value,
-      updatedReel: updatedReels[index],
-      allReels: updatedReels,
-    });
+
     onReelsChange(updatedReels);
   };
 
@@ -102,7 +96,6 @@ export default function ReelSelector({
   };
 
   const handleEdit = (index: number) => {
-    // در اینجا می‌توانید منطق ویرایش را اضافه کنید
     console.log("🔍 ویرایش قرقره:", { index, reel: reels[index] });
   };
 
@@ -110,15 +103,6 @@ export default function ReelSelector({
     const reel = reels[index];
     if (!reel) return;
 
-    console.log("💾 handleSave - reel قبل از ساخت reelData:", {
-      reel,
-      index,
-      allReels: reels,
-      wasteCategory: reel.wasteCategory,
-      wasteCategoryId: reel.wasteCategoryId,
-    });
-
-    // تعیین statusId و status بر اساس label
     const isEntrance = label === "قرقره‌های ورودی:";
     const statusId = isEntrance ? "1" : "2";
     const status = isEntrance ? "ورودی" : "خروجی";
@@ -139,18 +123,6 @@ export default function ReelSelector({
       Created: "",
       Modified: "",
     };
-
-    console.log("📋 اطلاعات قرقره برای ثبت:", {
-      reel,
-      reelData,
-      index,
-      label,
-      isEntrance,
-      statusId,
-      status,
-      wasteCategoryValue: reel.wasteCategory,
-      wasteCategoryIdValue: reel.wasteCategoryId,
-    });
 
     try {
       const result = await submitCUManagementReels(reelData);
@@ -266,7 +238,10 @@ export default function ReelSelector({
 
           {label === "قرقره‌های خروجی:" && (
             <>
-              <div className="relative w-[200px]" ref={index === 0 ? wasteDropdownRef : undefined}>
+              <div
+                className="relative w-[200px]"
+                ref={index === 0 ? wasteDropdownRef : undefined}
+              >
                 <div
                   onClick={(e) => {
                     e.preventDefault();
@@ -316,26 +291,13 @@ export default function ReelSelector({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log("🔍 انتخاب دسته‌بندی ضایعات:", {
-                              waste,
-                              reel,
-                              index,
-                              wasteTitle: waste.Title,
-                              wasteId: waste.ID,
-                            });
-                            
-                            // به‌روزرسانی هر دو فیلد در یک فراخوانی
+
                             const updatedReels = [...reels];
                             updatedReels[index] = {
                               ...updatedReels[index],
                               wasteCategory: waste.Title,
                               wasteCategoryId: waste.ID,
                             };
-                            console.log("🔄 به‌روزرسانی قرقره:", {
-                              index,
-                              updatedReel: updatedReels[index],
-                              allReels: updatedReels,
-                            });
                             onReelsChange(updatedReels);
                             setShowWasteDropdown(null);
                           }}

@@ -119,14 +119,6 @@ export default function ProductionPlanRowForm({
   const isLoadingMaterials = materialQueries.some((query) => query.isLoading);
 
   useEffect(() => {
-    console.log("🔍 بررسی محاسبه مصرف مواد:", {
-      productsCount: products.length,
-      uniqueTarhetolidsCount: uniqueTarhetolids.length,
-      uniqueTarhetolids: uniqueTarhetolids,
-      allMaterialsCount: allMaterials.length,
-      filteredPlanItemsCount: filteredPlanItems.length,
-    });
-
     if (
       products.length > 0 &&
       uniqueTarhetolids.length > 0 &&
@@ -135,46 +127,25 @@ export default function ProductionPlanRowForm({
     ) {
       for (const tarhetolid of uniqueTarhetolids) {
         const tarhetolidNumber = parseFloat(tarhetolid);
-        console.log(
-          `🔍 بررسی کد طرح: ${tarhetolid} (عدد: ${tarhetolidNumber})`
-        );
 
         if (!isNaN(tarhetolidNumber)) {
           const matchedProduct = products.find(
             (product) => product.code === tarhetolidNumber
           );
 
-          console.log(`🔍 محصول پیدا شده:`, matchedProduct);
-          console.log(
-            `🔍 تمام فیلدهای محصول:`,
-            Object.keys(matchedProduct || {})
-          );
-          console.log(`🔍 String محصول (مقدار):`, matchedProduct?.String);
-          console.log(`🔍 String محصول (نوع):`, typeof matchedProduct?.String);
-
           if (matchedProduct) {
-            // بررسی String - ممکن است 0 باشد که falsy است
             const stringValue = matchedProduct.String;
-            console.log(
-              `🔍 String محصول (مقدار خام):`,
-              stringValue,
-              `نوع:`,
-              typeof stringValue
-            );
 
             if (stringValue !== null && stringValue !== undefined) {
               const stringCount =
                 typeof stringValue === "number"
                   ? stringValue
                   : parseFloat(String(stringValue));
-              console.log(`🔍 String تبدیل شده به عدد:`, stringCount);
 
               if (!isNaN(stringCount) && stringCount > 0) {
                 const planItemForTarhetolid = filteredPlanItems.find(
                   (item) => item.tarhetolid === tarhetolid
                 );
-
-                console.log(`🔍 آیتم برنامه پیدا شده:`, planItemForTarhetolid);
 
                 if (planItemForTarhetolid) {
                   const stageMaterials = filterMaterialsByStage(
@@ -182,13 +153,6 @@ export default function ProductionPlanRowForm({
                     planItemForTarhetolid
                   );
 
-                  console.log(
-                    `🔍 مواد فیلتر شده:`,
-                    stageMaterials.length,
-                    stageMaterials
-                  );
-
-                  // محاسبه مجموع vahed تمام مواد (به گرم)
                   const totalVahed = stageMaterials.reduce(
                     (sum: number, material: IProductMaterialPerStage) => {
                       return sum + (material.vahed || 0);
@@ -196,23 +160,10 @@ export default function ProductionPlanRowForm({
                     0
                   );
 
-                  console.log(`🔍 مجموع vahed (گرم):`, totalVahed);
-
                   if (totalVahed > 0 && stringCount > 0) {
-                    // تقسیم vahed بر تعداد رشته و تبدیل به کیلوگرم (تقسیم بر 1000)
                     const result = totalVahed / stringCount / 1000;
                     setMaterialConsumptionPerString(result);
-                    console.log(
-                      `✅ کد طرح: ${tarhetolid}, تعداد رشته: ${stringCount}, مجموع vahed: ${totalVahed.toFixed(
-                        2
-                      )} گرم, مصرف مواد تقسیم بر رشته: ${result.toFixed(
-                        4
-                      )} کیلوگرم`
-                    );
                   } else {
-                    console.log(
-                      `⚠️ vahed یا تعداد رشته صفر است - vahed: ${totalVahed}, تعداد رشته: ${stringCount}`
-                    );
                     setMaterialConsumptionPerString(null);
                   }
                   break;

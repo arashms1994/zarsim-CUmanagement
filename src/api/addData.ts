@@ -203,8 +203,6 @@ export async function submitCUManagementRow(
       }
     }
 
-    console.log("📋 استفاده از type:", itemType);
-
     const payload: any = {
       __metadata: {
         type: itemType,
@@ -404,8 +402,6 @@ export async function submitCUManagementReels(
         console.warn("خطا در parse کردن پاسخ لیست:", parseError);
       }
     }
-
-    console.log("📋 استفاده از type:", itemType);
 
     const payload: any = {
       __metadata: {
