@@ -9,6 +9,7 @@ import type {
   IProductMaterialPerStage,
   IReelListItem,
   IProductListItem,
+  IWasteListItem,
 } from "../types/type";
 
 export async function getDevice(): Promise<IDevicesListItem[]> {
@@ -589,6 +590,56 @@ export async function getProducts(): Promise<IProductListItem[]> {
     return items;
   } catch (error) {
     console.error("خطا در دریافت لیست محصولات:", error);
+    throw error;
+  }
+}
+
+export async function getWasteList(): Promise<IWasteListItem[]> {
+  let items: IWasteListItem[] = [];
+
+  const listGuid = config.LIST_GUIDS.WASTE_LIST;
+  if (!listGuid) {
+    throw new Error("GUID لیست WASTE_LIST تنظیم نشده است");
+  }
+
+  let nextUrl:
+    | string
+    | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=ID,Title,stage&$orderby=ID desc`;
+
+  try {
+    while (nextUrl) {
+      const res = await fetch(nextUrl, {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(
+          `خطا در گرفتن لیست ضایعات: ${err} (Status: ${res.status})`
+        );
+      }
+
+      const json: {
+        d: { results: IWasteListItem[]; __next?: string };
+      } = await res.json();
+
+      const results = json.d?.results;
+      if (!Array.isArray(results)) {
+        throw new Error(
+          "ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست"
+        );
+      }
+
+      items = items.concat(results);
+      nextUrl = json.d?.__next || null;
+    }
+
+    return items;
+  } catch (error) {
+    console.error("خطا در دریافت لیست ضایعات:", error);
     throw error;
   }
 }

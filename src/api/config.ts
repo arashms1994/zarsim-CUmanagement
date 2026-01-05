@@ -4,8 +4,9 @@ export const config = {
   LIST_GUIDS: {
     STOP_LIST: import.meta.env.VITE_STOP_LIST_GUID,
     REELS_LIST: import.meta.env.VITE_REELS_LIST_GUID,
-    SUPPLIERS: import.meta.env.VITE_SUPPLIERS_LIST_GUID,
+    WASTE_LIST: import.meta.env.VITE_WASTE_LIST_GUID,
     PERSONNEL: import.meta.env.VITE_PERSONNEL_LIST_GUID,
+    SUPPLIERS: import.meta.env.VITE_SUPPLIERS_LIST_GUID,
     DEVICES_LIST: import.meta.env.VITE_DEVICES_LIST_GUID,
     PRODUCTS_LIST: import.meta.env.VITE_PRODUCTS_LIST_GUID,
     PRINT_TAJMI: import.meta.env.VITE_PRINT_TAJMI_LIST_GUID,

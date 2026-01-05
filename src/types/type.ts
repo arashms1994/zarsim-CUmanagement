@@ -366,6 +366,9 @@ export interface IReelItem {
   reelTitle: string;
   weight: string;
   amount: string;
+  wasteWeight: string;
+  wasteCategory?: string;
+  wasteCategoryId?: number;
 }
 
 export interface IReelSelectorProps {
@@ -639,3 +642,8 @@ export interface IProductListItem {
   GUID: string;
 }
 
+export interface IWasteListItem {
+  ID: number;
+  Title: string;
+  stage: string;
+}
