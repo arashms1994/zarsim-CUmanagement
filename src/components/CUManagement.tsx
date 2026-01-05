@@ -83,7 +83,7 @@ export default function CUManagement() {
           borderRadius={4}
         >
           <span className="text-xl font-medium text-white">
-            فرم ثبت مس مصرفی بر اساس شماره برنامه
+            فرم ثبت مواد مصرفی بر اساس شماره برنامه
           </span>
         </Stack>
 
