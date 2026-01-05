@@ -1,6 +1,5 @@
 import type { IReelsActionsComponentProps } from "../../types/type";
 
-
 export default function ReelsActionsComponent({
   index,
   onEdit,
@@ -74,4 +73,3 @@ export default function ReelsActionsComponent({
     </div>
   );
 }
-
