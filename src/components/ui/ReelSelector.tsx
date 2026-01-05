@@ -3,12 +3,19 @@ import { Input } from "./input";
 import { SkeletonSearchSuggestion } from "./Skeleton";
 import { useWasteList } from "../../hooks/useWasteList";
 import { useSearchReels } from "../../hooks/useSearchReels";
+import ReelsActionsComponent from "./ReelsActionsComponent";
+import { submitCUManagementReels } from "../../api/addData";
 import type { IReelSelectorProps, IReelItem } from "../../types/type";
 
 export default function ReelSelector({
   reels,
   label,
   onReelsChange,
+  productionPlanNumber = "",
+  selectedStage = "",
+  device = "",
+  operator = "",
+  preInvoiceRow = "",
 }: IReelSelectorProps) {
   const [showReelSuggestions, setShowReelSuggestions] = useState<number | null>(
     null
@@ -16,6 +23,7 @@ export default function ReelSelector({
   const [showWasteDropdown, setShowWasteDropdown] = useState<number | null>(
     null
   );
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const {
     searchResults: reelResults,
@@ -64,6 +72,57 @@ export default function ReelSelector({
     handleReelChange(index, "reelId", reelId);
     handleReelChange(index, "reelTitle", reelTitle);
     setShowReelSuggestions(null);
+  };
+
+  const handleEdit = (index: number) => {
+    setEditingIndex(index);
+  };
+
+  const handleSave = async (index: number) => {
+    const reel = reels[index];
+    if (!reel) return;
+
+    // تعیین statusId و status بر اساس label
+    const isEntrance = label === "قرقره‌های ورودی:";
+    const statusId = isEntrance ? "1" : "2";
+    const status = isEntrance ? "ورودی" : "خروجی";
+
+    const reelData = {
+      Title: productionPlanNumber || "",
+      reelNumber: reel.reelTitle || "",
+      wasteCategory: reel.wasteCategory || "",
+      productAmount: reel.amount || "",
+      productWeight: reel.weight || "",
+      wasteWeight: reel.wasteWeight || "",
+      productionStage: selectedStage || "",
+      device: device || "",
+      operator: operator || "",
+      statusId: statusId,
+      status: status,
+      preInvoiceRowNumber: preInvoiceRow || "",
+      Created: "",
+      Modified: "",
+    };
+
+    try {
+      const result = await submitCUManagementReels(reelData);
+      if (result.success) {
+        setEditingIndex(null);
+        alert("قرقره با موفقیت ثبت شد ✅");
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      alert(
+        `خطا در ثبت قرقره: ${
+          error instanceof Error ? error.message : "خطای نامشخص"
+        }`
+      );
+    }
+  };
+
+  const handleDelete = (index: number) => {
+    handleRemoveReel(index);
   };
 
   return (
@@ -239,19 +298,20 @@ export default function ReelSelector({
                   type="string"
                   className="w-full"
                   onChange={(e) => {
-                    handleReelChange(index, "amount", e.target.value);
+                    handleReelChange(index, "wasteWeight", e.target.value);
                   }}
                 />
               </div>
             </>
           )}
 
-          <div
-            onClick={() => handleRemoveReel(index)}
-            className="px-3 py-2 cursor-pointer bg-red-500 text-white rounded-lg hover:bg-red-700 duration-300 transition-colors text-sm"
-          >
-            حذف
-          </div>
+          <ReelsActionsComponent
+            index={index}
+            onEdit={handleEdit}
+            onSave={handleSave}
+            onDelete={handleDelete}
+            isEditing={editingIndex === index}
+          />
         </div>
       ))}
 

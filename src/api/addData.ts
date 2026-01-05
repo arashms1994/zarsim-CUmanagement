@@ -7,6 +7,7 @@ import type {
   IStopListItem,
   ICUManagementSubmitData,
   ICUManagementRowListItem,
+  ICUManagementReelsListItem,
 } from "../types/type";
 
 export async function submitMaterialChargeEntry(
@@ -543,6 +544,130 @@ export async function addStopItem(
     return {
       success: false,
       message: `خطا در افزودن توقف: ${
+        error instanceof Error ? error.message : "خطای نامشخص"
+      }`,
+    };
+  }
+}
+
+export async function submitCUManagementReels(
+  reelData: ICUManagementReelsListItem
+): Promise<{ success: boolean; message: string }> {
+  const listGuid = config.LIST_GUIDS.CU_MANAGEMENT_REELS;
+
+  if (!listGuid) {
+    throw new Error("GUID لیست CU_MANAGEMENT_REELS تنظیم نشده است");
+  }
+
+  try {
+    const listInfoResponse = await fetch(
+      `${BASE_URL}/_api/web/lists(guid'${listGuid}')?$select=ListItemEntityTypeFullName`,
+      {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      }
+    );
+
+    let itemType = "SP.Data.CU_x005f_Management_x005f_ReelsListItem";
+    if (listInfoResponse.ok) {
+      try {
+        const contentType = listInfoResponse.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const listInfo = await listInfoResponse.json();
+          if (listInfo.d?.ListItemEntityTypeFullName) {
+            itemType = listInfo.d.ListItemEntityTypeFullName;
+          }
+        } else if (contentType.includes("xml")) {
+          const xmlText = await listInfoResponse.text();
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+          const typeElement = xmlDoc.querySelector(
+            "ListItemEntityTypeFullName"
+          );
+          if (typeElement && typeElement.textContent) {
+            itemType = typeElement.textContent.trim();
+          }
+        }
+      } catch (parseError) {
+        console.warn("خطا در parse کردن پاسخ لیست:", parseError);
+      }
+    }
+
+    console.log("📋 استفاده از type:", itemType);
+
+    const payload: any = {
+      __metadata: {
+        type: itemType,
+      },
+      Title: String(reelData.Title || ""),
+    };
+
+    if (reelData.reelNumber) {
+      payload.reelNumber = String(reelData.reelNumber);
+    }
+    if (reelData.wasteCategory) {
+      payload.wasteCategory = String(reelData.wasteCategory);
+    }
+    if (reelData.productAmount) {
+      payload.productAmount = String(reelData.productAmount);
+    }
+    if (reelData.productWeight) {
+      payload.productWeight = String(reelData.productWeight);
+    }
+    if (reelData.wasteWeight) {
+      payload.wasteWeight = String(reelData.wasteWeight);
+    }
+    if (reelData.productionStage) {
+      payload.productionStage = String(reelData.productionStage);
+    }
+    if (reelData.device) {
+      payload.device = String(reelData.device);
+    }
+    if (reelData.operator) {
+      payload.operator = String(reelData.operator);
+    }
+    if (reelData.statusId) {
+      payload.statusId = String(reelData.statusId);
+    }
+    if (reelData.status) {
+      payload.status = String(reelData.status);
+    }
+    if (reelData.preInvoiceRowNumber) {
+      payload.preInvoiceRowNumber = String(reelData.preInvoiceRowNumber);
+    }
+
+    const response = await fetch(
+      `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+          "X-RequestDigest": await getRequestDigest(),
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ خطای SharePoint در CU_MANAGEMENT_REELS:", errorText);
+      throw new Error(
+        `خطا در ارسال داده: ${errorText} (Status: ${response.status})`
+      );
+    }
+
+    return {
+      success: true,
+      message: "قرقره با موفقیت ثبت شد ✅",
+    };
+  } catch (error) {
+    console.error("خطا در ارسال داده به CU_MANAGEMENT_REELS:", error);
+    return {
+      success: false,
+      message: `خطا در ثبت قرقره: ${
         error instanceof Error ? error.message : "خطای نامشخص"
       }`,
     };

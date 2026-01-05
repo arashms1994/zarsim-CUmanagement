@@ -375,6 +375,11 @@ export interface IReelSelectorProps {
   reels: IReelItem[];
   onReelsChange: (reels: IReelItem[]) => void;
   label: string;
+  productionPlanNumber?: string;
+  selectedStage?: string;
+  device?: string;
+  operator?: string;
+  preInvoiceRow?: string;
 }
 
 export interface ICUManagementListItem {
@@ -646,4 +651,31 @@ export interface IWasteListItem {
   ID: number;
   Title: string;
   stage: string;
+}
+
+export interface ICUManagementReelsListItem {
+  Title: string;
+  reelNumber: string;
+  wasteCategory: string;
+  productAmount: string;
+  productWeight: string;
+  wasteWeight: string;
+  productionStage: string;
+  device: string;
+  operator: string;
+  statusId: string;
+  status: string;
+  preInvoiceRowNumber: string;
+  Created: string;
+  Modified: string;
+  AuthorId?: number;
+  EditorId?: number;
+}
+
+export interface IReelsActionsComponentProps {
+  index: number;
+  onEdit: (index: number) => void;
+  onSave: (index: number) => void;
+  onDelete: (index: number) => void;
+  isEditing?: boolean;
 }

@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo, useEffect } from "react";
 import { Input } from "./input";
+import { Spinner } from "./spinner";
 import ReelSelector from "./ReelSelector";
 import ProductsTable from "./ProductsTable";
 import OperatorSelector from "./OperatorSelector";
 import { useQueries } from "@tanstack/react-query";
+import { useProducts } from "../../hooks/useProducts";
 import StopReasonSelector from "./StopReasonSelector";
-import { Spinner } from "./spinner";
 import { getProductMaterialPerStage } from "../../api/getData";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { IProductMaterialPerStage } from "../../types/type";
 import { sortItemsByPriority } from "../../lib/sortItemsByPriority";
+import { filterMaterialsByStage } from "../../lib/filterMaterialsByStage";
 import { filterItemsByMinQuantity } from "../../lib/filterItemsByMinQuantity";
 import { submitCUManagement, submitCUManagementRow } from "../../api/addData";
 import { calculateProductionValues } from "../../lib/calculateProductionValues";
 import { prepareRowDataForSubmission } from "../../lib/prepareRowDataForSubmission";
 import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
-import { useProducts } from "../../hooks/useProducts";
-import { filterMaterialsByStage } from "../../lib/filterMaterialsByStage";
 import type {
   IProductionPlanRowFormProps,
   IReelItem,
@@ -556,12 +556,22 @@ export default function ProductionPlanRowForm({
             reels={entranceReels}
             onReelsChange={setEntranceReels}
             label="قرقره‌های ورودی:"
+            productionPlanNumber={productionPlanNumber || ""}
+            selectedStage={selectedStage || ""}
+            device={planItem.dasatghah || ""}
+            operator={operator || ""}
+            preInvoiceRow={preInvoiceRow || ""}
           />
 
           <ReelSelector
             reels={exitReels}
             onReelsChange={setExitReels}
             label="قرقره‌های خروجی:"
+            productionPlanNumber={productionPlanNumber || ""}
+            selectedStage={selectedStage || ""}
+            device={planItem.dasatghah || ""}
+            operator={operator || ""}
+            preInvoiceRow={preInvoiceRow || ""}
           />
         </div>
 
