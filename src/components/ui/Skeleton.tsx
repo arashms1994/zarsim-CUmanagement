@@ -1,13 +1,6 @@
-interface SkeletonProps {
-  width?: string | number;
-  height?: string | number;
-  className?: string;
-  variant?: "text" | "rectangular" | "circular";
-  animation?: "pulse" | "wave" | "none";
-  count?: number;
-}
+import type { ISkeletonProps } from "../../types/type";
 
-const Skeleton: React.FC<SkeletonProps> = ({
+const Skeleton: React.FC<ISkeletonProps> = ({
   width = "100%",
   height = "1rem",
   className = "",
@@ -55,15 +48,15 @@ const Skeleton: React.FC<SkeletonProps> = ({
   );
 };
 
-export const SkeletonText: React.FC<Omit<SkeletonProps, "variant">> = (
+export const SkeletonText: React.FC<Omit<ISkeletonProps, "variant">> = (
   props
 ) => <Skeleton {...props} variant="text" />;
 
-export const SkeletonRect: React.FC<Omit<SkeletonProps, "variant">> = (
+export const SkeletonRect: React.FC<Omit<ISkeletonProps, "variant">> = (
   props
 ) => <Skeleton {...props} variant="rectangular" />;
 
-export const SkeletonCircle: React.FC<Omit<SkeletonProps, "variant">> = (
+export const SkeletonCircle: React.FC<Omit<ISkeletonProps, "variant">> = (
   props
 ) => <Skeleton {...props} variant="circular" />;
 

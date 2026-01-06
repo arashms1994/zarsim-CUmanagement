@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from "react";
+import type { IToastProps } from "../../types/type";
 
-interface ToastProps {
-  message: string;
-  type: "success" | "error" | "info";
-  duration?: number;
-  onClose?: () => void;
-}
-
-const Toast: React.FC<ToastProps> = ({
+const Toast: React.FC<IToastProps> = ({
   message,
   type,
   duration = 5000,

@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import { Input } from "./input";
 import { SkeletonSearchSuggestion } from "./Skeleton";
-import { useSearchDevice } from "../../hooks/useSearchDevice";
 import type { IDeviceSelectorProps } from "../../types/type";
+import { useSearchDevice } from "../../hooks/useSearchDevice";
 
 export default function DeviceSelector({
   value,

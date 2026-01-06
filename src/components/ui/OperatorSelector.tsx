@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useSearchPersonnel } from "../../hooks/useSearchPersonnel";
 import { Input } from "./input";
+import { SHIFT_LIST } from "../../lib/constants";
 import { SkeletonSearchSuggestion } from "./Skeleton";
 import type { IOperatorSelectorProps } from "../../types/type";
-import { SHIFT_LIST } from "../../lib/constants";
+import { useSearchPersonnel } from "../../hooks/useSearchPersonnel";
 
 export default function OperatorSelector({
   value,

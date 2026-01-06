@@ -7,6 +7,22 @@ export interface ITabPanelProps {
   children?: React.ReactNode;
 }
 
+export interface ISkeletonProps {
+  width?: string | number;
+  height?: string | number;
+  className?: string;
+  variant?: "text" | "rectangular" | "circular";
+  animation?: "pulse" | "wave" | "none";
+  count?: number;
+}
+
+export interface IToastProps {
+  message: string;
+  type: "success" | "error" | "info";
+  duration?: number;
+  onClose?: () => void;
+}
+
 export interface IProductsTableProps {
   items: ISubProductionPlanListItem[];
   isLoading: boolean;

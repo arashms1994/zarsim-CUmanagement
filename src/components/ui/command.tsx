@@ -1,7 +1,7 @@
 "use client";
 
-import { Command as CommandPrimitive } from "cmdk";
 import { cn } from "../../lib/utils";
+import { Command as CommandPrimitive } from "cmdk";
 import {
   Dialog,
   DialogContent,
