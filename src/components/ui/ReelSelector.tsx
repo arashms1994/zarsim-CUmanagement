@@ -25,7 +25,6 @@ export default function ReelSelector({
   );
   const wasteDropdownRef = useRef<HTMLDivElement>(null);
 
-  // بستن dropdown با کلیک خارج از آن
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
