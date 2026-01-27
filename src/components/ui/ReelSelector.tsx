@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Input } from "./input";
 import { SkeletonSearchSuggestion } from "./Skeleton";
-import { useWasteList } from "../../hooks/useWasteList";
 import { useSearchReels } from "../../hooks/useSearchReels";
 import ReelsActionsComponent from "./ReelsActionsComponent";
 import { submitCUManagementReels } from "../../api/addData";
@@ -50,7 +49,7 @@ export default function ReelSelector({
     handleSearch: handleReelSearch,
   } = useSearchReels();
 
-  const { wasteList, isLoading: wasteLoading } = useWasteList();
+  // const { wasteList, isLoading: wasteLoading } = useWasteList();
 
   const handleAddReel = () => {
     const newReel: IReelItem = {
@@ -235,7 +234,7 @@ export default function ReelSelector({
             />
           </div>
 
-          {label === "قرقره‌های خروجی:" && (
+          {/* {label === "قرقره‌های خروجی:" && (
             <>
               <div
                 className="relative w-[200px]"
@@ -324,7 +323,7 @@ export default function ReelSelector({
                 />
               </div>
             </>
-          )}
+          )} */}
 
           <ReelsActionsComponent
             index={index}

@@ -453,7 +453,7 @@ export default function ProductionPlanRowForm({
               )}
             />
           </div>
-
+{/* 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">
               ضایعات (کیلوگرم):
@@ -470,7 +470,7 @@ export default function ProductionPlanRowForm({
                 />
               )}
             />
-          </div>
+          </div> */}
 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">توضیحات:</label>

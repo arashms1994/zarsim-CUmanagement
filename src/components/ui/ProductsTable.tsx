@@ -257,9 +257,9 @@ export default function ProductsTable({
             <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
               مصرف واقعی مواد
             </th>
-            <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
+            {/* <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
               ضایعات (کیلوگرم)
-            </th>
+            </th> */}
           </tr>
         </thead>
         <tbody>
