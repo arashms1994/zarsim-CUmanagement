@@ -375,6 +375,7 @@ export interface IReelListItem {
   Title: string;
   Size?: string;
   Weight?: string;
+  Devices: string;
 }
 
 export interface IReelItem {
