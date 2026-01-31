@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type DateObject from "react-date-object";
+import type { Controller } from "react-hook-form";
 
 export interface ITabPanelProps {
   index: number;
@@ -77,6 +78,7 @@ export interface IProductionPlanRowFormProps {
   showDeleteButton?: boolean;
   planItem: IPrintTajmiListItem;
   control?: any;
+  setValue?: (name: string, value: unknown, options?: { shouldValidate?: boolean; shouldDirty?: boolean; shouldTouch?: boolean }) => void;
   productionPlanNumber?: string;
   selectedStage?: string;
   onSubmit?: (
@@ -694,4 +696,17 @@ export interface IReelsActionsComponentProps {
   onEdit: (index: number) => void;
   onSave: (index: number) => void;
   onDelete: (index: number) => void;
+}
+
+
+export interface IProductionActualWeightProps {
+  control: React.ComponentProps<typeof Controller>["control"];
+  setValue?: (name: string, value: unknown, options?: object) => void;
+  materialConsumptionPerString: number | null;
+}
+
+export interface IProductionActualAmountProps {
+  control: React.ComponentProps<typeof Controller>["control"];
+  setValue?: (name: string, value: unknown, options?: object) => void;
+  materialConsumptionPerString: number | null;
 }
