@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Input } from "./input";
+import { Input } from "../ui/input";
 import { SHIFT_LIST } from "../../lib/constants";
-import { SkeletonSearchSuggestion } from "./Skeleton";
+import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import type { IOperatorSelectorProps } from "../../types/type";
 import { useSearchPersonnel } from "../../hooks/useSearchPersonnel";
 

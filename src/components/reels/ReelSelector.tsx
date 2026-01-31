@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Input } from "./input";
-import { SkeletonSearchSuggestion } from "./Skeleton";
+import { Input } from "../ui/input";
+import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import { useSearchReels } from "../../hooks/useSearchReels";
 import ReelsActionsComponent from "./ReelsActionsComponent";
 import { submitCUManagementReels } from "../../api/addData";
@@ -15,6 +15,7 @@ export default function ReelSelector({
   device = "",
   operator = "",
   preInvoiceRow = "",
+  materialConsumptionPerString = null,
 }: IReelSelectorProps) {
   const [showReelSuggestions, setShowReelSuggestions] = useState<number | null>(
     null
@@ -83,6 +84,20 @@ export default function ReelSelector({
     onReelsChange(updatedReels);
   };
 
+  const handleReelWeightAndAmountChange = (
+    index: number,
+    weight: string,
+    amount: string
+  ) => {
+    const updatedReels = [...reels];
+    updatedReels[index] = {
+      ...updatedReels[index],
+      weight,
+      amount,
+    };
+    onReelsChange(updatedReels);
+  };
+
   const handleSelectReel = (
     index: number,
     reelId: number,
@@ -131,8 +146,7 @@ export default function ReelSelector({
     } catch (error) {
       console.error("❌ خطا در ثبت قرقره:", error);
       alert(
-        `خطا در ثبت قرقره: ${
-          error instanceof Error ? error.message : "خطای نامشخص"
+        `خطا در ثبت قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"
         }`
       );
     }
@@ -216,7 +230,26 @@ export default function ReelSelector({
               type="string"
               className="w-full"
               onChange={(e) => {
-                handleReelChange(index, "weight", e.target.value);
+                const value = e.target.value;
+                if (
+                  materialConsumptionPerString != null &&
+                  materialConsumptionPerString > 0
+                ) {
+                  const kg = parseFloat(value);
+                  if (!isNaN(kg) && kg > 0) {
+                    const metersRaw = kg / materialConsumptionPerString;
+                    const amount = Number.isInteger(metersRaw)
+                      ? String(metersRaw)
+                      : String(Math.ceil(metersRaw));
+                    handleReelWeightAndAmountChange(index, value, amount);
+                  } else if (!value || value.trim() === "") {
+                    handleReelWeightAndAmountChange(index, "", "");
+                  } else {
+                    handleReelChange(index, "weight", value);
+                  }
+                } else {
+                  handleReelChange(index, "weight", value);
+                }
               }}
             />
           </div>
@@ -228,7 +261,25 @@ export default function ReelSelector({
               type="string"
               className="w-full"
               onChange={(e) => {
-                handleReelChange(index, "amount", e.target.value);
+                const value = e.target.value;
+                if (
+                  materialConsumptionPerString != null &&
+                  materialConsumptionPerString > 0
+                ) {
+                  const meters = parseFloat(value);
+                  if (!isNaN(meters) && meters > 0) {
+                    const weight = (
+                      meters * materialConsumptionPerString
+                    ).toFixed(2);
+                    handleReelWeightAndAmountChange(index, weight, value);
+                  } else if (!value || value.trim() === "") {
+                    handleReelWeightAndAmountChange(index, "", "");
+                  } else {
+                    handleReelChange(index, "amount", value);
+                  }
+                } else {
+                  handleReelChange(index, "amount", value);
+                }
               }}
             />
           </div>

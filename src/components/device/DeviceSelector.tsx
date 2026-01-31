@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { Input } from "./input";
-import { SkeletonSearchSuggestion } from "./Skeleton";
+import { Input } from "../ui/input";
+import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import type { IDeviceSelectorProps } from "../../types/type";
 import { useSearchDevice } from "../../hooks/useSearchDevice";
 

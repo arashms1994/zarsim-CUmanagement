@@ -3,7 +3,7 @@ import { Input } from "./ui/input";
 import { Stack } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { filterPlanDetails } from "../lib/filterPlanDetails";
-import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
+import ProductionPlanRowForm from "./production-plan-row/ProductionPlanRowForm";
 import { extractUniqueStages } from "../lib/extractUniqueStages";
 import { extractUniqueColors } from "../lib/extractUniqueColors";
 import { useSearchPrintTajmi } from "../hooks/useSearchPrintTajmi";
@@ -199,8 +199,8 @@ export default function CUManagement() {
                           <div
                             key={`${stage}-${index}`}
                             className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${selectedStage === stage
-                                ? "bg-[#1e7677] text-white"
-                                : "hover:bg-gray-100"
+                              ? "bg-[#1e7677] text-white"
+                              : "hover:bg-gray-100"
                               }`}
                             onClick={() => handleStageChange(stage)}
                           >
@@ -255,8 +255,8 @@ export default function CUManagement() {
                           <div
                             key={`${color}-${index}`}
                             className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${selectedColor === color
-                                ? "bg-[#1e7677] text-white"
-                                : "hover:bg-gray-100"
+                              ? "bg-[#1e7677] text-white"
+                              : "hover:bg-gray-100"
                               }`}
                             onClick={() => {
                               setSelectedColor(color);

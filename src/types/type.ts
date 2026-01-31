@@ -399,6 +399,7 @@ export interface IReelSelectorProps {
   device?: string;
   operator?: string;
   preInvoiceRow?: string;
+  materialConsumptionPerString?: number | null;
 }
 
 export interface ICUManagementListItem {

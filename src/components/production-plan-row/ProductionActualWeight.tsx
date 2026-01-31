@@ -1,4 +1,4 @@
-import { Input } from "./input";
+import { Input } from "../ui/input";
 import { Controller } from "react-hook-form";
 import type { IProductionActualWeightProps } from "../../types/type";
 

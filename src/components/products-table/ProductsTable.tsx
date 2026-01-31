@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState } from "react";
-import { Input } from "./input";
-import { Spinner } from "./spinner";
+import { Input } from "../ui/input";
+import { Spinner } from "../ui/spinner";
 import { Controller } from "react-hook-form";
 import { useQueries } from "@tanstack/react-query";
 import { buildReportUrl } from "../../lib/buildReportUrl";

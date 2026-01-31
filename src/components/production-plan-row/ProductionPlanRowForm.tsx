@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo, useEffect } from "react";
-import { Input } from "./input";
-import { Spinner } from "./spinner";
-import ReelSelector from "./ReelSelector";
-import ProductsTable from "./ProductsTable";
-import OperatorSelector from "./OperatorSelector";
+import { Input } from "../ui/input";
+import { Spinner } from "../ui/spinner";
+import ReelSelector from "../reels/ReelSelector";
 import { useQueries } from "@tanstack/react-query";
 import { useProducts } from "../../hooks/useProducts";
-import StopReasonSelector from "./StopReasonSelector";
+import OperatorSelector from "../operator/OperatorSelector";
+import ProductsTable from "../products-table/ProductsTable";
+import StopReasonSelector from "../stops/StopReasonSelector";
 import ProductionActualAmount from "./ProductionActualAmount";
 import ProductionActualWeight from "./ProductionActualWeight";
 import { getProductMaterialPerStage } from "../../api/getData";
@@ -433,7 +433,7 @@ export default function ProductionPlanRowForm({
             setValue={setValue}
             materialConsumptionPerString={materialConsumptionPerString}
           />
-          
+
           {/* 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">
@@ -493,6 +493,7 @@ export default function ProductionPlanRowForm({
             device={planItem.dasatghah || ""}
             operator={operator || ""}
             preInvoiceRow={preInvoiceRow || ""}
+            materialConsumptionPerString={materialConsumptionPerString}
           />
 
           <ReelSelector
@@ -504,6 +505,7 @@ export default function ProductionPlanRowForm({
             device={planItem.dasatghah || ""}
             operator={operator || ""}
             preInvoiceRow={preInvoiceRow || ""}
+            materialConsumptionPerString={materialConsumptionPerString}
           />
         </div>
 
