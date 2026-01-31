@@ -118,8 +118,7 @@ export default function ReelSelector({
       statusId: statusId,
       status: status,
       preInvoiceRowNumber: preInvoiceRow || "",
-      Created: "",
-      Modified: "",
+
     };
 
     try {

@@ -685,10 +685,6 @@ export interface ICUManagementReelsListItem {
   statusId: string;
   status: string;
   preInvoiceRowNumber: string;
-  Created: string;
-  Modified: string;
-  AuthorId?: number;
-  EditorId?: number;
 }
 
 export interface IReelsActionsComponentProps {
