@@ -74,8 +74,10 @@ export default function ProductsTable({
   }, [sortedItems, waste, control]);
 
   useEffect(() => {
-    if (setValue && Object.keys(productionValues).length > 0) {
-      const timeoutId = setTimeout(() => {
+    if (!setValue) return;
+
+    const timeoutId = setTimeout(() => {
+      if (Object.keys(productionValues).length > 0) {
         Object.entries(productionValues).forEach(([fieldName, value]) => {
           setValue(fieldName, value, {
             shouldValidate: false,
@@ -83,11 +85,28 @@ export default function ProductsTable({
             shouldTouch: false,
           });
         });
-      }, 0);
+      } else if (sortedItems.length > 0) {
+        sortedItems.forEach((item) => {
+          const itemPreInvoiceRowId = item.shomareradiffactor;
+          if (itemPreInvoiceRowId) {
+            setValue(`${itemPreInvoiceRowId}.actualProduction`, "", {
+              shouldValidate: false,
+              shouldDirty: false,
+              shouldTouch: false,
+            });
+            setValue(`${itemPreInvoiceRowId}.actualMaterialConsumption`, "", {
+              shouldValidate: false,
+              shouldDirty: false,
+              shouldTouch: false,
+            });
+          }
+        });
+        setMaterialConsumptionValues({});
+      }
+    }, 0);
 
-      return () => clearTimeout(timeoutId);
-    }
-  }, [productionValues, setValue]);
+    return () => clearTimeout(timeoutId);
+  }, [productionValues, setValue, sortedItems]);
 
   useEffect(() => {
     if (setValue && Object.keys(wasteValues).length > 0) {
@@ -252,7 +271,7 @@ export default function ProductsTable({
               مقدار مواد مصرفی بر اساس BOM
             </th>
             <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
-              تولید واقعی
+              متراژ تولید واقعی
             </th>
             <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
               مصرف واقعی مواد
@@ -354,7 +373,7 @@ export default function ProductsTable({
                       render={({ field }) => {
                         const valueFromProduction =
                           productionValues[
-                            `${itemPreInvoiceRowId}.actualProduction`
+                          `${itemPreInvoiceRowId}.actualProduction`
                           ];
                         return (
                           <Input
@@ -418,7 +437,7 @@ export default function ProductsTable({
                       render={({ field }) => {
                         const valueFromState =
                           materialConsumptionValues[
-                            `${itemPreInvoiceRowId}.actualMaterialConsumption`
+                          `${itemPreInvoiceRowId}.actualMaterialConsumption`
                           ];
                         return (
                           <Input
@@ -438,7 +457,7 @@ export default function ProductsTable({
                   )}
                 </td>
 
-                <td className="border border-[#1e7677] px-4 py-2 text-right">
+                {/* <td className="border border-[#1e7677] px-4 py-2 text-right">
                   {control ? (
                     <Controller
                       name={`${itemPreInvoiceRowId}.waste`}
@@ -462,7 +481,7 @@ export default function ProductsTable({
                   ) : (
                     <Input type="text" className="w-24" disabled />
                   )}
-                </td>
+                </td> */}
               </tr>
             );
           })}

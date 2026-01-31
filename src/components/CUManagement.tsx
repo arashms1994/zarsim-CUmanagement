@@ -2,13 +2,16 @@ import { useState, useMemo } from "react";
 import { Input } from "./ui/input";
 import { Stack } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import type { ICUManagementFormProps } from "../types/type";
 import { filterPlanDetails } from "../lib/filterPlanDetails";
 import ProductionPlanRowForm from "./ui/ProductionPlanRowForm";
 import { extractUniqueStages } from "../lib/extractUniqueStages";
 import { extractUniqueColors } from "../lib/extractUniqueColors";
 import { useSearchPrintTajmi } from "../hooks/useSearchPrintTajmi";
 import { usePrintTajmiByCart } from "../hooks/usePrintTajmiByCart";
+import type {
+  ICUManagementFormProps,
+  IProductionPlanRowFormProps,
+} from "../types/type";
 
 export default function CUManagement() {
   const { control, setValue, watch } = useForm<ICUManagementFormProps>();
@@ -176,9 +179,8 @@ export default function CUManagement() {
                         {selectedStage || "مرحله را انتخاب کنید..."}
                       </span>
                       <svg
-                        className={`w-4 h-4 transition-transform ${
-                          showStageDropdown ? "rotate-180" : ""
-                        }`}
+                        className={`w-4 h-4 transition-transform ${showStageDropdown ? "rotate-180" : ""
+                          }`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -196,11 +198,10 @@ export default function CUManagement() {
                         {uniqueStages.map((stage, index) => (
                           <div
                             key={`${stage}-${index}`}
-                            className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                              selectedStage === stage
+                            className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${selectedStage === stage
                                 ? "bg-[#1e7677] text-white"
                                 : "hover:bg-gray-100"
-                            }`}
+                              }`}
                             onClick={() => handleStageChange(stage)}
                           >
                             {stage}
@@ -234,9 +235,8 @@ export default function CUManagement() {
                         {selectedColor || "رنگ را انتخاب کنید..."}
                       </span>
                       <svg
-                        className={`w-4 h-4 transition-transform ${
-                          showColorDropdown ? "rotate-180" : ""
-                        }`}
+                        className={`w-4 h-4 transition-transform ${showColorDropdown ? "rotate-180" : ""
+                          }`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -254,11 +254,10 @@ export default function CUManagement() {
                         {uniqueColors.map((color, index) => (
                           <div
                             key={`${color}-${index}`}
-                            className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                              selectedColor === color
+                            className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${selectedColor === color
                                 ? "bg-[#1e7677] text-white"
                                 : "hover:bg-gray-100"
-                            }`}
+                              }`}
                             onClick={() => {
                               setSelectedColor(color);
                               setShowColorDropdown(false);
@@ -277,12 +276,12 @@ export default function CUManagement() {
                 filteredPlanDetails.length > 0 ? (
                   filteredPlanDetails.map((planItem, index) => (
                     <ProductionPlanRowForm
-                      key={`${selectedPlan}-${selectedStage}-${
-                        selectedColor || "no-color"
-                      }-${index}`}
+                      key={`${selectedPlan}-${selectedStage}-${selectedColor || "no-color"
+                        }-${index}`}
                       index={index}
                       planItem={planItem}
                       control={control}
+                      setValue={setValue as IProductionPlanRowFormProps["setValue"]}
                       productionPlanNumber={selectedPlan}
                       selectedStage={selectedStage}
                     />

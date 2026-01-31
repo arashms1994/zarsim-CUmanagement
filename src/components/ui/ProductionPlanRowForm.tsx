@@ -8,6 +8,8 @@ import OperatorSelector from "./OperatorSelector";
 import { useQueries } from "@tanstack/react-query";
 import { useProducts } from "../../hooks/useProducts";
 import StopReasonSelector from "./StopReasonSelector";
+import ProductionActualAmount from "./ProductionActualAmount";
+import ProductionActualWeight from "./ProductionActualWeight";
 import { getProductMaterialPerStage } from "../../api/getData";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { IProductMaterialPerStage } from "../../types/type";
@@ -27,12 +29,13 @@ import type {
 export default function ProductionPlanRowForm({
   planItem,
   control: externalControl,
+  setValue: externalSetValue,
   productionPlanNumber,
   selectedStage,
 }: IProductionPlanRowFormProps) {
   const localForm = useForm();
   const control = externalControl || localForm.control;
-  const setValue = externalControl?.setValue || localForm.setValue;
+  const setValue = externalSetValue || localForm.setValue;
 
   const [operator, setOperator] = useState("");
   const [stopReason, setStopReason] = useState("");
@@ -357,14 +360,15 @@ export default function ProductionPlanRowForm({
       }
     } catch (error) {
       alert(
-        `خطا در ثبت اطلاعات: ${
-          error instanceof Error ? error.message : "خطای نامشخص"
+        `خطا در ثبت اطلاعات: ${error instanceof Error ? error.message : "خطای نامشخص"
         }`
       );
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  console.log("واحد:", materialConsumptionPerString)
 
   return (
     <div className="w-full p-5 gap-2 flex justify-between items-center flex-wrap rounded-[4px] border-2 shadow border-[#1e7677] relative">
@@ -395,8 +399,8 @@ export default function ProductionPlanRowForm({
               مقدار مصرف موادبراساس BOM (کیلوگرم):
             </label>
             {isLoadingMaterials ||
-            isLoadingProducts ||
-            materialConsumptionPerString === null ? (
+              isLoadingProducts ||
+              materialConsumptionPerString === null ? (
               <span className="text-purple-500 text-sm flex justify-start items-center">
                 <Spinner className="size-8 text-purple-500" />
                 در حال محاسبه...
@@ -405,9 +409,9 @@ export default function ProductionPlanRowForm({
               <span className="text-lg font-normal">
                 {materialConsumptionPerString !== null && planItem.barnamerizi
                   ? (
-                      materialConsumptionPerString *
-                      parseFloat(planItem.barnamerizi.toString())
-                    ).toFixed(2)
+                    materialConsumptionPerString *
+                    parseFloat(planItem.barnamerizi.toString())
+                  ).toFixed(2)
                   : "-"}
               </span>
             )}
@@ -418,42 +422,19 @@ export default function ProductionPlanRowForm({
             <span className="text-lg font-normal">{planItem.dasatghah}</span>
           </div>
 
-          <div className="flex items-center justify-start gap-2">
-            <label className="min-w-[150px] font-medium">
-              متراژ تولیدی (متر):
-            </label>
-            <Controller
-              name="actualAmountProduction"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="string"
-                  placeholder="مثلاً 50"
-                  className="w-[250px]"
-                />
-              )}
-            />
-          </div>
+          <ProductionActualAmount
+            control={control}
+            setValue={setValue}
+            materialConsumptionPerString={materialConsumptionPerString}
+          />
 
-          <div className="flex items-center justify-start gap-2">
-            <label className="min-w-[150px] font-medium">
-              وزن تولیدی (کیلوگرم):
-            </label>
-            <Controller
-              name="actualWeight"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="string"
-                  placeholder="مثلاً 50"
-                  className="w-[250px]"
-                />
-              )}
-            />
-          </div>
-{/* 
+          <ProductionActualWeight
+            control={control}
+            setValue={setValue}
+            materialConsumptionPerString={materialConsumptionPerString}
+          />
+          
+          {/* 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">
               ضایعات (کیلوگرم):
@@ -551,9 +532,8 @@ export default function ProductionPlanRowForm({
 
         <div
           onClick={handleSubmit}
-          className={`px-3 py-2 cursor-pointer w-[150px] text-center mx-auto bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm ${
-            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`px-3 py-2 cursor-pointer w-[150px] text-center mx-auto bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
           {isSubmitting ? "در حال ثبت..." : "ثبت اطلاعات"}
         </div>
