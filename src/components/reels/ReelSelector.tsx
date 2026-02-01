@@ -227,7 +227,8 @@ export default function ReelSelector({
             <Input
               value={reel.weight}
               placeholder="وزن (کیلوگرم)..."
-              type="string"
+              type="text"
+              inputMode="decimal"
               className="w-full"
               onChange={(e) => {
                 const value = e.target.value;
@@ -242,7 +243,7 @@ export default function ReelSelector({
                       ? String(metersRaw)
                       : String(Math.ceil(metersRaw));
                     handleReelWeightAndAmountChange(index, value, amount);
-                  } else if (!value || value.trim() === "") {
+                  } else if (value === "") {
                     handleReelWeightAndAmountChange(index, "", "");
                   } else {
                     handleReelChange(index, "weight", value);
@@ -258,7 +259,8 @@ export default function ReelSelector({
             <Input
               value={reel.amount}
               placeholder="متراژ (متر)..."
-              type="string"
+              type="text"
+              inputMode="decimal"
               className="w-full"
               onChange={(e) => {
                 const value = e.target.value;
@@ -268,11 +270,10 @@ export default function ReelSelector({
                 ) {
                   const meters = parseFloat(value);
                   if (!isNaN(meters) && meters > 0) {
-                    const weight = (
-                      meters * materialConsumptionPerString
-                    ).toFixed(2);
+                    const kgRaw = meters * materialConsumptionPerString;
+                    const weight = parseFloat(kgRaw.toFixed(6)).toFixed(2);
                     handleReelWeightAndAmountChange(index, weight, value);
-                  } else if (!value || value.trim() === "") {
+                  } else if (value === "") {
                     handleReelWeightAndAmountChange(index, "", "");
                   } else {
                     handleReelChange(index, "amount", value);
