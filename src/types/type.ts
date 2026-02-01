@@ -692,6 +692,7 @@ export interface ICUManagementReelsListItem {
 export interface IReelsActionsComponentProps {
   index: number;
   reel: IReelItem;
+  isEditing: boolean;
   onEdit: (index: number) => void;
   onSave: (index: number) => void;
   onDelete: (index: number) => void;

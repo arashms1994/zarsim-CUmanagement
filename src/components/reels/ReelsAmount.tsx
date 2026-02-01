@@ -3,6 +3,7 @@ import { Input } from "../ui/input";
 export interface IReelsAmountProps {
   value: string;
   materialConsumptionPerString: number | null;
+  disabled?: boolean;
   onWeightAndAmountChange: (weight: string, amount: string) => void;
   onReelChange: (field: "weight" | "amount", value: string) => void;
 }
@@ -10,13 +11,16 @@ export interface IReelsAmountProps {
 export default function ReelsAmount({
   value,
   materialConsumptionPerString,
+  disabled = false,
   onWeightAndAmountChange,
   onReelChange,
 }: IReelsAmountProps) {
   return (
-    <div className="w-[200px]">
+    <div className="flex items-center justify-start gap-2">
+      <label className="min-w-[100px] font-medium">متراژ(متر):</label>
       <Input
         value={value}
+        disabled={disabled}
         placeholder="متراژ (متر)..."
         type="text"
         inputMode="decimal"

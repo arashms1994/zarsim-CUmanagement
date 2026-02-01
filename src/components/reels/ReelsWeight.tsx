@@ -3,6 +3,7 @@ import { Input } from "../ui/input";
 export interface IReelsWeightProps {
   value: string;
   materialConsumptionPerString: number | null;
+  disabled?: boolean;
   onWeightAndAmountChange: (weight: string, amount: string) => void;
   onReelChange: (field: "weight" | "amount", value: string) => void;
 }
@@ -10,13 +11,16 @@ export interface IReelsWeightProps {
 export default function ReelsWeight({
   value,
   materialConsumptionPerString,
+  disabled = false,
   onWeightAndAmountChange,
   onReelChange,
 }: IReelsWeightProps) {
   return (
-    <div className="w-[200px]">
+    <div className="flex items-center justify-start gap-2">
+      <label className="min-w-[100px] font-medium">وزن(کیلوگرم):</label>
       <Input
         value={value}
+        disabled={disabled}
         placeholder="وزن (کیلوگرم)..."
         type="text"
         inputMode="decimal"

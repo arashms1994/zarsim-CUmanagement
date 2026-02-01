@@ -25,6 +25,7 @@ export default function ReelSelector({
   const [showWasteDropdown, setShowWasteDropdown] = useState<number | null>(
     null
   );
+  const [editingReelIndex, setEditingReelIndex] = useState<number | null>(null);
   const wasteDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -111,7 +112,7 @@ export default function ReelSelector({
   };
 
   const handleEdit = (index: number) => {
-    console.log("🔍 ویرایش قرقره:", { index, reel: reels[index] });
+    setEditingReelIndex(index);
   };
 
   const handleSave = async (index: number) => {
@@ -141,6 +142,7 @@ export default function ReelSelector({
     try {
       const result = await submitCUManagementReels(reelData);
       if (result.success) {
+        setEditingReelIndex(null);
         alert("قرقره با موفقیت ثبت شد ✅");
       } else {
         alert(result.message);
@@ -170,80 +172,112 @@ export default function ReelSelector({
         </div>
       </div>
 
-      {reels.map((reel, index) => (
-        <div
-          key={index}
-          className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
-        >
-          <div className="relative">
-            <Input
-              value={reel.reelTitle}
-              placeholder="جستجو قرقره..."
-              className="w-full max-w-[250px]"
-              onChange={(e) => {
-                const value = e.target.value;
-                handleReelChange(index, "reelTitle", value);
-                handleReelSearch(value);
-                setShowReelSuggestions(index);
-              }}
-              onFocus={() => {
-                if (reel.reelTitle.trim().length > 0) {
-                  setShowReelSuggestions(index);
-                }
-              }}
-              onBlur={() => {
-                setTimeout(() => setShowReelSuggestions(null), 200);
-              }}
-            />
+      {reels.map((reel, index) => {
+        const isExistingReel = reel.reelId > 0;
+        const isReelEditable = !isExistingReel || editingReelIndex === index;
 
-            {showReelSuggestions === index && (
-              <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {reelLoading ? (
-                  <SkeletonSearchSuggestion count={3} />
-                ) : reelResults.length > 0 ? (
-                  reelResults.map((reelOption) => (
-                    <div
-                      key={reelOption.Id}
-                      className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                      onClick={() => {
-                        handleSelectReel(
-                          index,
-                          reelOption.Id,
-                          reelOption.Title
-                        );
-                      }}
-                    >
-                      {reelOption.Title}
+        return (
+          <div
+            key={index}
+            className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
+          >
+            <div className="flex items-center justify-start gap-2 min-w-[250px]">
+              <label className="min-w-[100px] font-medium">شماره قرقره:</label>
+              {isReelEditable ? (
+                <div className="relative">
+                  <Input
+                    value={reel.reelTitle}
+                    placeholder="جستجو قرقره..."
+                    className="w-full max-w-[250px]"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleReelChange(index, "reelTitle", value);
+                      handleReelSearch(value);
+                      setShowReelSuggestions(index);
+                    }}
+                    onFocus={() => {
+                      if (reel.reelTitle.trim().length > 0) {
+                        setShowReelSuggestions(index);
+                      }
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => setShowReelSuggestions(null), 200);
+                    }}
+                  />
+
+                  {showReelSuggestions === index && (
+                    <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      {reelLoading ? (
+                        <SkeletonSearchSuggestion count={3} />
+                      ) : reelResults.length > 0 ? (
+                        reelResults.map((reelOption) => (
+                          <div
+                            key={reelOption.Id}
+                            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                            onClick={() => {
+                              handleSelectReel(
+                                index,
+                                reelOption.Id,
+                                reelOption.Title
+                              );
+                            }}
+                          >
+                            {reelOption.Title}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-gray-500">
+                          قرقره‌ای یافت نشد
+                        </div>
+                      )}
                     </div>
-                  ))
-                ) : (
-                  <div className="px-3 py-2 text-sm text-gray-500">
-                    قرقره‌ای یافت نشد
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              ) : (
+                <span className="text-lg font-normal">
+                  {reel.reelTitle || "-"}
+                </span>
+              )}
+            </div>
+
+            {isReelEditable ? (
+              <>
+                <ReelsWeight
+                  value={reel.weight}
+                  materialConsumptionPerString={materialConsumptionPerString}
+                  onWeightAndAmountChange={(weight, amount) =>
+                    handleReelWeightAndAmountChange(index, weight, amount)
+                  }
+                  onReelChange={(field, value) => handleReelChange(index, field, value)}
+                />
+
+                <ReelsAmount
+                  value={reel.amount}
+                  materialConsumptionPerString={materialConsumptionPerString}
+                  onWeightAndAmountChange={(weight, amount) =>
+                    handleReelWeightAndAmountChange(index, weight, amount)
+                  }
+                  onReelChange={(field, value) => handleReelChange(index, field, value)}
+                />
+              </>
+            ) : (
+              <>
+                <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3 w-[200px]">
+                  <label className="min-w-[50px] font-medium text-sm">وزن:</label>
+                  <span className="text-lg font-normal">
+                    {reel.weight ? `${reel.weight} کیلوگرم` : "-"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3 w-[200px]">
+                  <label className="min-w-[50px] font-medium text-sm">متراژ:</label>
+                  <span className="text-lg font-normal">
+                    {reel.amount ? `${reel.amount} متر` : "-"}
+                  </span>
+                </div>
+              </>
             )}
-          </div>
 
-          <ReelsWeight
-            value={reel.weight}
-            materialConsumptionPerString={materialConsumptionPerString}
-            onWeightAndAmountChange={(weight, amount) =>
-              handleReelWeightAndAmountChange(index, weight, amount)
-            }
-            onReelChange={(field, value) => handleReelChange(index, field, value)}
-          />
-
-          <ReelsAmount
-            value={reel.amount}
-            materialConsumptionPerString={materialConsumptionPerString}
-            onWeightAndAmountChange={(weight, amount) =>
-              handleReelWeightAndAmountChange(index, weight, amount)
-            }
-            onReelChange={(field, value) => handleReelChange(index, field, value)}
-          />
-
-          {/* {label === "قرقره‌های خروجی:" && (
+            {/* {label === "قرقره‌های خروجی:" && (
             <>
               <div
                 className="relative w-[200px]"
@@ -334,15 +368,17 @@ export default function ReelSelector({
             </>
           )} */}
 
-          <ReelsActionsComponent
-            index={index}
-            reel={reel}
-            onEdit={handleEdit}
-            onSave={handleSave}
-            onDelete={handleDelete}
-          />
-        </div>
-      ))}
+            <ReelsActionsComponent
+              index={index}
+              reel={reel}
+              isEditing={editingReelIndex === index}
+              onEdit={handleEdit}
+              onSave={handleSave}
+              onDelete={handleDelete}
+            />
+          </div>
+        );
+      })}
 
       {reels.length === 0 && (
         <div className="text-right py-4 text-gray-500 text-sm">

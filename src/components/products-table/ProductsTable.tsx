@@ -262,7 +262,7 @@ export default function ProductsTable({
               کد طرح
             </th>
             <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
-              محصولات
+              محصول
             </th>
             <th className="border border-[#1e7677] px-4 py-2 text-right font-medium">
               مقدار سفارش

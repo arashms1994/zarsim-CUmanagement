@@ -1,28 +1,22 @@
-import { useState } from "react";
 import type { IReelsActionsComponentProps } from "../../types/type";
 
 export default function ReelsActionsComponent({
   index,
   reel,
+  isEditing,
   onEdit,
   onSave,
   onDelete,
 }: IReelsActionsComponentProps) {
-  const [isEditing, setIsEditing] = useState(false);
-
   const isNewReel = reel.reelId === 0;
   const showSaveButton = isNewReel || isEditing;
 
   const handleEditClick = () => {
-    setIsEditing(true);
     onEdit(index);
   };
 
   const handleSaveClick = () => {
     onSave(index);
-    if (!isNewReel) {
-      setIsEditing(false);
-    }
   };
 
   const handleDeleteClick = () => {

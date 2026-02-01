@@ -537,7 +537,14 @@ export default function ProductionPlanRowForm({
         </div>
 
         <div className="w-full space-y-2">
-          <label className="font-medium text-lg">محصولات:</label>
+          <div className="w-full flex justify-between items-center mb-4">
+            <div className="bg-[#1e7677] text-center px-3 py-2 rounded-lg">
+              <span className="text-lg font-normal text-white">
+                محصولات
+              </span>
+            </div>
+          </div>
+
           {planNumbers.length > 0 ? (
             <ProductsTable
               items={planItems}
