@@ -7,7 +7,7 @@ import type {
   ICUManagementReelsListItem,
 } from "../types/type";
 
-async function getRequestDigest(): Promise<string> {
+export async function getRequestDigest(): Promise<string> {
   try {
     const response = await fetch(`${BASE_URL}/_api/contextinfo`, {
       method: "POST",
@@ -357,7 +357,7 @@ export async function addStopItem(
 
 export async function submitCUManagementReels(
   reelData: ICUManagementReelsListItem
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string; newItemId?: number }> {
   const listGuid = config.LIST_GUIDS.CU_MANAGEMENT_REELS;
 
   if (!listGuid) {
@@ -462,15 +462,108 @@ export async function submitCUManagementReels(
       );
     }
 
+    const result = await response.json();
+    const newId = result.d?.Id ?? result.d?.ID;
+
     return {
       success: true,
       message: "قرقره با موفقیت ثبت شد ✅",
+      newItemId: newId,
     };
   } catch (error) {
     console.error("خطا در ارسال داده به CU_MANAGEMENT_REELS:", error);
     return {
       success: false,
       message: `خطا در ثبت قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"
+        }`,
+    };
+  }
+}
+
+export async function updateCUManagementReels(
+  itemId: number,
+  reelData: ICUManagementReelsListItem
+): Promise<{ success: boolean; message: string }> {
+  const listGuid = config.LIST_GUIDS.CU_MANAGEMENT_REELS;
+
+  if (!listGuid) {
+    throw new Error("GUID لیست CU_MANAGEMENT_REELS تنظیم نشده است");
+  }
+
+  try {
+    const listInfoResponse = await fetch(
+      `${BASE_URL}/_api/web/lists(guid'${listGuid}')?$select=ListItemEntityTypeFullName`,
+      {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      }
+    );
+
+    let itemType = "SP.Data.CU_x005f_Management_x005f_ReelsListItem";
+    if (listInfoResponse.ok) {
+      try {
+        const contentType = listInfoResponse.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const listInfo = await listInfoResponse.json();
+          if (listInfo.d?.ListItemEntityTypeFullName) {
+            itemType = listInfo.d.ListItemEntityTypeFullName;
+          }
+        }
+      } catch (parseError) {
+        console.warn("خطا در parse کردن پاسخ لیست:", parseError);
+      }
+    }
+
+    const payload: any = {
+      __metadata: { type: itemType },
+    };
+    if (reelData.Title !== undefined) payload.Title = String(reelData.Title);
+    if (reelData.reelNumber !== undefined) payload.reelNumber = String(reelData.reelNumber);
+    if (reelData.wasteCategory !== undefined) payload.wasteCategory = String(reelData.wasteCategory);
+    if (reelData.productAmount !== undefined) payload.productAmount = String(reelData.productAmount);
+    if (reelData.productWeight !== undefined) payload.productWeight = String(reelData.productWeight);
+    if (reelData.wasteWeight !== undefined) payload.wasteWeight = String(reelData.wasteWeight);
+    if (reelData.productionStage !== undefined) payload.productionStage = String(reelData.productionStage);
+    if (reelData.device !== undefined) payload.device = String(reelData.device);
+    if (reelData.operator !== undefined) payload.operator = String(reelData.operator);
+    if (reelData.statusId !== undefined) payload.statusId = String(reelData.statusId);
+    if (reelData.status !== undefined) payload.status = String(reelData.status);
+    if (reelData.preInvoiceRowNumber !== undefined) payload.preInvoiceRowNumber = String(reelData.preInvoiceRowNumber);
+
+    const response = await fetch(
+      `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items(${itemId})`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+          "X-HTTP-Method": "MERGE",
+          "IF-MATCH": "*",
+          "X-RequestDigest": await getRequestDigest(),
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ خطای SharePoint در به‌روزرسانی قرقره:", errorText);
+      throw new Error(
+        `خطا در به‌روزرسانی قرقره: ${errorText} (Status: ${response.status})`
+      );
+    }
+
+    return {
+      success: true,
+      message: "قرقره با موفقیت به‌روزرسانی شد ✅",
+    };
+  } catch (error) {
+    console.error("خطا در به‌روزرسانی قرقره:", error);
+    return {
+      success: false,
+      message: `خطا در به‌روزرسانی قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"
         }`,
     };
   }

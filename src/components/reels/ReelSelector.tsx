@@ -2,11 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { Input } from "../ui/input";
 import ReelsAmount from "./ReelsAmount";
 import ReelsWeight from "./ReelsWeight";
+import { useQueryClient } from "@tanstack/react-query";
 import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import { useSearchReels } from "../../hooks/useSearchReels";
 import ReelsActionsComponent from "./ReelsActionsComponent";
-import { submitCUManagementReels } from "../../api/addData";
+import { deleteCUManagementReel } from "../../api/deleteData";
 import type { IReelSelectorProps, IReelItem } from "../../types/type";
+import {
+  submitCUManagementReels,
+  updateCUManagementReels,
+} from "../../api/addData";
 
 export default function ReelSelector({
   reels,
@@ -27,6 +32,7 @@ export default function ReelSelector({
   );
   const [editingReelIndex, setEditingReelIndex] = useState<number | null>(null);
   const wasteDropdownRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -136,28 +142,64 @@ export default function ReelSelector({
       statusId: statusId,
       status: status,
       preInvoiceRowNumber: preInvoiceRow || "",
-
     };
 
     try {
-      const result = await submitCUManagementReels(reelData);
-      if (result.success) {
-        setEditingReelIndex(null);
-        alert("قرقره با موفقیت ثبت شد ✅");
+      if (reel.reelId > 0) {
+        const result = await updateCUManagementReels(reel.reelId, reelData);
+        if (result.success) {
+          setEditingReelIndex(null);
+          queryClient.invalidateQueries({ queryKey: ["cu-management-reels"] });
+          alert("قرقره با موفقیت به‌روزرسانی شد ✅");
+        } else {
+          alert(result.message);
+        }
       } else {
-        alert(result.message);
+        const result = await submitCUManagementReels(reelData);
+        if (result.success) {
+          setEditingReelIndex(null);
+          const newId = result.newItemId;
+          if (typeof newId === "number") {
+            const updatedReels = [...reels];
+            updatedReels[index] = { ...reel, reelId: newId };
+            onReelsChange(updatedReels);
+          }
+          queryClient.invalidateQueries({ queryKey: ["cu-management-reels"] });
+          alert("قرقره با موفقیت ثبت شد ✅");
+        } else {
+          alert(result.message);
+        }
       }
     } catch (error) {
       console.error("❌ خطا در ثبت قرقره:", error);
       alert(
-        `خطا در ثبت قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"
-        }`
+        `خطا در ثبت قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"}`
       );
     }
   };
 
-  const handleDelete = (index: number) => {
-    handleRemoveReel(index);
+  const handleDelete = async (index: number) => {
+    const reel = reels[index];
+    if (!reel) return;
+
+    if (reel.reelId > 0) {
+      try {
+        const result = await deleteCUManagementReel(reel.reelId);
+        if (result.success) {
+          handleRemoveReel(index);
+          queryClient.invalidateQueries({ queryKey: ["cu-management-reels"] });
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        console.error("❌ خطا در حذف قرقره:", error);
+        alert(
+          `خطا در حذف قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"}`
+        );
+      }
+    } else {
+      handleRemoveReel(index);
+    }
   };
 
   return (
