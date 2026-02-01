@@ -336,6 +336,7 @@ export default function ReelSelector({
 
           <ReelsActionsComponent
             index={index}
+            reel={reel}
             onEdit={handleEdit}
             onSave={handleSave}
             onDelete={handleDelete}
