@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Input } from "../ui/input";
+import ReelsAmount from "./ReelsAmount";
+import ReelsWeight from "./ReelsWeight";
 import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import { useSearchReels } from "../../hooks/useSearchReels";
 import ReelsActionsComponent from "./ReelsActionsComponent";
@@ -223,67 +225,23 @@ export default function ReelSelector({
             )}
           </div>
 
-          <div className="w-[200px]">
-            <Input
-              value={reel.weight}
-              placeholder="وزن (کیلوگرم)..."
-              type="text"
-              inputMode="decimal"
-              className="w-full"
-              onChange={(e) => {
-                const value = e.target.value;
-                if (
-                  materialConsumptionPerString != null &&
-                  materialConsumptionPerString > 0
-                ) {
-                  const kg = parseFloat(value);
-                  if (!isNaN(kg) && kg > 0) {
-                    const metersRaw = kg / materialConsumptionPerString;
-                    const amount = Number.isInteger(metersRaw)
-                      ? String(metersRaw)
-                      : String(Math.ceil(metersRaw));
-                    handleReelWeightAndAmountChange(index, value, amount);
-                  } else if (value === "") {
-                    handleReelWeightAndAmountChange(index, "", "");
-                  } else {
-                    handleReelChange(index, "weight", value);
-                  }
-                } else {
-                  handleReelChange(index, "weight", value);
-                }
-              }}
-            />
-          </div>
+          <ReelsWeight
+            value={reel.weight}
+            materialConsumptionPerString={materialConsumptionPerString}
+            onWeightAndAmountChange={(weight, amount) =>
+              handleReelWeightAndAmountChange(index, weight, amount)
+            }
+            onReelChange={(field, value) => handleReelChange(index, field, value)}
+          />
 
-          <div className="w-[200px]">
-            <Input
-              value={reel.amount}
-              placeholder="متراژ (متر)..."
-              type="text"
-              inputMode="decimal"
-              className="w-full"
-              onChange={(e) => {
-                const value = e.target.value;
-                if (
-                  materialConsumptionPerString != null &&
-                  materialConsumptionPerString > 0
-                ) {
-                  const meters = parseFloat(value);
-                  if (!isNaN(meters) && meters > 0) {
-                    const kgRaw = meters * materialConsumptionPerString;
-                    const weight = parseFloat(kgRaw.toFixed(6)).toFixed(2);
-                    handleReelWeightAndAmountChange(index, weight, value);
-                  } else if (value === "") {
-                    handleReelWeightAndAmountChange(index, "", "");
-                  } else {
-                    handleReelChange(index, "amount", value);
-                  }
-                } else {
-                  handleReelChange(index, "amount", value);
-                }
-              }}
-            />
-          </div>
+          <ReelsAmount
+            value={reel.amount}
+            materialConsumptionPerString={materialConsumptionPerString}
+            onWeightAndAmountChange={(weight, amount) =>
+              handleReelWeightAndAmountChange(index, weight, amount)
+            }
+            onReelChange={(field, value) => handleReelChange(index, field, value)}
+          />
 
           {/* {label === "قرقره‌های خروجی:" && (
             <>

@@ -1,0 +1,49 @@
+import { Input } from "../ui/input";
+
+export interface IReelsWeightProps {
+  value: string;
+  materialConsumptionPerString: number | null;
+  onWeightAndAmountChange: (weight: string, amount: string) => void;
+  onReelChange: (field: "weight" | "amount", value: string) => void;
+}
+
+export default function ReelsWeight({
+  value,
+  materialConsumptionPerString,
+  onWeightAndAmountChange,
+  onReelChange,
+}: IReelsWeightProps) {
+  return (
+    <div className="w-[200px]">
+      <Input
+        value={value}
+        placeholder="وزن (کیلوگرم)..."
+        type="text"
+        inputMode="decimal"
+        className="w-full"
+        onChange={(e) => {
+          const val = e.target.value;
+          if (
+            materialConsumptionPerString != null &&
+            materialConsumptionPerString > 0
+          ) {
+            const kg = parseFloat(val);
+            if (!isNaN(kg) && kg > 0) {
+              const metersRaw = kg / materialConsumptionPerString;
+              const amount = Number.isInteger(metersRaw)
+                ? String(metersRaw)
+                : String(Math.ceil(metersRaw));
+              onWeightAndAmountChange(val, amount);
+            } else if (val === "") {
+              onWeightAndAmountChange("", "");
+            } else {
+              onReelChange("weight", val);
+            }
+          } else {
+            onReelChange("weight", val);
+          }
+        }}
+      />
+    </div>
+  );
+}
