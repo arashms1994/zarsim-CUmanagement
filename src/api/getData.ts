@@ -10,6 +10,7 @@ import type {
   IReelListItem,
   IProductListItem,
   IWasteListItem,
+  ICUManagementReelsListItem,
 } from "../types/type";
 
 export async function getDevice(): Promise<IDevicesListItem[]> {
@@ -641,5 +642,62 @@ export async function getWasteList(): Promise<IWasteListItem[]> {
   } catch (error) {
     console.error("خطا در دریافت لیست ضایعات:", error);
     throw error;
+  }
+}
+
+export async function getCUManagementReels(
+  productionPlanNumber: string,
+  productionStage: string
+): Promise<ICUManagementReelsListItem[]> {
+  const listGuid = config.LIST_GUIDS.CU_MANAGEMENT_REELS;
+  if (!listGuid) {
+    throw new Error("GUID لیست CU_MANAGEMENT_REELS تنظیم نشده است");
+  }
+  if (!productionPlanNumber?.trim() || !productionStage?.trim()) {
+    return [];
+  }
+
+  const titleVal = productionPlanNumber.trim().replace(/'/g, "''");
+  const stageVal = productionStage.trim().replace(/'/g, "''");
+  const filter = `Title eq '${titleVal}' and productionStage eq '${stageVal}'`;
+
+  let items: ICUManagementReelsListItem[] = [];
+  let nextUrl: string | null = `${BASE_URL}/_api/web/lists(guid'${listGuid}')/items?$select=*&$filter=${encodeURIComponent(filter)}&$orderby=ID desc`;
+
+  try {
+    while (nextUrl) {
+      const res = await fetch(nextUrl, {
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json;odata=verbose",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(
+          `خطا در دریافت قرقره‌های CU_MANAGEMENT_REELS: ${err} (Status: ${res.status})`
+        );
+      }
+
+      const json: {
+        d: { results: ICUManagementReelsListItem[]; __next?: string };
+      } = await res.json();
+
+      const results = json.d?.results;
+      if (!Array.isArray(results)) {
+        throw new Error(
+          "ساختار داده‌ی برگشتی نامعتبر است: results یک آرایه نیست"
+        );
+      }
+
+      items = [...items, ...results];
+      nextUrl = json.d?.__next ?? null;
+    }
+
+    return items;
+  } catch (err) {
+    console.error("خطا در دریافت قرقره‌های CU_MANAGEMENT_REELS:", err);
+    throw err;
   }
 }

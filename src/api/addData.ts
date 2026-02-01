@@ -151,9 +151,8 @@ export async function submitCUManagement(
     console.error("خطا در ارسال داده به CU_MANAGEMENT:", error);
     return {
       success: false,
-      message: `خطا در ثبت اطلاعات: ${
-        error instanceof Error ? error.message : "خطای نامشخص"
-      }`,
+      message: `خطا در ثبت اطلاعات: ${error instanceof Error ? error.message : "خطای نامشخص"
+        }`,
     };
   }
 }
@@ -279,9 +278,8 @@ export async function submitCUManagementRow(
     console.error("خطا در ارسال داده به CU_MANAGEMENT_ROW:", error);
     return {
       success: false,
-      message: `خطا در ثبت ردیف: ${
-        error instanceof Error ? error.message : "خطای نامشخص"
-      }`,
+      message: `خطا در ثبت ردیف: ${error instanceof Error ? error.message : "خطای نامشخص"
+        }`,
     };
   }
 }
@@ -351,9 +349,8 @@ export async function addStopItem(
     console.error("خطا در افزودن توقف:", error);
     return {
       success: false,
-      message: `خطا در افزودن توقف: ${
-        error instanceof Error ? error.message : "خطای نامشخص"
-      }`,
+      message: `خطا در افزودن توقف: ${error instanceof Error ? error.message : "خطای نامشخص"
+        }`,
     };
   }
 }
@@ -473,9 +470,8 @@ export async function submitCUManagementReels(
     console.error("خطا در ارسال داده به CU_MANAGEMENT_REELS:", error);
     return {
       success: false,
-      message: `خطا در ثبت قرقره: ${
-        error instanceof Error ? error.message : "خطای نامشخص"
-      }`,
+      message: `خطا در ثبت قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"
+        }`,
     };
   }
 }

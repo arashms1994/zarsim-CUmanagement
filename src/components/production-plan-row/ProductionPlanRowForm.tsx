@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
 import ReelSelector from "../reels/ReelSelector";
@@ -20,6 +20,7 @@ import { submitCUManagement, submitCUManagementRow } from "../../api/addData";
 import { calculateProductionValues } from "../../lib/calculateProductionValues";
 import { prepareRowDataForSubmission } from "../../lib/prepareRowDataForSubmission";
 import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
+import { useCUManagementReels } from "../../hooks/useCUManagementReels";
 import type {
   IProductionPlanRowFormProps,
   IReelItem,
@@ -89,6 +90,21 @@ export default function ProductionPlanRowForm({
 
   const { planItems, isLoading: planItemsLoading } =
     useSubProductionPlanByNumbers(planNumbers);
+
+  const {
+    entranceReels: apiEntranceReels,
+    exitReels: apiExitReels,
+    isLoading: reelsLoading,
+  } = useCUManagementReels(productionPlanNumber ?? undefined, selectedStage ?? undefined);
+
+  const prevReelsLoading = useRef(true);
+  useEffect(() => {
+    if (prevReelsLoading.current && !reelsLoading) {
+      setEntranceReels(apiEntranceReels);
+      setExitReels(apiExitReels);
+    }
+    prevReelsLoading.current = reelsLoading;
+  }, [reelsLoading, apiEntranceReels, apiExitReels]);
 
   const filteredPlanItems = useMemo(
     () => filterItemsByMinQuantity(planItems),
@@ -484,29 +500,40 @@ export default function ProductionPlanRowForm({
         </div>
 
         <div className="w-full space-y-4">
-          <ReelSelector
-            reels={entranceReels}
-            onReelsChange={setEntranceReels}
-            label="قرقره‌های ورودی:"
-            productionPlanNumber={productionPlanNumber || ""}
-            selectedStage={selectedStage || ""}
-            device={planItem.dasatghah || ""}
-            operator={operator || ""}
-            preInvoiceRow={preInvoiceRow || ""}
-            materialConsumptionPerString={materialConsumptionPerString}
-          />
+          {reelsLoading ? (
+            <div className="flex justify-start items-center gap-3 py-4 px-4 bg-gray-50 rounded-lg border border-gray-200">
+              <Spinner className="size-8 text-purple-500" />
+              <span className="text-purple-500 text-sm font-medium">
+                در حال بارگذاری قرقره‌ها...
+              </span>
+            </div>
+          ) : (
+            <>
+              <ReelSelector
+                reels={entranceReels}
+                onReelsChange={setEntranceReels}
+                label="قرقره‌های ورودی:"
+                productionPlanNumber={productionPlanNumber || ""}
+                selectedStage={selectedStage || ""}
+                device={planItem.dasatghah || ""}
+                operator={operator || ""}
+                preInvoiceRow={preInvoiceRow || ""}
+                materialConsumptionPerString={materialConsumptionPerString}
+              />
 
-          <ReelSelector
-            reels={exitReels}
-            onReelsChange={setExitReels}
-            label="قرقره‌های خروجی:"
-            productionPlanNumber={productionPlanNumber || ""}
-            selectedStage={selectedStage || ""}
-            device={planItem.dasatghah || ""}
-            operator={operator || ""}
-            preInvoiceRow={preInvoiceRow || ""}
-            materialConsumptionPerString={materialConsumptionPerString}
-          />
+              <ReelSelector
+                reels={exitReels}
+                onReelsChange={setExitReels}
+                label="قرقره‌های خروجی:"
+                productionPlanNumber={productionPlanNumber || ""}
+                selectedStage={selectedStage || ""}
+                device={planItem.dasatghah || ""}
+                operator={operator || ""}
+                preInvoiceRow={preInvoiceRow || ""}
+                materialConsumptionPerString={materialConsumptionPerString}
+              />
+            </>
+          )}
         </div>
 
         <div className="w-full space-y-2">

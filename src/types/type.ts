@@ -674,6 +674,7 @@ export interface IWasteListItem {
 }
 
 export interface ICUManagementReelsListItem {
+  ID?: number;
   Title: string;
   reelNumber: string;
   wasteCategory: string;
