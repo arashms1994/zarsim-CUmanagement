@@ -32,6 +32,7 @@ export default function ReelSelector({
   );
   const [editingReelIndex, setEditingReelIndex] = useState<number | null>(null);
   const wasteDropdownRef = useRef<HTMLDivElement>(null);
+  const originalReelSnapshotRef = useRef<IReelItem | null>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -118,7 +119,31 @@ export default function ReelSelector({
   };
 
   const handleEdit = (index: number) => {
+    if (editingReelIndex !== null && editingReelIndex !== index) {
+      const original = originalReelSnapshotRef.current;
+      if (original) {
+        const updatedReels = [...reels];
+        updatedReels[editingReelIndex] = { ...original };
+        onReelsChange(updatedReels);
+        originalReelSnapshotRef.current = null;
+      }
+    }
+    const reel = reels[index];
+    if (reel) {
+      originalReelSnapshotRef.current = { ...reel };
+    }
     setEditingReelIndex(index);
+  };
+
+  const handleCancel = (index: number) => {
+    const original = originalReelSnapshotRef.current;
+    if (original) {
+      const updatedReels = [...reels];
+      updatedReels[index] = { ...original };
+      onReelsChange(updatedReels);
+      originalReelSnapshotRef.current = null;
+    }
+    setEditingReelIndex(null);
   };
 
   const handleSave = async (index: number) => {
@@ -148,6 +173,7 @@ export default function ReelSelector({
       if (reel.reelId > 0) {
         const result = await updateCUManagementReels(reel.reelId, reelData);
         if (result.success) {
+          originalReelSnapshotRef.current = null;
           setEditingReelIndex(null);
           queryClient.invalidateQueries({ queryKey: ["cu-management-reels"] });
           alert("قرقره با موفقیت به‌روزرسانی شد ✅");
@@ -157,6 +183,7 @@ export default function ReelSelector({
       } else {
         const result = await submitCUManagementReels(reelData);
         if (result.success) {
+          originalReelSnapshotRef.current = null;
           setEditingReelIndex(null);
           const newId = result.newItemId;
           if (typeof newId === "number") {
@@ -417,6 +444,7 @@ export default function ReelSelector({
               onEdit={handleEdit}
               onSave={handleSave}
               onDelete={handleDelete}
+              onCancel={handleCancel}
             />
           </div>
         );

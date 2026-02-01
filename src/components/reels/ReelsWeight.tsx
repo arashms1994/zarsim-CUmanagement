@@ -1,12 +1,5 @@
 import { Input } from "../ui/input";
-
-export interface IReelsWeightProps {
-  value: string;
-  materialConsumptionPerString: number | null;
-  disabled?: boolean;
-  onWeightAndAmountChange: (weight: string, amount: string) => void;
-  onReelChange: (field: "weight" | "amount", value: string) => void;
-}
+import type { IReelsWeightProps } from "../../types/type";
 
 export default function ReelsWeight({
   value,

@@ -7,6 +7,7 @@ export default function ReelsActionsComponent({
   onEdit,
   onSave,
   onDelete,
+  onCancel,
 }: IReelsActionsComponentProps) {
   const isNewReel = reel.reelId === 0;
   const showSaveButton = isNewReel || isEditing;
@@ -19,8 +20,10 @@ export default function ReelsActionsComponent({
     onSave(index);
   };
 
-  const handleDeleteClick = () => {
-    if (isNewReel) {
+  const handleDeleteOrCancelClick = () => {
+    if (isEditing) {
+      onCancel(index);
+    } else if (isNewReel) {
       onDelete(index);
     } else {
       const confirmed = window.confirm("آیا از حذف مطمئنید؟");
@@ -75,9 +78,13 @@ export default function ReelsActionsComponent({
       )}
 
       <div
-        onClick={handleDeleteClick}
-        className="px-3 py-2 cursor-pointer bg-red-500 text-white rounded-lg hover:bg-red-700 duration-300 transition-colors flex items-center justify-center"
-        title="حذف"
+        onClick={handleDeleteOrCancelClick}
+        className={`px-3 py-2 cursor-pointer rounded-lg duration-300 transition-colors flex items-center justify-center ${
+          isEditing
+            ? "bg-gray-500 text-white hover:bg-gray-600"
+            : "bg-red-500 text-white hover:bg-red-700"
+        }`}
+        title={isEditing ? "لغو" : "حذف"}
       >
         <svg
           className="w-5 h-5"

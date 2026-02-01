@@ -696,6 +696,7 @@ export interface IReelsActionsComponentProps {
   onEdit: (index: number) => void;
   onSave: (index: number) => void;
   onDelete: (index: number) => void;
+  onCancel: (index: number) => void;
 }
 
 
@@ -709,4 +710,20 @@ export interface IProductionActualAmountProps {
   control: React.ComponentProps<typeof Controller>["control"];
   setValue?: (name: string, value: unknown, options?: object) => void;
   materialConsumptionPerString: number | null;
+}
+
+export interface IReelsAmountProps {
+  value: string;
+  materialConsumptionPerString: number | null;
+  disabled?: boolean;
+  onWeightAndAmountChange: (weight: string, amount: string) => void;
+  onReelChange: (field: "weight" | "amount", value: string) => void;
+}
+
+export interface IReelsWeightProps {
+  value: string;
+  materialConsumptionPerString: number | null;
+  disabled?: boolean;
+  onWeightAndAmountChange: (weight: string, amount: string) => void;
+  onReelChange: (field: "weight" | "amount", value: string) => void;
 }

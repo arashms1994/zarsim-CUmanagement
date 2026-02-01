@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Controller } from "react-hook-form";
-import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import type { IStopListItem } from "../../types/type";
+import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import { useSearchStop } from "../../hooks/useSearchStop";
 import type { IStopReasonSelectorProps } from "../../types/type";
 
