@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { config } from "../api/config";
 import { useQuery } from "@tanstack/react-query";
 import { getCUManagementReels } from "../api/getData";
 import type { ICUManagementReelsListItem, IReelItem } from "../types/type";
@@ -29,7 +28,8 @@ export function useCUManagementReels(
       getCUManagementReels(productionPlanNumber!, selectedStage!),
     enabled:
       !!productionPlanNumber?.trim() && !!selectedStage?.trim(),
-    staleTime: config.CACHE_STALE_TIME,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   const { entranceReels, exitReels } = useMemo(() => {

@@ -273,7 +273,7 @@ export default function ProductionPlanRowForm({
       .map((item) => item.shomareradiffactor)
       .filter((r): r is string => !!r && r.trim().length > 0);
     const uniqueRadiffactors = Array.from(new Set(radiffactors));
-    return uniqueRadiffactors.join("-");
+    return uniqueRadiffactors.join(";");
   }, [filteredPlanItems]);
 
   const product = useMemo(() => {
@@ -383,8 +383,6 @@ export default function ProductionPlanRowForm({
       setIsSubmitting(false);
     }
   };
-
-  console.log("واحد:", materialConsumptionPerString)
 
   return (
     <div className="w-full p-5 gap-2 flex justify-between items-center flex-wrap rounded-[4px] border-2 shadow border-[#1e7677] relative">

@@ -2,13 +2,18 @@ import { config } from "../api/config";
 import { getPrintTajmi } from "../api/getData";
 import { useQuery } from "@tanstack/react-query";
 
-export const usePrintTajmiByCart = (cartNumber: string | null | undefined) => {
+export const usePrintTajmiByCart = (
+  cartNumber: string | null | undefined,
+  productionPlanNumber: string | undefined,
+  selectedStage: string | undefined,
+  selectedColor: string | undefined
+) => {
   const {
     data: planDetails = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["print-tajmi-by-cart", cartNumber],
+    queryKey: ["print-tajmi-by-cart", cartNumber, productionPlanNumber, selectedStage, selectedColor],
     queryFn: () => getPrintTajmi(cartNumber!),
     enabled: !!cartNumber && cartNumber.trim().length > 0,
     staleTime: config.CACHE_STALE_TIME,

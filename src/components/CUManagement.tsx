@@ -32,8 +32,12 @@ export default function CUManagement() {
     handleSearch,
   } = useSearchPrintTajmi();
 
-  const { planDetails, isLoading: planLoading } =
-    usePrintTajmiByCart(selectedPlan);
+  const { planDetails, isLoading: planLoading } = usePrintTajmiByCart(
+    selectedPlan,
+    selectedPlan,
+    selectedStage,
+    selectedColor
+  );
 
   const uniqueStages = useMemo(
     () => extractUniqueStages(planDetails || []),
