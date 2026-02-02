@@ -563,7 +563,7 @@ export default function ProductionPlanRowForm({
 
         <div
           onClick={handleSubmit}
-          className={`px-3 py-2 cursor-pointer w-[150px] text-center mx-auto bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+          className={`cursor-pointer font-medium flex justify-center items-center h-10 w-[200px] text-center mx-auto bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors duration-300 text-sm ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
             }`}
         >
           {isSubmitting ? "در حال ثبت..." : "ثبت اطلاعات"}
