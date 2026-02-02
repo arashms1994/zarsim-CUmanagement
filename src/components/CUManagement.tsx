@@ -3,18 +3,18 @@ import { Input } from "./ui/input";
 import { Stack } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { filterPlanDetails } from "../lib/filterPlanDetails";
-import ProductionPlanRowForm from "./production-plan-row/ProductionPlanRowForm";
 import { extractUniqueStages } from "../lib/extractUniqueStages";
 import { extractUniqueColors } from "../lib/extractUniqueColors";
 import { useSearchPrintTajmi } from "../hooks/useSearchPrintTajmi";
 import { usePrintTajmiByCart } from "../hooks/usePrintTajmiByCart";
+import ProductionPlanRowForm from "./production-plan-row/ProductionPlanRowForm";
 import type {
   ICUManagementFormProps,
   IProductionPlanRowFormProps,
 } from "../types/type";
 
 export default function CUManagement() {
-  const { control, setValue, watch } = useForm<ICUManagementFormProps>();
+  const { control, setValue, watch, reset } = useForm<ICUManagementFormProps>();
   const selectedPlan = watch("productionPlanNumber");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showColorDropdown, setShowColorDropdown] = useState(false);
@@ -74,6 +74,13 @@ export default function CUManagement() {
     setSelectedColor(undefined);
     setShowStageDropdown(false);
     setShowColorDropdown(false);
+    reset({ productionPlanNumber: selectedPlan ?? "" });
+  };
+
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color);
+    setShowColorDropdown(false);
+    reset({ productionPlanNumber: selectedPlan ?? "" });
   };
 
   return (
@@ -262,10 +269,7 @@ export default function CUManagement() {
                               ? "bg-[#1e7677] text-white"
                               : "hover:bg-gray-100"
                               }`}
-                            onClick={() => {
-                              setSelectedColor(color);
-                              setShowColorDropdown(false);
-                            }}
+                            onClick={() => handleColorChange(color)}
                           >
                             {color}
                           </div>

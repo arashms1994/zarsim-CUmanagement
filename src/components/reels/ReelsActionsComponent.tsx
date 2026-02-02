@@ -1,4 +1,12 @@
+import { useState } from "react";
 import type { IReelsActionsComponentProps } from "../../types/type";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 
 export default function ReelsActionsComponent({
   index,
@@ -9,6 +17,7 @@ export default function ReelsActionsComponent({
   onDelete,
   onCancel,
 }: IReelsActionsComponentProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const isNewReel = reel.reelId === 0;
   const showSaveButton = isNewReel || isEditing;
 
@@ -26,11 +35,13 @@ export default function ReelsActionsComponent({
     } else if (isNewReel) {
       onDelete(index);
     } else {
-      const confirmed = window.confirm("آیا از حذف مطمئنید؟");
-      if (confirmed) {
-        onDelete(index);
-      }
+      setDeleteDialogOpen(true);
     }
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(index);
+    setDeleteDialogOpen(false);
   };
 
   return (
@@ -79,11 +90,10 @@ export default function ReelsActionsComponent({
 
       <div
         onClick={handleDeleteOrCancelClick}
-        className={`px-3 py-2 cursor-pointer rounded-lg duration-300 transition-colors flex items-center justify-center ${
-          isEditing
-            ? "bg-gray-500 text-white hover:bg-gray-600"
-            : "bg-red-500 text-white hover:bg-red-700"
-        }`}
+        className={`px-3 py-2 cursor-pointer rounded-lg duration-300 transition-colors flex items-center justify-center ${isEditing
+          ? "bg-gray-500 text-white hover:bg-gray-600"
+          : "bg-red-500 text-white hover:bg-red-700"
+          }`}
         title={isEditing ? "لغو" : "حذف"}
       >
         <svg
@@ -100,6 +110,30 @@ export default function ReelsActionsComponent({
           />
         </svg>
       </div>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              آیا از حذف این قرقره مطمئنید؟ این عمل قابل بازگشت نیست.
+            </DialogTitle>
+          </DialogHeader>
+          <DialogFooter>
+            <div
+              onClick={() => setDeleteDialogOpen(false)}
+              className="px-3 py-2 cursor-pointer bg-gray-500 text-white rounded-lg hover:bg-gray-700 duration-300 transition-colors flex items-center justify-center"
+            >
+              انصراف
+            </div>
+            <div
+              onClick={handleConfirmDelete}
+              className="px-3 py-2 cursor-pointer bg-red-500 text-white rounded-lg hover:bg-red-700 duration-300 transition-colors flex items-center justify-center"
+            >
+              حذف قرقره
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
