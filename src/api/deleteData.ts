@@ -1,6 +1,7 @@
+import { toast } from "react-toastify";
 import { BASE_URL } from "./base";
 import { config } from "./config";
-import { getRequestDigest } from "./addData";
+import { getRequestDigest } from "./getDigest";
 
 export async function deleteCUManagementReel(
     itemId: number
@@ -33,12 +34,14 @@ export async function deleteCUManagementReel(
             );
         }
 
+        toast.success("قرقره با موفقیت پاک گردید");
         return {
             success: true,
             message: "قرقره با موفقیت حذف شد ✅",
         };
     } catch (error) {
         console.error("خطا در حذف قرقره:", error);
+        toast.error("خطا در پاک کردن اطلاعات قرقره");
         return {
             success: false,
             message: `خطا در حذف قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"

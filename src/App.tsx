@@ -3,8 +3,9 @@ import theme from "./theme/theme.ts";
 import createCache from "@emotion/cache";
 import rtlPlugin from "stylis-plugin-rtl";
 import { CssBaseline } from "@mui/material";
+import "react-toastify/dist/ReactToastify.css";
 import AppProvider from "./providers/AppProvider.tsx";
-import { Bounce, ToastContainer } from "react-toastify";
+import { ToastContainer, Slide } from "react-toastify";
 import CUManagement from "./components/CUManagement.tsx";
 import { CacheProvider, ThemeProvider } from "@emotion/react";
 
@@ -31,7 +32,7 @@ function App() {
             draggable
             pauseOnHover
             theme="colored"
-            transition={Bounce}
+            transition={Slide}
           />
         </ThemeProvider>
       </CacheProvider>

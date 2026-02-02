@@ -1,33 +1,13 @@
+import { toast } from "react-toastify";
 import { BASE_URL } from "./base";
 import { config } from "./config";
+import { getRequestDigest } from "./getDigest";
 import type {
   IStopListItem,
   ICUManagementSubmitData,
   ICUManagementRowListItem,
   ICUManagementReelsListItem,
 } from "../types/type";
-
-export async function getRequestDigest(): Promise<string> {
-  try {
-    const response = await fetch(`${BASE_URL}/_api/contextinfo`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json;odata=verbose",
-        "Content-Type": "application/json;odata=verbose",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`خطا در دریافت Request Digest: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.d.GetContextWebInformation.FormDigestValue;
-  } catch (error) {
-    console.error("خطا در دریافت Request Digest:", error);
-    throw error;
-  }
-}
 
 export async function submitCUManagement(
   formData: ICUManagementSubmitData
@@ -143,12 +123,14 @@ export async function submitCUManagement(
       );
     }
 
+    toast.success("اطلاعات با موفقیت ثبت گردید");
     return {
       success: true,
       message: "اطلاعات با موفقیت ثبت شد ✅",
     };
   } catch (error) {
     console.error("خطا در ارسال داده به CU_MANAGEMENT:", error);
+    toast.error("خطا در ثبت اطلاعات");
     return {
       success: false,
       message: `خطا در ثبت اطلاعات: ${error instanceof Error ? error.message : "خطای نامشخص"
@@ -270,12 +252,14 @@ export async function submitCUManagementRow(
       );
     }
 
+    toast.success("اطلاعات با موفقیت ثبت گردید");
     return {
       success: true,
       message: "ردیف با موفقیت ثبت شد ✅",
     };
   } catch (error) {
     console.error("خطا در ارسال داده به CU_MANAGEMENT_ROW:", error);
+    toast.error("خطا در ثبت اطلاعات");
     return {
       success: false,
       message: `خطا در ثبت ردیف: ${error instanceof Error ? error.message : "خطای نامشخص"
@@ -465,6 +449,7 @@ export async function submitCUManagementReels(
     const result = await response.json();
     const newId = result.d?.Id ?? result.d?.ID;
 
+    toast.success("قرقره با موفقیت ثبت گردید");
     return {
       success: true,
       message: "قرقره با موفقیت ثبت شد ✅",
@@ -472,6 +457,7 @@ export async function submitCUManagementReels(
     };
   } catch (error) {
     console.error("خطا در ارسال داده به CU_MANAGEMENT_REELS:", error);
+    toast.error("خطا در ثبت قرقره");
     return {
       success: false,
       message: `خطا در ثبت قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"
@@ -555,12 +541,14 @@ export async function updateCUManagementReels(
       );
     }
 
+    toast.success("اطلاعات قرقره با موفقیت ویرایش گردید");
     return {
       success: true,
       message: "قرقره با موفقیت به‌روزرسانی شد ✅",
     };
   } catch (error) {
     console.error("خطا در به‌روزرسانی قرقره:", error);
+    toast.error("خطا در ویرایش اطلاعات قرقره");
     return {
       success: false,
       message: `خطا در به‌روزرسانی قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"
