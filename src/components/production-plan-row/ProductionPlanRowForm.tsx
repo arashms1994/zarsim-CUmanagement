@@ -363,22 +363,19 @@ export default function ProductionPlanRowForm({
         const successRows = rowResults.filter((r) => r && r.success).length;
 
         if (failedRows > 0) {
-          alert(
+          console.log(
             `ثبت اصلی موفق بود ✅\n${successRows} ردیف با موفقیت ثبت شد\n${failedRows} ردیف با خطا مواجه شد`
           );
         } else {
-          alert(`ثبت با موفقیت انجام شد ✅\n${successRows} ردیف ثبت شد`);
+          console.error(`ثبت با موفقیت انجام شد ✅\n${successRows} ردیف ثبت شد`);
         }
 
         window.location.reload();
       } else {
-        alert(result.message);
+        console.error(result.message);
       }
     } catch (error) {
-      alert(
-        `خطا در ثبت اطلاعات: ${error instanceof Error ? error.message : "خطای نامشخص"
-        }`
-      );
+      console.error(error)
     } finally {
       setIsSubmitting(false);
     }

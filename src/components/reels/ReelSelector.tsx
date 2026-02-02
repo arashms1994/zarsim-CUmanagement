@@ -176,9 +176,8 @@ export default function ReelSelector({
           originalReelSnapshotRef.current = null;
           setEditingReelIndex(null);
           queryClient.invalidateQueries({ queryKey: ["cu-management-reels"] });
-          alert("قرقره با موفقیت به‌روزرسانی شد ✅");
         } else {
-          alert(result.message);
+          console.error(result.message);
         }
       } else {
         const result = await submitCUManagementReels(reelData);
@@ -192,16 +191,12 @@ export default function ReelSelector({
             onReelsChange(updatedReels);
           }
           queryClient.invalidateQueries({ queryKey: ["cu-management-reels"] });
-          alert("قرقره با موفقیت ثبت شد ✅");
         } else {
-          alert(result.message);
+          console.error(result.message);
         }
       }
     } catch (error) {
       console.error("❌ خطا در ثبت قرقره:", error);
-      alert(
-        `خطا در ثبت قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"}`
-      );
     }
   };
 
@@ -216,13 +211,10 @@ export default function ReelSelector({
           handleRemoveReel(index);
           queryClient.invalidateQueries({ queryKey: ["cu-management-reels"] });
         } else {
-          alert(result.message);
+          console.error(result.message)
         }
       } catch (error) {
         console.error("❌ خطا در حذف قرقره:", error);
-        alert(
-          `خطا در حذف قرقره: ${error instanceof Error ? error.message : "خطای نامشخص"}`
-        );
       }
     } else {
       handleRemoveReel(index);

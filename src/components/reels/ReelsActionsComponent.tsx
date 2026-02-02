@@ -18,6 +18,7 @@ export default function ReelsActionsComponent({
   onCancel,
 }: IReelsActionsComponentProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   const isNewReel = reel.reelId === 0;
   const showSaveButton = isNewReel || isEditing;
 

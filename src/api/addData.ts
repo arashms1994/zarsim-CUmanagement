@@ -252,14 +252,12 @@ export async function submitCUManagementRow(
       );
     }
 
-    toast.success("اطلاعات با موفقیت ثبت گردید");
     return {
       success: true,
       message: "ردیف با موفقیت ثبت شد ✅",
     };
   } catch (error) {
     console.error("خطا در ارسال داده به CU_MANAGEMENT_ROW:", error);
-    toast.error("خطا در ثبت اطلاعات");
     return {
       success: false,
       message: `خطا در ثبت ردیف: ${error instanceof Error ? error.message : "خطای نامشخص"
