@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { SHIFT_LIST } from "../../lib/constants";
+// import { SHIFT_LIST } from "../../lib/constants";
 import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import type { IOperatorSelectorProps } from "../../types/type";
 import { useSearchPersonnel } from "../../hooks/useSearchPersonnel";
@@ -8,13 +8,13 @@ import { useSearchPersonnel } from "../../hooks/useSearchPersonnel";
 export default function OperatorSelector({
   value,
   onChange,
-  onShiftChange,
+  // onShiftChange,
 }: IOperatorSelectorProps) {
   const [showPersonnelSuggestions, setShowPersonnelSuggestions] =
     useState(false);
-  const [shiftId, setShiftId] = useState<number | "">("");
-  const [shiftStart, setShiftStart] = useState("");
-  const [shiftEnd, setShiftEnd] = useState("");
+  // const [shiftEnd, setShiftEnd] = useState("");
+  // const [shiftStart, setShiftStart] = useState("");
+  // const [shiftId, setShiftId] = useState<number | "">("");
 
   const {
     searchResults: personnelResults,
@@ -74,7 +74,7 @@ export default function OperatorSelector({
         </div>
       </div>
 
-      <div className="flex items-center justify-start gap-2">
+      {/* <div className="flex items-center justify-start gap-2">
         <label className="min-w-[150px] font-medium">شیفت:</label>
         <select
           className="w-[250px] px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-[#1e7677]"
@@ -142,7 +142,7 @@ export default function OperatorSelector({
             }
           }}
         />
-      </div>
+      </div> */}
     </>
   );
 }
