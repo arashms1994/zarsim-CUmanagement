@@ -5,7 +5,6 @@ import type { IWasteTypeProps } from "../../types/type";
 export default function WasteType({
   value,
   onChange,
-  labelClassName = "min-w-[150px] font-medium",
   compact = false,
 }: IWasteTypeProps) {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -27,8 +26,8 @@ export default function WasteType({
   }, [showDropdown]);
 
   return (
-    <div className="flex items-center justify-start gap-2">
-      <label className={compact ? "min-w-[100px] font-medium text-sm" : labelClassName}>
+    <div className={`flex items-center justify-start ${compact ? "gap-2" : "gap-3"}`}>
+      <label className={compact ? "min-w-[100px] font-medium" : "min-w-[150px] font-medium"}>
         نوع ضایعات:
       </label>
       <div className="relative" ref={dropdownRef}>
@@ -36,7 +35,10 @@ export default function WasteType({
           onClick={() => setShowDropdown(!showDropdown)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
           tabIndex={0}
-          className="w-[250px] px-3 py-2 text-sm border border-gray-300 rounded-md bg-white cursor-pointer hover:bg-gray-50 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#1e7677]"
+          className={compact
+            ? "w-[200px] px-3 py-2 text-sm border border-gray-300 rounded-md bg-white cursor-pointer hover:bg-gray-50 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#1e7677]"
+            : "w-[250px] px-3 py-2 text-sm border border-gray-300 rounded-md bg-white cursor-pointer hover:bg-gray-50 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#1e7677]"
+          }
         >
           <span className={value ? "" : "text-gray-500"}>
             {value || "انتخاب نوع ضایعات..."}

@@ -332,7 +332,7 @@ export default function ReelSelector({
             )}
 
             {label === "قرقره‌های خروجی:" && isReelEditable && (
-              <div className="w-full flex items-center justify-start gap-3">
+              <>
                 <WasteType
                   value={reel.wasteCategory || ""}
                   onChange={(value) =>
@@ -347,7 +347,7 @@ export default function ReelSelector({
                   }
                   compact
                 />
-              </div>
+              </>
             )}
             {label === "قرقره‌های خروجی:" && !isReelEditable && (
               <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">

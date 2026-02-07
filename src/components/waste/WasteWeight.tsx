@@ -34,14 +34,14 @@ export default function WasteWeight({
 
   return (
     <div className="flex items-center justify-start gap-2">
-      <label className={compact ? "min-w-[80px] font-medium text-sm" : "min-w-[150px] font-medium"}>
-        {compact ? "وزن(kg):" : "وزن ضایعات (کیلوگرم):"}
+      <label className={compact ? "min-w-[100px] font-medium" : "min-w-[150px] font-medium"}>
+        {compact ? "وزن ضایعات (کیلوگرم):" : "وزن ضایعات (کیلوگرم):"}
       </label>
       <Input
         value={value ?? ""}
         type="string"
-        placeholder="مثلاً 50"
-        className="w-[250px]"
+        placeholder="وزن (کیلوگرم)..."
+        className={compact ? "w-full" : "w-[250px]"}
         onChange={(e) => onChange?.(e.target.value)}
       />
     </div>

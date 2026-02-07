@@ -765,6 +765,5 @@ export interface ICalculatedWeightOnBOMProps {
 export interface IWasteTypeProps {
   value: string;
   onChange: (value: string) => void;
-  labelClassName?: string;
   compact?: boolean;
 }
