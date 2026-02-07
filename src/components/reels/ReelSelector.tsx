@@ -2,7 +2,8 @@ import { useState, useRef } from "react";
 import { Input } from "../ui/input";
 import ReelsAmount from "./ReelsAmount";
 import ReelsWeight from "./ReelsWeight";
-import Waste from "../waste/Waste";
+import WasteType from "../waste/WasteType";
+import WasteWeight from "../waste/WasteWeight";
 import { useQueryClient } from "@tanstack/react-query";
 import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import { useSearchReels } from "../../hooks/useSearchReels";
@@ -232,7 +233,7 @@ export default function ReelSelector({
         return (
           <div
             key={index}
-            className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
+            className="flex flex-wrap justify-start items-center gap-3 p-3 rounded-lg bg-gray-50 border border-[#1e7677]"
           >
             <div className="flex items-center justify-start gap-2 min-w-[250px]">
               <label className="min-w-[100px] font-medium">شماره قرقره:</label>
@@ -331,13 +332,20 @@ export default function ReelSelector({
             )}
 
             {label === "قرقره‌های خروجی:" && isReelEditable && (
-              <div className="flex items-center justify-start gap-2">
-                <Waste
-                  wasteType={reel.wasteCategory || ""}
-                  wasteWeight={reel.wasteWeight || ""}
-                  onWasteChange={(wasteType, weight) =>
-                    handleWasteChange(index, wasteType, weight)
+              <div className="w-full flex items-center justify-start gap-3">
+                <WasteType
+                  value={reel.wasteCategory || ""}
+                  onChange={(value) =>
+                    handleWasteChange(index, value, reel.wasteWeight || "")
                   }
+                  compact
+                />
+                <WasteWeight
+                  value={reel.wasteWeight || ""}
+                  onChange={(value) =>
+                    handleWasteChange(index, reel.wasteCategory || "", value)
+                  }
+                  compact
                 />
               </div>
             )}

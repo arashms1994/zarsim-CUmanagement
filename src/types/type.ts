@@ -739,6 +739,14 @@ export interface IWasteFormProps {
   setValue?: UseFormSetValue<{ wasteType?: string; wasteWeight?: string }>;
 }
 
+export interface IWasteWeightProps {
+  value?: string;
+  onChange?: (value: string) => void;
+  control?: Parameters<typeof Controller>[0]["control"];
+  name?: string;
+  compact?: boolean;
+}
+
 export interface IWasteStandaloneProps {
   wasteType: string;
   wasteWeight: string;
@@ -746,3 +754,17 @@ export interface IWasteStandaloneProps {
 }
 
 export type IWasteProps = IWasteFormProps | IWasteStandaloneProps;
+
+export interface ICalculatedWeightOnBOMProps {
+  isLoadingMaterials: boolean;
+  isLoadingProducts: boolean;
+  materialConsumptionPerString: number | null;
+  planAmount: string | number;
+}
+
+export interface IWasteTypeProps {
+  value: string;
+  onChange: (value: string) => void;
+  labelClassName?: string;
+  compact?: boolean;
+}

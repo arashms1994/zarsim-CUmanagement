@@ -2,6 +2,8 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Input } from "../ui/input";
 import { Spinner } from "../ui/spinner";
+import WasteType from "../waste/WasteType";
+import WasteWeight from "../waste/WasteWeight";
 import ReelSelector from "../reels/ReelSelector";
 import { useQueries } from "@tanstack/react-query";
 import { useProducts } from "../../hooks/useProducts";
@@ -10,7 +12,6 @@ import ProductsTable from "../products-table/ProductsTable";
 import StopReasonSelector from "../stops/StopReasonSelector";
 import ProductionActualAmount from "./ProductionActualAmount";
 import ProductionActualWeight from "./ProductionActualWeight";
-import Waste from "../waste/Waste";
 import { getProductMaterialPerStage } from "../../api/getData";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { IProductMaterialPerStage } from "../../types/type";
@@ -21,6 +22,7 @@ import { filterItemsByMinQuantity } from "../../lib/filterItemsByMinQuantity";
 import { submitCUManagement, submitCUManagementRow } from "../../api/addData";
 import { calculateProductionValues } from "../../lib/calculateProductionValues";
 import { prepareRowDataForSubmission } from "../../lib/prepareRowDataForSubmission";
+import CalculatedWeightOnBOM from "../calculated-weight-on-bom/CalculatedWeightOnBOM";
 import { useSubProductionPlanByNumbers } from "../../hooks/useSubProductionPlanByNumbers";
 import type {
   IProductionPlanRowFormProps,
@@ -416,28 +418,12 @@ export default function ProductionPlanRowForm({
             <span className="text-lg font-normal">{planItem.barnamerizi}</span>
           </div>
 
-          <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">
-            <label className="min-w-[150px] font-medium">
-              مقدار مصرف موادبراساس BOM (کیلوگرم):
-            </label>
-            {isLoadingMaterials ||
-              isLoadingProducts ||
-              materialConsumptionPerString === null ? (
-              <span className="text-purple-500 text-sm flex justify-start items-center">
-                <Spinner className="size-8 text-purple-500" />
-                در حال محاسبه...
-              </span>
-            ) : (
-              <span className="text-lg font-normal">
-                {materialConsumptionPerString !== null && planItem.barnamerizi
-                  ? (
-                    materialConsumptionPerString *
-                    parseFloat(planItem.barnamerizi.toString())
-                  ).toFixed(2)
-                  : "-"}
-              </span>
-            )}
-          </div>
+          <CalculatedWeightOnBOM
+            isLoadingMaterials={isLoadingMaterials}
+            isLoadingProducts={isLoadingProducts}
+            materialConsumptionPerString={materialConsumptionPerString}
+            planAmount={planItem.barnamerizi ?? ""}
+          />
 
           <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">
             <label className="min-w-[150px] font-medium">دستگاه:</label>
@@ -456,7 +442,25 @@ export default function ProductionPlanRowForm({
             materialConsumptionPerString={materialConsumptionPerString}
           />
 
-          <Waste control={control} />
+          <WasteType
+            value={wasteType || ""}
+            onChange={(value) =>
+              setValue("wasteType", value, {
+                shouldValidate: false,
+                shouldDirty: true,
+              })
+            }
+          />
+
+          <WasteWeight
+            value={wasteWeight || ""}
+            onChange={(value) =>
+              setValue("wasteWeight", value, {
+                shouldValidate: false,
+                shouldDirty: true,
+              })
+            }
+          />
 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">توضیحات:</label>
@@ -557,7 +561,7 @@ export default function ProductionPlanRowForm({
 
         <div
           onClick={handleSubmit}
-          className={`cursor-pointer font-medium flex justify-center items-center h-10 w-[200px] text-center mx-auto bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors duration-300 text-sm ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+          className={`cursor-pointer text-base font-normal flex justify-center items-center h-10 w-[200px] text-center mx-auto bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors duration-300 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
             }`}
         >
           {isSubmitting ? "در حال ثبت..." : "ثبت اطلاعات"}
