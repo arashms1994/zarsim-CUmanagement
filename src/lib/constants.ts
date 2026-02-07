@@ -43,3 +43,42 @@ export const REELS_LIST = [
     title: "1254",
   },
 ];
+
+export const WASTE_LIST = [
+  {
+    id: 1,
+    value: "مس خالص",
+  },
+  {
+    id: 2,
+    value: "مس روکشدار 30%",
+  },
+  {
+    id: 3,
+    value: "مس روکشدار 25%",
+  },
+  {
+    id: 4,
+    value: "pvc",
+  },
+  {
+    id: 5,
+    value: "فولاد",
+  },
+  {
+    id: 6,
+    value: "روکشدار فولاد",
+  },
+  {
+    id: 7,
+    value: "قلع اندود",
+  },
+  {
+    id: 8,
+    value: "pvc پوست کنده",
+  },
+  {
+    id: 9,
+    value: "xlpe",
+  },
+];

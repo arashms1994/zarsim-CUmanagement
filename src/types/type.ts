@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type DateObject from "react-date-object";
-import type { Controller } from "react-hook-form";
+import type { Control, Controller, UseFormSetValue } from "react-hook-form";
 
 export interface ITabPanelProps {
   index: number;
@@ -104,6 +104,8 @@ export interface ICUManagementFormProps {
   actualAmountProduction?: string;
   actualWeight?: string;
   stopTime?: string;
+  wasteType?: string;
+  wasteWeight?: string;
 }
 
 export interface IEnterFormInput {
@@ -413,7 +415,8 @@ export interface ICUManagementListItem {
   calculatedWeight: string;
   actualWeight: string;
   entranceWeight: string;
-  waste: string;
+  wasteWeight: string;
+  wasteType: string;
   product: string;
   productCode: string;
   description: string;
@@ -487,6 +490,8 @@ export interface ICUManagementSubmitData {
   deviceId: string;
   entranceWeight: string;
   waste: string;
+  wasteType?: string;
+  wasteWeight?: string;
   ordersTotalWeight: string;
   ordersTotalAmount: string;
 }
@@ -677,7 +682,8 @@ export interface ICUManagementReelsListItem {
   ID?: number;
   Title: string;
   reelNumber: string;
-  wasteCategory: string;
+  wasteType?: string;
+  wasteCategory?: string;
   productAmount: string;
   productWeight: string;
   wasteWeight: string;
@@ -727,3 +733,16 @@ export interface IReelsWeightProps {
   onWeightAndAmountChange: (weight: string, amount: string) => void;
   onReelChange: (field: "weight" | "amount", value: string) => void;
 }
+
+export interface IWasteFormProps {
+  control: Control;
+  setValue?: UseFormSetValue<{ wasteType?: string; wasteWeight?: string }>;
+}
+
+export interface IWasteStandaloneProps {
+  wasteType: string;
+  wasteWeight: string;
+  onWasteChange: (wasteType: string, wasteWeight: string) => void;
+}
+
+export type IWasteProps = IWasteFormProps | IWasteStandaloneProps;

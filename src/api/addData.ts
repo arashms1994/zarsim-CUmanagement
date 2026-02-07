@@ -82,6 +82,12 @@ export async function submitCUManagement(
     if (formData.waste) {
       payload.waste = String(formData.waste);
     }
+    if (formData.wasteType) {
+      payload.wasteType = String(formData.wasteType);
+    }
+    if (formData.wasteWeight) {
+      payload.wasteWeight = String(formData.wasteWeight);
+    }
 
     if (formData.shiftId && formData.shiftId !== "") {
       payload.shiftId = String(formData.shiftId);

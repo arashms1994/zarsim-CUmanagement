@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { Input } from "../ui/input";
 import ReelsAmount from "./ReelsAmount";
 import ReelsWeight from "./ReelsWeight";
+import Waste from "../waste/Waste";
 import { useQueryClient } from "@tanstack/react-query";
 import { SkeletonSearchSuggestion } from "../ui/Skeleton";
 import { useSearchReels } from "../../hooks/useSearchReels";
@@ -27,32 +28,9 @@ export default function ReelSelector({
   const [showReelSuggestions, setShowReelSuggestions] = useState<number | null>(
     null
   );
-  const [showWasteDropdown, setShowWasteDropdown] = useState<number | null>(
-    null
-  );
   const [editingReelIndex, setEditingReelIndex] = useState<number | null>(null);
-  const wasteDropdownRef = useRef<HTMLDivElement>(null);
   const originalReelSnapshotRef = useRef<IReelItem | null>(null);
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wasteDropdownRef.current &&
-        !wasteDropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowWasteDropdown(null);
-      }
-    };
-
-    if (showWasteDropdown !== null) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showWasteDropdown]);
 
   const {
     searchResults: reelResults,
@@ -91,6 +69,20 @@ export default function ReelSelector({
       [field]: value,
     };
 
+    onReelsChange(updatedReels);
+  };
+
+  const handleWasteChange = (
+    index: number,
+    wasteType: string,
+    wasteWeight: string
+  ) => {
+    const updatedReels = [...reels];
+    updatedReels[index] = {
+      ...updatedReels[index],
+      wasteCategory: wasteType,
+      wasteWeight: wasteWeight,
+    };
     onReelsChange(updatedReels);
   };
 
@@ -338,96 +330,26 @@ export default function ReelSelector({
               </>
             )}
 
-            {/* {label === "قرقره‌های خروجی:" && (
-            <>
-              <div
-                className="relative w-[200px]"
-                ref={index === 0 ? wasteDropdownRef : undefined}
-              >
-                <div
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowWasteDropdown(
-                      showWasteDropdown === index ? null : index
-                    );
-                  }}
-                  tabIndex={0}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white cursor-pointer hover:bg-gray-50 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#1e7677]"
-                >
-                  <span className={reel.wasteCategory ? "" : "text-gray-500"}>
-                    {reel.wasteCategory || "انتخاب نوع ضایعات..."}
-                  </span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      showWasteDropdown === index ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </div>
-                {showWasteDropdown === index && (
-                  <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    {wasteLoading ? (
-                      <div className="px-3 py-2 text-sm text-gray-500 flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#1e7677]"></div>
-                        در حال بارگذاری...
-                      </div>
-                    ) : wasteList.length > 0 ? (
-                      wasteList.map((waste) => (
-                        <div
-                          key={waste.ID}
-                          className={`px-3 py-2 text-sm cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                            reel.wasteCategoryId === waste.ID
-                              ? "bg-[#1e7677] text-white"
-                              : "hover:bg-gray-100"
-                          }`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-
-                            const updatedReels = [...reels];
-                            updatedReels[index] = {
-                              ...updatedReels[index],
-                              wasteCategory: waste.Title,
-                              wasteCategoryId: waste.ID,
-                            };
-                            onReelsChange(updatedReels);
-                            setShowWasteDropdown(null);
-                          }}
-                        >
-                          {waste.Title}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="px-3 py-2 text-sm text-gray-500">
-                        دسته‌بندی ضایعاتی یافت نشد
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div className="w-[200px]">
-                <Input
-                  value={reel.wasteWeight}
-                  placeholder="وزن ضایعات (کیلوگرم)..."
-                  type="string"
-                  className="w-full"
-                  onChange={(e) => {
-                    handleReelChange(index, "wasteWeight", e.target.value);
-                  }}
+            {label === "قرقره‌های خروجی:" && isReelEditable && (
+              <div className="flex items-center justify-start gap-2">
+                <Waste
+                  wasteType={reel.wasteCategory || ""}
+                  wasteWeight={reel.wasteWeight || ""}
+                  onWasteChange={(wasteType, weight) =>
+                    handleWasteChange(index, wasteType, weight)
+                  }
                 />
               </div>
-            </>
-          )} */}
+            )}
+            {label === "قرقره‌های خروجی:" && !isReelEditable && (
+              <div className="flex items-center justify-start gap-2 rounded-lg py-2 px-3">
+                <span className="text-sm text-gray-500">
+                  {reel.wasteCategory
+                    ? `${reel.wasteCategory}${reel.wasteWeight ? ` - ${reel.wasteWeight} kg` : ""}`
+                    : "-"}
+                </span>
+              </div>
+            )}
 
             <ReelsActionsComponent
               index={index}

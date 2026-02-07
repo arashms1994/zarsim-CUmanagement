@@ -10,6 +10,7 @@ import ProductsTable from "../products-table/ProductsTable";
 import StopReasonSelector from "../stops/StopReasonSelector";
 import ProductionActualAmount from "./ProductionActualAmount";
 import ProductionActualWeight from "./ProductionActualWeight";
+import Waste from "../waste/Waste";
 import { getProductMaterialPerStage } from "../../api/getData";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { IProductMaterialPerStage } from "../../types/type";
@@ -242,6 +243,14 @@ export default function ProductionPlanRowForm({
     control,
     name: "waste",
   });
+  const wasteType = useWatch({
+    control,
+    name: "wasteType",
+  });
+  const wasteWeight = useWatch({
+    control,
+    name: "wasteWeight",
+  });
 
   const actualWeight = useWatch({
     control,
@@ -320,6 +329,8 @@ export default function ProductionPlanRowForm({
         deviceId: "",
         entranceWeight: entranceWeight || "",
         waste: waste || "",
+        wasteType: wasteType || "",
+        wasteWeight: wasteWeight || "",
         ordersTotalWeight: ordersTotalWeight || "",
         ordersTotalAmount: ordersTotalAmount || "",
       };
@@ -445,24 +456,7 @@ export default function ProductionPlanRowForm({
             materialConsumptionPerString={materialConsumptionPerString}
           />
 
-          {/* 
-          <div className="flex items-center justify-start gap-2">
-            <label className="min-w-[150px] font-medium">
-              ضایعات (کیلوگرم):
-            </label>
-            <Controller
-              name="waste"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  type="string"
-                  placeholder="مثلاً 50"
-                  className="w-[250px]"
-                />
-              )}
-            />
-          </div> */}
+          <Waste control={control} />
 
           <div className="flex items-center justify-start gap-2">
             <label className="min-w-[150px] font-medium">توضیحات:</label>
