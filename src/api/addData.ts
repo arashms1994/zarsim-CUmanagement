@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
 import { BASE_URL } from "./base";
 import { config } from "./config";
+import { toast } from "react-toastify";
 import { getRequestDigest } from "./getDigest";
 import type {
   IStopListItem,
